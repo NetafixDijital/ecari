@@ -1,0 +1,12 @@
+{
+  "data": [
+    {"id": 1, "fatura_no": "SF-2026-0142", "cari": "ABC Teknoloji Ltd.", "tarih": "28.05.2026", "vade": "28.06.2026", "tutar": "4250.00", "durum": "odendi", "preview_url": "fatura-onizleme.html"},
+    {"id": 2, "fatura_no": "SF-2026-0141", "cari": "XYZ Ticaret A.Ş.", "tarih": "27.05.2026", "vade": "27.06.2026", "tutar": "12800.00", "durum": "bekliyor", "preview_url": "fatura-onizleme.html"},
+    {"id": 3, "fatura_no": "SF-2026-0140", "cari": "Mehmet Yılmaz", "tarih": "25.05.2026", "vade": "25.05.2026", "tutar": "850.00", "durum": "vadesi_gecmis", "preview_url": "fatura-onizleme.html"},
+    {"id": 4, "fatura_no": "SF-2026-0138", "cari": "Demir Sanayi Ltd.", "tarih": "24.05.2026", "vade": "24.06.2026", "tutar": "6320.00", "durum": "kismi", "preview_url": "fatura-onizleme.html"},
+    {"id": 5, "fatura_no": "SF-2026-0135", "cari": "Yılmaz Gıda", "tarih": "22.05.2026", "vade": "22.06.2026", "tutar": "2140.00", "durum": "odendi", "preview_url": "fatura-onizleme.html"},
+    {"id": 6, "fatura_no": "SF-2026-0132", "cari": "Kaya İnşaat", "tarih": "20.05.2026", "vade": "20.05.2026", "tutar": "9800.00", "durum": "vadesi_gecmis", "preview_url": "fatura-onizleme.html"},
+    {"id": 7, "fatura_no": "SF-2026-0129", "cari": "Anadolu Ltd.", "tarih": "18.05.2026", "vade": "18.06.2026", "tutar": "1560.00", "durum": "bekliyor", "preview_url": "fatura-onizleme.html"},
+    {"id": 8, "fatura_no": "SF-2026-0124", "cari": "Perakende Müşteri", "tarih": "15.05.2026", "vade": "15.06.2026", "tutar": "740.00", "durum": "odendi", "preview_url": "fatura-onizleme.html"}
+  ]
+}

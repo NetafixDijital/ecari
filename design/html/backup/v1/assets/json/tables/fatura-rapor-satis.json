@@ -1,0 +1,10 @@
+{
+  "data": [
+    {"id": 1, "cari": "ABC Teknoloji Ltd.", "fatura_no": "SF-2026-0142", "tarih": "28.05.2026", "tutar": "4250.00", "kdv": "708.33", "durum": "odendi"},
+    {"id": 2, "cari": "XYZ Ticaret A.Ş.", "fatura_no": "SF-2026-0141", "tarih": "27.05.2026", "tutar": "12800.00", "kdv": "2133.33", "durum": "bekliyor"},
+    {"id": 3, "cari": "Demir Sanayi Ltd.", "fatura_no": "SF-2026-0138", "tarih": "24.05.2026", "tutar": "6320.00", "kdv": "1053.33", "durum": "kismi"},
+    {"id": 4, "cari": "Yılmaz Gıda", "fatura_no": "SF-2026-0135", "tarih": "22.05.2026", "tutar": "2140.00", "kdv": "356.67", "durum": "odendi"},
+    {"id": 5, "cari": "Kaya İnşaat", "fatura_no": "SF-2026-0132", "tarih": "20.05.2026", "tutar": "9800.00", "kdv": "1633.33", "durum": "vadesi_gecmis"},
+    {"id": 6, "cari": "Anadolu Ltd.", "fatura_no": "SF-2026-0129", "tarih": "18.05.2026", "tutar": "1560.00", "kdv": "260.00", "durum": "bekliyor"}
+  ]
+}

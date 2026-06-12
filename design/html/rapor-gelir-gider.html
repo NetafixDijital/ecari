@@ -1,0 +1,250 @@
+﻿<!doctype html>
+<html lang="tr" data-bs-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#5955D1">
+  <title>Gelir - Gider Raporu | e-Cari - Ön Muhasebe</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="assets/css/nexlink/app.css">
+</head>
+<body>
+  <div class="page-layout">
+    <div id="nl-sidebar-host"></div>
+    <div class="layout-overlay"></div>
+    <div id="nl-header-host"></div>
+    <main class="app-wrapper">
+      <div class="container-fluid">
+        <div class="app-page-head d-flex align-items-center justify-content-between flex-wrap gap-2">
+          <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-0">
+              <li class="breadcrumb-item"><a href="index.html"><i class="ti ti-smart-home me-1"></i> Ana Sayfa</a></li>
+              <li class="breadcrumb-item"><a href="javascript:void(0)">Raporlar</a></li>
+              <li class="breadcrumb-item active">Gelir - Gider</li>
+            </ol>
+          </nav>
+          <div class="d-flex flex-wrap gap-2 align-items-center">
+            <ul class="nav nav-pills nav-pills-custom nav-fill p-1 rounded-5">
+              <li class="nav-item"><button class="nav-link rounded-5" type="button">Bu Hafta</button></li>
+              <li class="nav-item"><button class="nav-link active rounded-5" type="button">Bu Ay</button></li>
+              <li class="nav-item"><button class="nav-link rounded-5" type="button">Bu Yıl</button></li>
+            </ul>
+            <button type="button" class="btn btn-sm btn-light"><i class="ti ti-download me-1"></i> Excel</button>
+            <button type="button" class="btn btn-sm btn-primary"><i class="ti ti-printer me-1"></i> Yazdır</button>
+          </div>
+        </div>
+
+        <!-- KPI -->
+        <div class="row g-3">
+          <div class="col-xxl-3 col-sm-6">
+            <div class="card finance-stat-card h-100">
+              <div class="card-body">
+                <div class="avatar bg-success-subtle text-success"><i class="ti ti-coins"></i></div>
+                <div><span class="stat-label">Toplam Gelir</span><h2 class="amount fw-bold mb-0">₺186.420</h2></div>
+              </div>
+            </div>
+          </div>
+          <div class="col-xxl-3 col-sm-6">
+            <div class="card finance-stat-card h-100">
+              <div class="card-body">
+                <div class="avatar bg-danger-subtle text-danger"><i class="ti ti-credit-card"></i></div>
+                <div><span class="stat-label">Toplam Gider</span><h2 class="amount fw-bold mb-0">₺84.320</h2></div>
+              </div>
+            </div>
+          </div>
+          <div class="col-xxl-3 col-sm-6">
+            <div class="card finance-stat-card h-100">
+              <div class="card-body">
+                <div class="avatar bg-info-subtle text-info"><i class="ti ti-chart-histogram"></i></div>
+                <div><span class="stat-label">Net Fark</span><h2 class="amount fw-bold mb-0">₺102.100</h2></div>
+              </div>
+            </div>
+          </div>
+          <div class="col-xxl-3 col-sm-6">
+            <div class="card finance-stat-card h-100">
+              <div class="card-body">
+                <div class="avatar bg-warning-subtle text-warning"><i class="ti ti-list-numbers"></i></div>
+                <div><span class="stat-label">İşlem Adedi</span><h2 class="fw-bold mb-0">248</h2></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Grafikler -->
+        <div class="row g-3 mt-0">
+          <div class="col-xxl-6">
+            <div class="card finance-chart-card h-100">
+              <div class="card-header d-flex flex-wrap align-items-center justify-content-between border-0 pb-0">
+                <h6 class="mb-0">Aylık Gelir vs Gider</h6>
+                <ul class="nav nav-pills nav-pills-custom nav-fill p-1 rounded-5">
+                  <li class="nav-item"><button class="nav-link rounded-5" type="button">6 Ay</button></li>
+                  <li class="nav-item"><button class="nav-link active rounded-5" type="button">12 Ay</button></li>
+                </ul>
+              </div>
+              <div class="card-body pt-2">
+                <div class="d-flex flex-wrap gap-3 text-1xs mb-1">
+                  <span><i class="ti ti-square-filled text-primary me-1"></i> Gelir</span>
+                  <span><i class="ti ti-square-filled text-primary opacity-50 me-1"></i> Gider</span>
+                </div>
+                <div class="finance-chart-bars" aria-hidden="true">
+                  <span style="height:62%"></span><span class="bar-alt" style="height:35%"></span>
+                  <span style="height:70%"></span><span class="bar-alt" style="height:40%"></span>
+                  <span style="height:58%"></span><span class="bar-alt" style="height:38%"></span>
+                  <span style="height:75%"></span><span class="bar-alt" style="height:44%"></span>
+                  <span style="height:68%"></span><span class="bar-alt" style="height:41%"></span>
+                  <span style="height:82%"></span><span class="bar-alt" style="height:46%"></span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-xxl-3 col-lg-6">
+            <div class="card h-100">
+              <div class="card-header border-0 pb-0">
+                <h6 class="card-title mb-0">Gelir Kaynakları</h6>
+              </div>
+              <div class="card-body pt-2 text-center">
+                <div class="finance-donut-wrap">
+                  <div class="chart-donut" style="background:conic-gradient(#28c76f 0 52%, rgba(40,199,111,0.45) 52% 78%, rgba(40,199,111,0.25) 78% 92%, rgba(40,199,111,0.12) 92% 100%);"></div>
+                  <div class="finance-donut-center">₺186K</div>
+                </div>
+                <div class="text-start">
+                  <div class="finance-legend-item"><span><span class="dot" style="background:#28c76f"></span>Satış Faturaları</span><strong>52%</strong></div>
+                  <div class="finance-legend-item"><span><span class="dot" style="background:rgba(40,199,111,0.65)"></span>Tahsilatlar</span><strong>26%</strong></div>
+                  <div class="finance-legend-item"><span><span class="dot" style="background:rgba(40,199,111,0.4)"></span>Hizmet Geliri</span><strong>14%</strong></div>
+                  <div class="finance-legend-item"><span><span class="dot" style="background:rgba(40,199,111,0.2)"></span>Diğer</span><strong>8%</strong></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-xxl-3 col-lg-6">
+            <div class="card h-100">
+              <div class="card-header border-0 pb-0">
+                <h6 class="card-title mb-0">Gider Dağılımı</h6>
+              </div>
+              <div class="card-body pt-2 text-center">
+                <div class="finance-donut-wrap">
+                  <div class="chart-donut"></div>
+                  <div class="finance-donut-center">₺84K</div>
+                </div>
+                <div class="finance-legend-nl text-start">
+                  <div class="finance-legend-nl-item"><i class="ti ti-square-filled text-primary text-opacity-10 me-1"></i>Alış Faturaları<strong class="ms-auto">38%</strong></div>
+                  <div class="finance-legend-nl-item"><i class="ti ti-square-filled text-primary text-opacity-25 me-1"></i>Personel &amp; Maaş<strong class="ms-auto">28%</strong></div>
+                  <div class="finance-legend-nl-item"><i class="ti ti-square-filled text-primary text-opacity-50 me-1"></i>Operasyon<strong class="ms-auto">22%</strong></div>
+                  <div class="finance-legend-nl-item"><i class="ti ti-square-filled text-primary text-opacity-75 me-1"></i>Diğer<strong class="ms-auto">12%</strong></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tablo + özet -->
+        <div class="row g-3 mt-0">
+          <div class="col-xxl-8">
+            <div class="card finance-table-card datatables-toolbar-hidden h-100">
+              <div class="card-header d-flex align-items-center justify-content-between border-0 pb-2">
+                <h6 class="card-title mb-0">Gelir / Gider İşlemleri</h6>
+                <a href="fatura-satis.html" class="btn btn-sm btn-light">Fatura Listesi</a>
+              </div>
+              <div class="table-responsive">
+                <table class="table table-hover datatables-ajax mb-0" data-table="dashboard-islemler" data-search-placeholder="İşlem ara..." data-page-length="10">
+                  <thead>
+                    <tr>
+                      <th>Cari</th>
+                      <th>Tarih</th>
+                      <th>Açıklama</th>
+                      <th>Kategori</th>
+                      <th class="text-end">Tutar</th>
+                      <th>Durum</th>
+                    </tr>
+                  </thead>
+                  <tbody></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-xxl-4">
+            <div class="row g-3">
+              <div class="col-12">
+                <div class="card finance-target-card">
+                  <div class="card-header pb-0 border-0">
+                    <h6 class="card-title mb-0 text-white">Dönem Özeti — Haziran 2026</h6>
+                  </div>
+                  <div class="card-body pt-2 pb-0">
+                    <div class="d-flex gap-2 align-items-center">
+                      <h2 class="mb-0 text-white">₺102.100</h2>
+                      <span class="text-white text-1xs">Net fark</span>
+                    </div>
+                    <div class="finance-target-visual">
+                      <div class="finance-target-ring" aria-hidden="true"></div>
+                      <div class="finance-target-mid text-white">248 işlem</div>
+                    </div>
+                    <div class="text-center px-2">
+                      <p class="text-white mb-0 text-1xs">Ortalama günlük net <strong class="text-warning">₺3.403</strong></p>
+                    </div>
+                  </div>
+                  <div class="card-footer border-0 pt-3 pb-3">
+                    <div class="finance-target-footer bg-body py-3 px-3 rounded-3 d-flex">
+                      <div class="text-center flex-fill py-1">
+                        <h4 class="mb-0">₺186K</h4>
+                        <span class="text-primary text-2xs fw-semibold d-block">Gelir</span>
+                      </div>
+                      <div class="vr opacity-50"></div>
+                      <div class="text-center flex-fill py-1">
+                        <h4 class="mb-0">₺84K</h4>
+                        <span class="text-primary text-2xs fw-semibold d-block">Gider</span>
+                      </div>
+                      <div class="vr opacity-50"></div>
+                      <div class="text-center flex-fill py-1">
+                        <h4 class="mb-0">%55</h4>
+                        <span class="text-primary text-2xs fw-semibold d-block">Marj</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-12">
+                <div class="card finance-side-card mb-0">
+                  <div class="card-header border-0 pb-0">
+                    <h6 class="card-title mb-0">Kategori Dağılımı</h6>
+                  </div>
+                  <div class="card-body pt-2">
+                    <div class="mb-2">
+                      <div class="d-flex justify-content-between text-1xs mb-1"><span>Satış Geliri</span><strong class="amount">₺96.940</strong></div>
+                      <div class="progress progress-sm"><div class="progress-bar bg-success" style="width:52%"></div></div>
+                    </div>
+                    <div class="mb-2">
+                      <div class="d-flex justify-content-between text-1xs mb-1"><span>Tahsilat</span><strong class="amount">₺48.470</strong></div>
+                      <div class="progress progress-sm"><div class="progress-bar" style="width:26%"></div></div>
+                    </div>
+                    <div class="mb-2">
+                      <div class="d-flex justify-content-between text-1xs mb-1"><span>Alış Gideri</span><strong class="amount">₺32.042</strong></div>
+                      <div class="progress progress-sm"><div class="progress-bar bg-danger" style="width:38%"></div></div>
+                    </div>
+                    <div class="mb-2">
+                      <div class="d-flex justify-content-between text-1xs mb-1"><span>Personel</span><strong class="amount">₺23.610</strong></div>
+                      <div class="progress progress-sm"><div class="progress-bar bg-warning" style="width:28%"></div></div>
+                    </div>
+                    <div>
+                      <div class="d-flex justify-content-between text-1xs mb-1"><span>Operasyon</span><strong class="amount">₺18.550</strong></div>
+                      <div class="progress progress-sm"><div class="progress-bar bg-info" style="width:22%"></div></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="nl-footer-host"></div>
+      </div>
+    </main>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="assets/js/nexlink/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,773 @@
+<!doctype html>
+<html lang="tr" class="layout-navbar-fixed layout-menu-fixed layout-compact" dir="ltr" data-bs-theme="light" data-skin="default" data-template="vertical-menu-template">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Dashboard | e-Cari - Ön Muhasebe</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="assets/css/swiper.css">
+  <link rel="stylesheet" href="assets/css/apex-charts.css">
+  <link rel="stylesheet" href="assets/css/pages/cards-advance.css">
+  <link rel="stylesheet" href="assets/css/pages/dashboard-shortcuts.css">
+  <link rel="stylesheet" href="assets/css/app.css">
+  <script src="assets/js/helpers.js"></script>
+</head>
+<body>
+  <div class="layout-wrapper layout-content-navbar">
+    <div class="layout-container">
+      <div id="app-sidebar"></div>
+      <div class="layout-page">
+        <div id="app-navbar"></div>
+        <div class="content-wrapper">
+          <div class="container-xxl flex-grow-1 container-p-y">
+            <div id="dashboardShortcuts"></div>
+            <div class="row g-6">
+              <!-- Finans Özeti / Swiper -->
+              <div class="col-xl-6 col">
+                <div class="swiper-container swiper-container-horizontal swiper swiper-card-advance-bg" id="swiper-with-pagination-cards">
+                  <div class="swiper-wrapper">
+                    <div class="swiper-slide">
+                      <div class="row">
+                        <div class="col-12">
+                          <h5 class="text-white mb-0">Cari Özeti</h5>
+                          <small>Bu ay %18,2 büyüme</small>
+                        </div>
+                        <div class="row">
+                          <div class="col-lg-7 col-md-9 col-12 order-2 order-md-1 pt-md-9">
+                            <h6 class="text-white mt-0 mt-md-3 mb-4">Finans Özeti</h6>
+                            <div class="row">
+                              <div class="col-6">
+                                <ul class="list-unstyled mb-0">
+                                  <li class="d-flex mb-4 align-items-center">
+                                    <p class="mb-0 fw-medium me-2 website-analytics-text-bg">₺245.800</p>
+                                    <p class="mb-0">Alacak</p>
+                                  </li>
+                                  <li class="d-flex align-items-center">
+                                    <p class="mb-0 fw-medium me-2 website-analytics-text-bg">₺98.400</p>
+                                    <p class="mb-0">Borç</p>
+                                  </li>
+                                </ul>
+                              </div>
+                              <div class="col-6">
+                                <ul class="list-unstyled mb-0">
+                                  <li class="d-flex mb-4 align-items-center">
+                                    <p class="mb-0 fw-medium me-2 website-analytics-text-bg">186</p>
+                                    <p class="mb-0">Aktif cari</p>
+                                  </li>
+                                  <li class="d-flex align-items-center">
+                                    <p class="mb-0 fw-medium me-2 website-analytics-text-bg">12</p>
+                                    <p class="mb-0">Vadesi geçen</p>
+                                  </li>
+                                </ul>
+                              </div>
+                            </div>
+                          </div>
+                          <div class="col-lg-5 col-md-3 col-12 order-1 order-md-2 my-4 my-md-0 text-center">
+                            <img src="assets/img/illustrations/card-website-analytics-1.png" alt="Cari Özeti" height="150" class="card-website-analytics-img" />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="swiper-slide">
+                      <div class="row">
+                        <div class="col-12">
+                          <h5 class="text-white mb-0">Kasa Özeti</h5>
+                          <small>Bu ay %18,2 büyüme</small>
+                        </div>
+                        <div class="col-lg-7 col-md-9 col-12 order-2 order-md-1 pt-md-9">
+                          <h6 class="text-white mt-0 mt-md-3 mb-4">Finans Özeti</h6>
+                          <div class="row">
+                            <div class="col-6">
+                              <ul class="list-unstyled mb-0">
+                                <li class="d-flex mb-4 align-items-center">
+                                  <p class="mb-0 fw-medium me-2 website-analytics-text-bg">₺8.200</p>
+                                  <p class="mb-0">Giriş</p>
+                                </li>
+                                <li class="d-flex align-items-center">
+                                  <p class="mb-0 fw-medium me-2 website-analytics-text-bg">₺2.150</p>
+                                  <p class="mb-0">Çıkış</p>
+                                </li>
+                              </ul>
+                            </div>
+                            <div class="col-6">
+                              <ul class="list-unstyled mb-0">
+                                <li class="d-flex mb-4 align-items-center">
+                                  <p class="mb-0 fw-medium me-2 website-analytics-text-bg">₺34.560</p>
+                                  <p class="mb-0">Bakiye</p>
+                                </li>
+                                <li class="d-flex align-items-center">
+                                  <p class="mb-0 fw-medium me-2 website-analytics-text-bg">24</p>
+                                  <p class="mb-0">İşlem</p>
+                                </li>
+                              </ul>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="col-lg-5 col-md-3 col-12 order-1 order-md-2 my-4 my-md-0 text-center">
+                          <img src="assets/img/illustrations/card-website-analytics-2.png" alt="Kasa Özeti" height="150" class="card-website-analytics-img" />
+                        </div>
+                      </div>
+                    </div>
+                    <div class="swiper-slide">
+                      <div class="row">
+                        <div class="col-12">
+                          <h5 class="text-white mb-0">Fatura Özeti</h5>
+                          <small>Bu ay %18,2 büyüme</small>
+                        </div>
+                        <div class="col-lg-7 col-md-9 col-12 order-2 order-md-1 pt-md-9">
+                          <h6 class="text-white mt-0 mt-md-3 mb-4">Finans Özeti</h6>
+                          <div class="row">
+                            <div class="col-6">
+                              <ul class="list-unstyled mb-0">
+                                <li class="d-flex mb-4 align-items-center">
+                                  <p class="mb-0 fw-medium me-2 website-analytics-text-bg">124</p>
+                                  <p class="mb-0">Kesilen</p>
+                                </li>
+                                <li class="d-flex align-items-center">
+                                  <p class="mb-0 fw-medium me-2 website-analytics-text-bg">₺128.450</p>
+                                  <p class="mb-0">Tutar</p>
+                                </li>
+                              </ul>
+                            </div>
+                            <div class="col-6">
+                              <ul class="list-unstyled mb-0">
+                                <li class="d-flex mb-4 align-items-center">
+                                  <p class="mb-0 fw-medium me-2 website-analytics-text-bg">₺18.450</p>
+                                  <p class="mb-0">Bekleyen</p>
+                                </li>
+                                <li class="d-flex align-items-center">
+                                  <p class="mb-0 fw-medium me-2 website-analytics-text-bg">%72</p>
+                                  <p class="mb-0">Tahsil</p>
+                                </li>
+                              </ul>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="col-lg-5 col-md-3 col-12 order-1 order-md-2 my-4 my-md-0 text-center">
+                          <img src="assets/img/illustrations/card-website-analytics-3.png" alt="Fatura Özeti" height="150" class="card-website-analytics-img" />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="swiper-pagination"></div>
+                </div>
+              </div>
+              <!-- / Finans Özeti -->
+
+              <!-- Günlük Ortalama Satış -->
+              <div class="col-xl-3 col-sm-6">
+                <div class="card h-100">
+                  <div class="card-header pb-0">
+                    <h5 class="mb-3 card-title">Günlük Ortalama Satış</h5>
+                    <p class="mb-0 text-body">Hızlı Satış — Bu Ay Toplam</p>
+                    <h4 class="mb-0">₺128.450</h4>
+                  </div>
+                  <div class="card-body px-0">
+                    <div id="averageDailySales"></div>
+                  </div>
+                </div>
+              </div>
+              <!-- / Günlük Ortalama Satış -->
+
+              <!-- Satış Özeti -->
+              <div class="col-xl-3 col-sm-6">
+                <div class="card h-100">
+                  <div class="card-header">
+                    <div class="d-flex justify-content-between">
+                      <p class="mb-0 text-body">Satış Özeti</p>
+                      <p class="card-text fw-medium text-success">+18,2%</p>
+                    </div>
+                    <h4 class="card-title mb-1">₺42,5k</h4>
+                    <p class="mb-0 text-body-secondary small">Fatura modülü</p>
+                  </div>
+                  <div class="card-body">
+                    <div class="row">
+                      <div class="col-4">
+                        <div class="d-flex gap-2 align-items-center mb-2">
+                          <span class="badge bg-label-info p-1 rounded"><i class="ti ti-shopping-cart icon-sm"></i></span>
+                          <p class="mb-0">Sipariş</p>
+                        </div>
+                        <h5 class="mb-0 pt-1">62,2%</h5>
+                        <small class="text-body-secondary">6.440</small>
+                      </div>
+                      <div class="col-4">
+                        <div class="divider divider-vertical">
+                          <div class="divider-text">
+                            <span class="badge-divider-bg bg-label-secondary">VS</span>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col-4 text-end">
+                        <div class="d-flex gap-2 justify-content-end align-items-center mb-2">
+                          <p class="mb-0">Tahsilat</p>
+                          <span class="badge bg-label-primary p-1 rounded"><i class="ti ti-cash icon-sm"></i></span>
+                        </div>
+                        <h5 class="mb-0 pt-1">25,5%</h5>
+                        <small class="text-body-secondary">12.749</small>
+                      </div>
+                    </div>
+                    <div class="d-flex align-items-center mt-6">
+                      <div class="progress w-100" style="height: 10px;">
+                        <div class="progress-bar bg-info" style="width: 70%" role="progressbar" aria-valuenow="70" aria-valuemin="0" aria-valuemax="100"></div>
+                        <div class="progress-bar bg-primary" role="progressbar" style="width: 30%" aria-valuenow="30" aria-valuemin="0" aria-valuemax="100"></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!-- / Satış Özeti -->
+
+              <!-- Kazanç Raporu -->
+              <div class="col-md-6">
+                <div class="card h-100">
+                  <div class="card-header pb-0 d-flex justify-content-between">
+                    <div class="card-title mb-0">
+                      <h5 class="mb-1">Kazanç Raporu</h5>
+                      <p class="card-subtitle">Haftalık kasa özeti</p>
+                    </div>
+                    <div class="dropdown">
+                      <button class="btn btn-text-secondary rounded-pill text-body-secondary border-0 p-2 me-n1" type="button" id="earningReportsId" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <i class="ti ti-dots-vertical icon-md text-body-secondary"></i>
+                      </button>
+                      <div class="dropdown-menu dropdown-menu-end" aria-labelledby="earningReportsId">
+                        <a class="dropdown-item" href="javascript:void(0);">Tümünü gör</a>
+                        <a class="dropdown-item" href="javascript:void(0);">Yenile</a>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="card-body">
+                    <div class="row align-items-center g-md-8">
+                      <div class="col-12 col-md-5 d-flex flex-column">
+                        <div class="d-flex gap-2 align-items-center mb-3 flex-wrap">
+                          <h2 class="mb-0">₺468</h2>
+                          <div class="badge rounded bg-label-success">+4,2%</div>
+                        </div>
+                        <small class="text-body">Geçen haftaya göre bu haftanın özeti</small>
+                      </div>
+                      <div class="col-12 col-md-7 ps-xl-8">
+                        <div id="weeklyEarningReports"></div>
+                      </div>
+                    </div>
+                    <div class="border rounded p-5 mt-5">
+                      <div class="row gap-4 gap-sm-0">
+                        <div class="col-12 col-sm-4">
+                          <div class="d-flex gap-2 align-items-center">
+                            <div class="badge rounded bg-label-primary p-1"><i class="ti ti-currency-lira icon-18px"></i></div>
+                            <h6 class="mb-0 fw-normal">Gelir</h6>
+                          </div>
+                          <h4 class="my-2">₺545,69</h4>
+                          <div class="progress w-75" style="height:4px">
+                            <div class="progress-bar" role="progressbar" style="width: 65%" aria-valuenow="65" aria-valuemin="0" aria-valuemax="100"></div>
+                          </div>
+                        </div>
+                        <div class="col-12 col-sm-4">
+                          <div class="d-flex gap-2 align-items-center">
+                            <div class="badge rounded bg-label-info p-1"><i class="ti ti-chart-pie-2 icon-18px"></i></div>
+                            <h6 class="mb-0 fw-normal">Kâr</h6>
+                          </div>
+                          <h4 class="my-2">₺256,34</h4>
+                          <div class="progress w-75" style="height:4px">
+                            <div class="progress-bar bg-info" role="progressbar" style="width: 50%" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"></div>
+                          </div>
+                        </div>
+                        <div class="col-12 col-sm-4">
+                          <div class="d-flex gap-2 align-items-center">
+                            <div class="badge rounded bg-label-danger p-1"><i class="ti ti-arrow-down icon-18px"></i></div>
+                            <h6 class="mb-0 fw-normal">Gider</h6>
+                          </div>
+                          <h4 class="my-2">₺74,19</h4>
+                          <div class="progress w-75" style="height:4px">
+                            <div class="progress-bar bg-danger" role="progressbar" style="width: 65%" aria-valuenow="65" aria-valuemin="0" aria-valuemax="100"></div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!-- / Kazanç Raporu -->
+
+              <!-- Tahsilat Takibi -->
+              <div class="col-12 col-md-6">
+                <div class="card h-100">
+                  <div class="card-header d-flex justify-content-between">
+                    <div class="card-title mb-0">
+                      <h5 class="mb-1">Tahsilat Takibi</h5>
+                      <p class="card-subtitle">Son 7 gün</p>
+                    </div>
+                    <div class="dropdown">
+                      <button class="btn btn-text-secondary rounded-pill text-body-secondary border-0 p-2 me-n1" type="button" id="supportTrackerMenu" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <i class="ti ti-dots-vertical icon-md text-body-secondary"></i>
+                      </button>
+                      <div class="dropdown-menu dropdown-menu-end" aria-labelledby="supportTrackerMenu">
+                        <a class="dropdown-item" href="javascript:void(0);">Tümünü gör</a>
+                        <a class="dropdown-item" href="javascript:void(0);">Yenile</a>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="card-body row">
+                    <div class="col-12 col-sm-4">
+                      <div class="mt-lg-4 mt-lg-2 mb-lg-6 mb-2">
+                        <h2 class="mb-0">₺164k</h2>
+                        <p class="mb-0">Toplam tahsilat</p>
+                      </div>
+                      <ul class="p-0 m-0">
+                        <li class="d-flex gap-4 align-items-center mb-lg-3 pb-1">
+                          <div class="badge rounded bg-label-primary p-1_5"><i class="ti ti-cash icon-md"></i></div>
+                          <div>
+                            <h6 class="mb-0 text-nowrap">Yeni tahsilat</h6>
+                            <small class="text-body-secondary">142</small>
+                          </div>
+                        </li>
+                        <li class="d-flex gap-4 align-items-center mb-lg-3 pb-1">
+                          <div class="badge rounded bg-label-info p-1_5"><i class="ti ti-circle-check icon-md"></i></div>
+                          <div>
+                            <h6 class="mb-0 text-nowrap">Bekleyen</h6>
+                            <small class="text-body-secondary">28</small>
+                          </div>
+                        </li>
+                        <li class="d-flex gap-4 align-items-center pb-1">
+                          <div class="badge rounded bg-label-warning p-1_5"><i class="ti ti-clock icon-md"></i></div>
+                          <div>
+                            <h6 class="mb-0 text-nowrap">Ortalama süre</h6>
+                            <small class="text-body-secondary">1 gün</small>
+                          </div>
+                        </li>
+                      </ul>
+                    </div>
+                    <div class="col-12 col-md-8">
+                      <div id="supportTracker"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!-- / Tahsilat Takibi -->
+
+              <!-- Bölgesel Satışlar -->
+              <div class="col-xxl-4 col-md-6 order-1 order-xl-0">
+                <div class="card h-100">
+                  <div class="card-header d-flex justify-content-between">
+                    <div class="card-title mb-0">
+                      <h5 class="mb-1">Bölgesel Satışlar</h5>
+                      <p class="card-subtitle">Sipariş — Aylık özet</p>
+                    </div>
+                    <div class="dropdown">
+                      <button class="btn btn-text-secondary btn-icon rounded-pill text-body-secondary border-0 me-n1" type="button" id="salesByCountry" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <i class="ti ti-dots-vertical icon-22px text-body-secondary"></i>
+                      </button>
+                      <div class="dropdown-menu dropdown-menu-end" aria-labelledby="salesByCountry">
+                        <a class="dropdown-item" href="javascript:void(0);">Tümünü gör</a>
+                        <a class="dropdown-item" href="javascript:void(0);">Yenile</a>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="card-body">
+                    <ul class="p-0 m-0">
+                      <li class="d-flex align-items-center mb-4">
+                        <div class="avatar flex-shrink-0 me-4">
+                          <span class="avatar-initial rounded-circle bg-label-primary">İS</span>
+                        </div>
+                        <div class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2">
+                          <div class="me-2">
+                            <div class="d-flex align-items-center">
+                              <h6 class="mb-0 me-1">₺856.700</h6>
+                            </div>
+                            <small class="text-body">İstanbul</small>
+                          </div>
+                          <div class="user-progress">
+                            <p class="text-success fw-medium mb-0 d-flex align-items-center gap-1">
+                              <i class="ti ti-chevron-up"></i>
+                              25,8%
+                            </p>
+                          </div>
+                        </div>
+                      </li>
+                      <li class="d-flex align-items-center mb-4">
+                        <div class="avatar flex-shrink-0 me-4">
+                          <span class="avatar-initial rounded-circle bg-label-info">AN</span>
+                        </div>
+                        <div class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2">
+                          <div class="me-2">
+                            <div class="d-flex align-items-center">
+                              <h6 class="mb-0 me-1">₺241.500</h6>
+                            </div>
+                            <small class="text-body">Ankara</small>
+                          </div>
+                          <div class="user-progress">
+                            <p class="text-danger fw-medium mb-0 d-flex align-items-center gap-1">
+                              <i class="ti ti-chevron-down"></i>
+                              6,2%
+                            </p>
+                          </div>
+                        </div>
+                      </li>
+                      <li class="d-flex align-items-center mb-4">
+                        <div class="avatar flex-shrink-0 me-4">
+                          <span class="avatar-initial rounded-circle bg-label-success">İZ</span>
+                        </div>
+                        <div class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2">
+                          <div class="me-2">
+                            <div class="d-flex align-items-center">
+                              <h6 class="mb-0 me-1">₺186.500</h6>
+                            </div>
+                            <small class="text-body">İzmir</small>
+                          </div>
+                          <div class="user-progress">
+                            <p class="text-success fw-medium mb-0 d-flex align-items-center gap-1">
+                              <i class="ti ti-chevron-up"></i>
+                              12,4%
+                            </p>
+                          </div>
+                        </div>
+                      </li>
+                      <li class="d-flex align-items-center mb-4">
+                        <div class="avatar flex-shrink-0 me-4">
+                          <span class="avatar-initial rounded-circle bg-label-warning">BU</span>
+                        </div>
+                        <div class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2">
+                          <div class="me-2">
+                            <div class="d-flex align-items-center">
+                              <h6 class="mb-0 me-1">₺74.500</h6>
+                            </div>
+                            <small class="text-body">Bursa</small>
+                          </div>
+                          <div class="user-progress">
+                            <p class="text-danger fw-medium mb-0 d-flex align-items-center gap-1">
+                              <i class="ti ti-chevron-down"></i>
+                              11,9%
+                            </p>
+                          </div>
+                        </div>
+                      </li>
+                      <li class="d-flex align-items-center mb-4">
+                        <div class="avatar flex-shrink-0 me-4">
+                          <span class="avatar-initial rounded-circle bg-label-danger">AT</span>
+                        </div>
+                        <div class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2">
+                          <div class="me-2">
+                            <div class="d-flex align-items-center">
+                              <h6 class="mb-0 me-1">₺45.200</h6>
+                            </div>
+                            <small class="text-body">Antalya</small>
+                          </div>
+                          <div class="user-progress">
+                            <p class="text-success fw-medium mb-0 d-flex align-items-center gap-1">
+                              <i class="ti ti-chevron-up"></i>
+                              16,2%
+                            </p>
+                          </div>
+                        </div>
+                      </li>
+                      <li class="d-flex align-items-center">
+                        <div class="avatar flex-shrink-0 me-4">
+                          <span class="avatar-initial rounded-circle bg-label-secondary">AD</span>
+                        </div>
+                        <div class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2">
+                          <div class="me-2">
+                            <div class="d-flex align-items-center">
+                              <h6 class="mb-0 me-1">₺32.800</h6>
+                            </div>
+                            <small class="text-body">Adana</small>
+                          </div>
+                          <div class="user-progress">
+                            <p class="text-success fw-medium mb-0 d-flex align-items-center gap-1">
+                              <i class="ti ti-chevron-up"></i>
+                              14,8%
+                            </p>
+                          </div>
+                        </div>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+              <!-- / Bölgesel Satışlar -->
+
+              <!-- Toplam Kazanç -->
+              <div class="col-12 col-md-6 col-xxl-4 order-2 order-xl-0">
+                <div class="card h-100">
+                  <div class="card-header">
+                    <div class="d-flex justify-content-between align-items-center">
+                      <h5 class="mb-0 card-title">Toplam Kazanç</h5>
+                      <div class="dropdown">
+                        <button class="btn btn-text-secondary rounded-pill text-body-secondary border-0 p-2 me-n1" type="button" id="totalEarning" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                          <i class="ti ti-dots-vertical icon-md text-body-secondary"></i>
+                        </button>
+                        <div class="dropdown-menu dropdown-menu-end" aria-labelledby="totalEarning">
+                          <a class="dropdown-item" href="javascript:void(0);">Tümünü gör</a>
+                          <a class="dropdown-item" href="javascript:void(0);">Yenile</a>
+                        </div>
+                      </div>
+                    </div>
+                    <p class="text-body-secondary small mb-2">Kasa + Banka</p>
+                    <div class="d-flex align-items-center">
+                      <h2 class="mb-0 me-2">87%</h2>
+                      <i class="ti ti-chevron-up text-success me-1"></i>
+                      <h6 class="text-success mb-0">25,8%</h6>
+                    </div>
+                  </div>
+                  <div class="card-body">
+                    <div id="totalEarningChart"></div>
+                    <div class="d-flex align-items-start my-4">
+                      <div class="badge rounded bg-label-primary p-2 me-4 rounded"><i class="ti ti-arrow-down-left icon-md"></i></div>
+                      <div class="d-flex justify-content-between w-100 gap-2 align-items-center">
+                        <div class="me-2">
+                          <h6 class="mb-0">Gelir tahsilat</h6>
+                          <small class="text-body">Müşteri ödemeleri</small>
+                        </div>
+                        <h6 class="mb-0 text-success">+₺126</h6>
+                      </div>
+                    </div>
+                    <div class="d-flex align-items-start">
+                      <div class="badge rounded bg-label-secondary p-2 me-4 rounded"><i class="ti ti-arrow-up-right icon-md"></i></div>
+                      <div class="d-flex justify-content-between w-100 gap-2 align-items-center">
+                        <div class="me-2">
+                          <h6 class="mb-0">Gider ödeme</h6>
+                          <small class="text-body">Tedarikçi ve masraflar</small>
+                        </div>
+                        <h6 class="mb-0 text-danger">-₺98</h6>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!-- / Toplam Kazanç -->
+
+              <!-- İrsaliye Durumu -->
+              <div class="col-xxl-4 col-md-6">
+                <div class="card h-100">
+                  <div class="card-header d-flex justify-content-between">
+                    <div class="card-title mb-0">
+                      <h5 class="mb-1">İrsaliye Durumu</h5>
+                      <p class="card-subtitle">Açık irsaliye özeti</p>
+                    </div>
+                    <div class="dropdown">
+                      <button class="btn btn-text-secondary rounded-pill text-body-secondary border-0 p-2 me-n1" type="button" id="MonthlyCampaign" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <i class="ti ti-dots-vertical icon-md text-body-secondary"></i>
+                      </button>
+                      <div class="dropdown-menu dropdown-menu-end" aria-labelledby="MonthlyCampaign">
+                        <a class="dropdown-item" href="javascript:void(0);">Tümünü gör</a>
+                        <a class="dropdown-item" href="javascript:void(0);">Yenile</a>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="card-body">
+                    <ul class="p-0 m-0">
+                      <li class="mb-6 d-flex justify-content-between align-items-center">
+                        <div class="badge bg-label-warning rounded p-1_5"><i class="ti ti-clock icon-md"></i></div>
+                        <div class="d-flex justify-content-between w-100 flex-wrap">
+                          <h6 class="mb-0 ms-4">Beklemede</h6>
+                          <div class="d-flex">
+                            <p class="mb-0">38</p>
+                            <p class="ms-4 text-warning mb-0">12,3%</p>
+                          </div>
+                        </div>
+                      </li>
+                      <li class="mb-6 d-flex justify-content-between align-items-center">
+                        <div class="badge bg-label-info rounded p-1_5"><i class="ti ti-truck icon-md"></i></div>
+                        <div class="d-flex justify-content-between w-100 flex-wrap">
+                          <h6 class="mb-0 ms-4">Sevkte</h6>
+                          <div class="d-flex">
+                            <p class="mb-0">56</p>
+                            <p class="ms-4 text-success mb-0">22,1%</p>
+                          </div>
+                        </div>
+                      </li>
+                      <li class="mb-6 d-flex justify-content-between align-items-center">
+                        <div class="badge bg-label-success rounded p-1_5"><i class="ti ti-package icon-md"></i></div>
+                        <div class="d-flex justify-content-between w-100 flex-wrap">
+                          <h6 class="mb-0 ms-4">Teslim edildi</h6>
+                          <div class="d-flex">
+                            <p class="mb-0">412</p>
+                            <p class="ms-4 text-success mb-0">58,4%</p>
+                          </div>
+                        </div>
+                      </li>
+                      <li class="mb-6 d-flex justify-content-between align-items-center">
+                        <div class="badge bg-label-danger rounded p-1_5"><i class="ti ti-ban icon-md"></i></div>
+                        <div class="d-flex justify-content-between w-100 flex-wrap">
+                          <h6 class="mb-0 ms-4">İptal</h6>
+                          <div class="d-flex">
+                            <p class="mb-0">10</p>
+                            <p class="ms-4 text-danger mb-0">1,5%</p>
+                          </div>
+                        </div>
+                      </li>
+                      <li class="mb-3 d-flex justify-content-between align-items-center">
+                        <div class="badge bg-label-secondary rounded p-1_5"><i class="ti ti-alert-triangle icon-md"></i></div>
+                        <div class="d-flex justify-content-between w-100 flex-wrap">
+                          <h6 class="mb-0 ms-4">Gecikmiş</h6>
+                          <div class="d-flex">
+                            <p class="mb-0">12</p>
+                            <p class="ms-4 text-danger mb-0">3,2%</p>
+                          </div>
+                        </div>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+              <!-- / İrsaliye Durumu -->
+
+              <!-- Servis Kanalları -->
+              <div class="col-xxl-4 col-md-6 col-12">
+                <div class="card h-100">
+                  <div class="card-header d-flex justify-content-between">
+                    <div class="card-title mb-0">
+                      <h5 class="mb-1">Servis Kanalları</h5>
+                      <p class="card-subtitle">Bu ay servis kayıtları</p>
+                    </div>
+                    <div class="dropdown">
+                      <button class="btn btn-text-secondary rounded-pill text-body-secondary border-0 p-2 me-n1" type="button" id="sourceVisits" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <i class="ti ti-dots-vertical icon-md text-body-secondary"></i>
+                      </button>
+                      <div class="dropdown-menu dropdown-menu-end" aria-labelledby="sourceVisits">
+                        <a class="dropdown-item" href="javascript:void(0);">Tümünü gör</a>
+                        <a class="dropdown-item" href="javascript:void(0);">Yenile</a>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="card-body">
+                    <ul class="list-unstyled mb-0">
+                      <li class="mb-6">
+                        <div class="d-flex align-items-center">
+                          <div class="badge bg-label-secondary text-body p-2 me-4 rounded"><i class="ti ti-tool icon-md"></i></div>
+                          <div class="d-flex justify-content-between w-100 flex-wrap gap-2">
+                            <div class="me-2">
+                              <h6 class="mb-0">Atölye</h6>
+                              <small class="text-body">Servis atölyesi</small>
+                            </div>
+                            <div class="d-flex align-items-center">
+                              <p class="mb-0">1,2k</p>
+                              <div class="ms-4 badge bg-label-success">+4,2%</div>
+                            </div>
+                          </div>
+                        </div>
+                      </li>
+                      <li class="mb-6">
+                        <div class="d-flex align-items-center">
+                          <div class="badge bg-label-secondary text-body p-2 me-4 rounded"><i class="ti ti-map-pin icon-md"></i></div>
+                          <div class="d-flex justify-content-between w-100 flex-wrap gap-2">
+                            <div class="me-2">
+                              <h6 class="mb-0">Sahada</h6>
+                              <small class="text-body">Saha servisi</small>
+                            </div>
+                            <div class="d-flex align-items-center">
+                              <p class="mb-0">845</p>
+                              <div class="ms-4 badge bg-label-success">+8,2%</div>
+                            </div>
+                          </div>
+                        </div>
+                      </li>
+                      <li class="mb-6">
+                        <div class="d-flex align-items-center">
+                          <div class="badge bg-label-secondary text-body p-2 me-4 rounded"><i class="ti ti-phone icon-md"></i></div>
+                          <div class="d-flex justify-content-between w-100 flex-wrap gap-2">
+                            <div class="me-2">
+                              <h6 class="mb-0">Telefon</h6>
+                              <small class="text-body">Çağrı merkezi</small>
+                            </div>
+                            <div class="d-flex align-items-center">
+                              <p class="mb-0">893</p>
+                              <div class="ms-4 badge bg-label-success">+2,4%</div>
+                            </div>
+                          </div>
+                        </div>
+                      </li>
+                      <li class="mb-6">
+                        <div class="d-flex align-items-center">
+                          <div class="badge bg-label-secondary text-body p-2 me-4 rounded"><i class="ti ti-shield-check icon-md"></i></div>
+                          <div class="d-flex justify-content-between w-100 flex-wrap gap-2">
+                            <div class="me-2">
+                              <h6 class="mb-0">Garanti</h6>
+                              <small class="text-body">Garanti kapsamı</small>
+                            </div>
+                            <div class="d-flex align-items-center">
+                              <p class="mb-0">342</p>
+                              <div class="ms-4 badge bg-label-danger">-0,4%</div>
+                            </div>
+                          </div>
+                        </div>
+                      </li>
+                      <li>
+                        <div class="d-flex align-items-center">
+                          <div class="badge bg-label-secondary text-body p-2 me-4 rounded"><i class="ti ti-dots icon-md"></i></div>
+                          <div class="d-flex justify-content-between w-100 flex-wrap gap-2">
+                            <div class="me-2">
+                              <h6 class="mb-0">Diğer</h6>
+                              <small class="text-body">Diğer kanallar</small>
+                            </div>
+                            <div class="d-flex align-items-center">
+                              <p class="mb-0">215</p>
+                              <div class="ms-4 badge bg-label-success">+6,2%</div>
+                            </div>
+                          </div>
+                        </div>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+              <!-- / Servis Kanalları -->
+
+              <!-- Son Faturalar tablosu -->
+              <div class="col-xxl-8">
+                <div class="card datatables-toolbar-hidden">
+                  <div class="card-header d-flex justify-content-between align-items-center">
+                    <div>
+                      <h5 class="mb-1">Son Faturalar</h5>
+                      <p class="card-subtitle mb-0">Son kesilen faturalar</p>
+                    </div>
+                    <div class="dropdown">
+                      <button class="btn btn-text-secondary rounded-pill text-body-secondary border-0 p-2" type="button" id="recentInvoicesMenu" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <i class="ti ti-dots-vertical icon-md text-body-secondary"></i>
+                      </button>
+                      <div class="dropdown-menu dropdown-menu-end" aria-labelledby="recentInvoicesMenu">
+                        <a class="dropdown-item" href="fatura-satis.html">Tümünü gör</a>
+                        <a class="dropdown-item" href="javascript:void(0);">Yenile</a>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="table-responsive mb-4">
+                    <table class="table datatables-ajax datatables-ajax-compact table-sm mb-0" data-table="dashboard-faturalar" data-search-placeholder="Fatura ara..." data-page-length="5">
+                      <thead class="border-top">
+                        <tr>
+                          <th>Fatura No</th>
+                          <th>Cari</th>
+                          <th>Tarih</th>
+                          <th>Durum</th>
+                          <th class="text-center">İşlemler</th>
+                        </tr>
+                      </thead>
+                      <tbody></tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+              <!-- / Son Faturalar -->
+            </div>
+          </div>
+          <div id="app-footer"></div>
+          <div class="content-backdrop fade"></div>
+        </div>
+      </div>
+    </div>
+    <div class="layout-overlay layout-menu-toggle"></div>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/apexcharts@3.54.1/dist/apexcharts.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+  <script src="assets/js/menu-app.js"></script>
+  <script src="assets/js/dashboard-text.js"></script>
+  <script src="assets/js/partials.js"></script>
+  <script src="assets/js/config.js"></script>
+  <script src="assets/js/perfect-scrollbar.js"></script>
+  <script src="assets/js/menu.js"></script>
+  <script src="assets/js/customizer.js"></script>
+  <script src="assets/js/main.js"></script>
+  <script src="assets/js/dashboard-shortcuts.js"></script>
+  <script src="assets/js/dashboards-analytics.js"></script>
+</body>
+</html>

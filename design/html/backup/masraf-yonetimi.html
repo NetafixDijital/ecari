@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="tr" data-bs-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Masraf Yönetimi | e-Cari - Ön Muhasebe</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="assets/css/nexlink/app.css">
+  <link rel="stylesheet" href="assets/css/pages/masraf.css">
+</head>
+<body data-page-script="assets/js/masraf-liste.js">
+  <div class="page-layout">
+    <div id="nl-sidebar-host"></div>
+    <div class="layout-overlay"></div>
+    <div id="nl-header-host"></div>
+    <main class="app-wrapper">
+      <div class="container-fluid">
+        <div class="app-page-content">
+          <div class="page-header d-flex flex-wrap justify-content-between align-items-start gap-2 mb-4">
+            <div>
+              <h4 class="mb-1"><i class="ti ti-chart-pie text-primary me-1"></i> Masraf Yönetimi</h4>
+              <p class="text-body-secondary mb-0 small">Masraf özeti, onay süreci ve kategori dağılımı</p>
+            </div>
+            <div class="d-flex align-items-center flex-wrap gap-2">
+              <a href="masraf-liste.html" class="btn btn-label-secondary"><i class="ti ti-list me-1"></i> Masraf Listesi</a>
+              <button type="button" class="btn btn-primary" id="btnYeniMasraf"><i class="ti ti-plus me-1"></i> Yeni Masraf</button>
+            </div>
+          </div>
+
+          <div class="row g-4 mb-4">
+            <div class="col-sm-6 col-xl-3">
+              <div class="module-stat-card masraf-summary-card">
+                <div class="d-flex justify-content-between align-items-start">
+                  <div>
+                    <p class="stat-label">Toplam Masraf</p>
+                    <h4 class="amount mb-0">₺11.115,50</h4>
+                  </div>
+                  <div class="stat-icon masraf-status-odendi"><i class="ti ti-sum"></i></div>
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-6 col-xl-3">
+              <div class="module-stat-card">
+                <div class="d-flex justify-content-between align-items-start">
+                  <div>
+                    <p class="stat-label">Onay Bekleyen</p>
+                    <h4 class="mb-0">2</h4>
+                  </div>
+                  <div class="stat-icon masraf-status-onay_bekliyor"><i class="ti ti-clock"></i></div>
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-6 col-xl-3">
+              <div class="module-stat-card">
+                <div class="d-flex justify-content-between align-items-start">
+                  <div>
+                    <p class="stat-label">Onaylanan</p>
+                    <h4 class="mb-0">2</h4>
+                  </div>
+                  <div class="stat-icon masraf-status-onaylandi"><i class="ti ti-circle-check"></i></div>
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-6 col-xl-3">
+              <div class="module-stat-card">
+                <div class="d-flex justify-content-between align-items-start">
+                  <div>
+                    <p class="stat-label">Ödenen</p>
+                    <h4 class="mb-0">2</h4>
+                  </div>
+                  <div class="stat-icon masraf-status-odendi"><i class="ti ti-cash"></i></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="row g-4 mb-4">
+            <div class="col-md-4">
+              <div class="card h-100">
+                <div class="card-body">
+                  <h6 class="mb-3"><i class="ti ti-gas-station text-warning me-1"></i> Yakıt</h6>
+                  <p class="amount mb-0">₺2.470,00</p>
+                  <small class="text-body-secondary">2 kayıt</small>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="card h-100">
+                <div class="card-body">
+                  <h6 class="mb-3"><i class="ti ti-tools-kitchen-2 text-success me-1"></i> Yemek</h6>
+                  <p class="amount mb-0">₺2.340,00</p>
+                  <small class="text-body-secondary">1 kayıt</small>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="card h-100">
+                <div class="card-body">
+                  <h6 class="mb-3"><i class="ti ti-pencil text-info me-1"></i> Diğer Kategoriler</h6>
+                  <p class="amount mb-0">₺6.305,50</p>
+                  <small class="text-body-secondary">4 kayıt</small>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card datatables-toolbar-hidden">
+            <div class="card-header border-bottom d-flex flex-wrap justify-content-between align-items-center gap-2">
+              <h6 class="mb-0">Onay Bekleyen Masraflar</h6>
+              <ul class="nav nav-pills card-header-pills mb-0" role="tablist">
+                <li class="nav-item"><button type="button" class="nav-link active" data-filter="onay_bekliyor">Onay Bekliyor</button></li>
+                <li class="nav-item"><button type="button" class="nav-link" data-filter="all">Tümü</button></li>
+                <li class="nav-item"><button type="button" class="nav-link" data-filter="onaylandi">Onaylandı</button></li>
+                <li class="nav-item"><button type="button" class="nav-link" data-filter="odendi">Ödendi</button></li>
+              </ul>
+            </div>
+            <div class="table-responsive">
+              <table class="table table-hover datatables-ajax mb-0" id="masrafYonetimTable" data-table="masraf-liste" data-search-placeholder="Masraf ara..." data-status-filter="onay_bekliyor">
+                <thead class="border-top">
+                  <tr>
+                    <th>Masraf No</th>
+                    <th>Açıklama</th>
+                    <th>Kategori</th>
+                    <th>Tutar</th>
+                    <th>Tarih</th>
+                    <th>Talep Eden</th>
+                    <th>Durum</th>
+                    <th class="text-center">İşlemler</th>
+                  </tr>
+                </thead>
+                <tbody></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        <div id="nl-footer-host"></div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Yeni Masraf -->
+  <div class="modal fade nl-modal-form" id="modalYeniMasraf" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+      <div class="modal-content">
+        <div class="modal-header">
+          <div class="pe-3">
+            <h5 class="modal-title">Yeni Masraf Talebi</h5>
+            <p class="modal-desc mb-0">Masraf bilgilerini girin. Talep onay sürecine gönderilir.</p>
+          </div>
+          <button type="button" class="btn-close ms-auto" data-bs-dismiss="modal" aria-label="Kapat"></button>
+        </div>
+        <div class="modal-body">
+          <form id="formYeniMasraf" novalidate>
+            <div class="form-section">
+              <div class="form-section-title">Masraf Bilgileri</div>
+              <div class="row g-3">
+                <div class="col-12">
+                  <label class="form-label" for="masrafAciklama">Açıklama <span class="text-danger">*</span></label>
+                  <div class="nl-field-icon">
+                    <span class="nl-field-icon__icon" aria-hidden="true"><i class="ti ti-file-description"></i></span>
+                    <input type="text" class="form-control" id="masrafAciklama" placeholder="Masraf açıklaması" required>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label" for="masrafKategori">Kategori <span class="text-danger">*</span></label>
+                  <div class="nl-field-icon">
+                    <span class="nl-field-icon__icon" aria-hidden="true"><i class="ti ti-category"></i></span>
+                    <select class="form-select" id="masrafKategori" required>
+                      <option value="">Seçiniz</option>
+                      <option value="yakit">Yakıt</option>
+                      <option value="yemek">Yemek</option>
+                      <option value="kirtasiye">Kırtasiye</option>
+                      <option value="ulasim">Ulaşım</option>
+                      <option value="diger">Diğer</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label" for="masrafTutar">Tutar (₺) <span class="text-danger">*</span></label>
+                  <div class="nl-field-icon">
+                    <span class="nl-field-icon__icon" aria-hidden="true"><i class="ti ti-currency-lira"></i></span>
+                    <input type="number" class="form-control" id="masrafTutar" placeholder="0,00" min="0" step="0.01" required>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label" for="masrafTarih">Tarih</label>
+                  <div class="nl-field-icon">
+                    <span class="nl-field-icon__icon" aria-hidden="true"><i class="ti ti-calendar"></i></span>
+                    <input type="date" class="form-control" id="masrafTarih">
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label" for="masrafTalepEden">Talep Eden</label>
+                  <div class="nl-field-icon">
+                    <span class="nl-field-icon__icon" aria-hidden="true"><i class="ti ti-user"></i></span>
+                    <input type="text" class="form-control" id="masrafTalepEden" placeholder="Personel adı">
+                  </div>
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-label-secondary" data-bs-dismiss="modal">Vazgeç</button>
+          <button type="button" class="btn btn-primary" id="btnMasrafEkle"><i class="ti ti-check me-1"></i> Talep Oluştur</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="assets/js/nexlink/main.js"></script>
+</body>
+</html>

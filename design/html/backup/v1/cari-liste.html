@@ -1,0 +1,208 @@
+<!doctype html>
+<html lang="tr" class="layout-navbar-fixed layout-menu-fixed layout-compact layout-content-navbar" dir="ltr" data-bs-theme="light" data-skin="default" data-template="vertical-menu-template">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cari Listesi | e-Cari - Ön Muhasebe</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="assets/css/app.css">
+  <script src="assets/js/helpers.js"></script>
+</head>
+<body>
+  <div class="layout-wrapper layout-content-navbar">
+    <div class="layout-container">
+      <div id="app-sidebar"></div>
+      <div class="layout-page">
+        <div id="app-navbar"></div>
+        <div class="content-wrapper">
+          <div class="container-xxl flex-grow-1 container-p-y">
+            <div class="page-header d-flex justify-content-between align-items-center mb-4">
+              <h4 class="mb-0">Cari Listesi</h4>
+              <button class="btn btn-primary"><i class="ti ti-plus me-1"></i> Yeni Cari</button>
+            </div>
+            <div class="card datatables-toolbar-hidden">
+              <div class="table-responsive">
+                <table class="table table-hover datatables-ajax mb-0" data-table="cari-liste" data-search-placeholder="Cari ara...">
+                  <thead class="border-top">
+                    <tr>
+                      <th>Cari Kodu</th>
+                      <th>Ünvan</th>
+                      <th>Telefon</th>
+                      <th>Bakiye</th>
+                      <th>Durum</th>
+                      <th class="text-center" style="min-width:11rem;">İşlemler</th>
+                    </tr>
+                  </thead>
+                  <tbody></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+          <div id="app-footer"></div>
+          <div class="content-backdrop fade"></div>
+        </div>
+      </div>
+    </div>
+    <div class="layout-overlay layout-menu-toggle"></div>
+  </div>
+
+  <!-- Tahsilat -->
+  <div class="modal fade" id="modalTahsilat" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title"><i class="ti ti-cash me-2 text-success"></i>Tahsilat</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
+        </div>
+        <div class="modal-body">
+          <p class="text-body-secondary small mb-3">Cari: <strong id="tahsilatCariUnvan"></strong> (<span id="tahsilatCariKod"></span>)</p>
+          <div class="mb-3">
+            <label class="form-label">Tutar (₺)</label>
+            <input type="number" class="form-control" id="tahsilatTutar" step="0.01" min="0" placeholder="0,00">
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Kasa / Banka</label>
+            <select class="form-select" id="tahsilatHesap">
+              <option>Kasa — Merkez</option>
+              <option>Banka — Ziraat TL</option>
+              <option>Banka — İş Bankası TL</option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Açıklama</label>
+            <textarea class="form-control" id="tahsilatAciklama" rows="2" placeholder="Tahsilat açıklaması"></textarea>
+          </div>
+          <div class="mb-0">
+            <label class="form-label">Tarih</label>
+            <input type="date" class="form-control" id="tahsilatTarih">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-label-secondary" data-bs-dismiss="modal">İptal</button>
+          <button type="button" class="btn btn-success" id="btnTahsilatKaydet">Kaydet</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tediye -->
+  <div class="modal fade" id="modalTediye" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title"><i class="ti ti-cash-off me-2 text-danger"></i>Tediye</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
+        </div>
+        <div class="modal-body">
+          <p class="text-body-secondary small mb-3">Cari: <strong id="tediyeCariUnvan"></strong> (<span id="tediyeCariKod"></span>)</p>
+          <div class="mb-3">
+            <label class="form-label">Tutar (₺)</label>
+            <input type="number" class="form-control" id="tediyeTutar" step="0.01" min="0" placeholder="0,00">
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Kasa / Banka</label>
+            <select class="form-select" id="tediyeHesap">
+              <option>Kasa — Merkez</option>
+              <option>Banka — Ziraat TL</option>
+              <option>Banka — İş Bankası TL</option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Açıklama</label>
+            <textarea class="form-control" id="tediyeAciklama" rows="2" placeholder="Tediye açıklaması"></textarea>
+          </div>
+          <div class="mb-0">
+            <label class="form-label">Tarih</label>
+            <input type="date" class="form-control" id="tediyeTarih">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-label-secondary" data-bs-dismiss="modal">İptal</button>
+          <button type="button" class="btn btn-danger" id="btnTediyeKaydet">Kaydet</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Virman -->
+  <div class="modal fade" id="modalVirman" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title"><i class="ti ti-arrows-exchange me-2 text-primary"></i>Virman</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
+        </div>
+        <div class="modal-body">
+          <p class="text-body-secondary small mb-3">Kaynak: <strong id="virmanKaynakUnvan"></strong> (<span id="virmanKaynakKod"></span>)</p>
+          <div class="mb-3">
+            <label class="form-label">Hedef Cari</label>
+            <select class="form-select" id="virmanHedef">
+              <option value="CR-001">CR-001 — ABC Teknoloji Ltd.</option>
+              <option value="CR-002">CR-002 — XYZ Ticaret A.Ş.</option>
+              <option value="CR-003">CR-003 — Mehmet Yılmaz</option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Tutar (₺)</label>
+            <input type="number" class="form-control" id="virmanTutar" step="0.01" min="0" placeholder="0,00">
+          </div>
+          <div class="mb-0">
+            <label class="form-label">Açıklama</label>
+            <textarea class="form-control" id="virmanAciklama" rows="2" placeholder="Virman açıklaması"></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-label-secondary" data-bs-dismiss="modal">İptal</button>
+          <button type="button" class="btn btn-primary" id="btnVirmanKaydet">Virman Yap</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Hareket Raporu -->
+  <div class="modal fade" id="modalHareketRaporu" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title"><i class="ti ti-report-analytics me-2 text-info"></i>Hareket Raporu</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
+        </div>
+        <div class="modal-body">
+          <p class="text-body-secondary small mb-3">Cari: <strong id="raporCariUnvan"></strong> (<span id="raporCariKod"></span>)</p>
+          <div class="table-responsive">
+            <table class="table table-sm table-bordered mb-0">
+              <thead class="table-light">
+                <tr>
+                  <th>Tarih</th>
+                  <th>İşlem</th>
+                  <th>Açıklama</th>
+                  <th class="text-end">Borç</th>
+                  <th class="text-end">Alacak</th>
+                  <th class="text-end">Bakiye</th>
+                </tr>
+              </thead>
+              <tbody id="raporHareketBody">
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-label-secondary" data-bs-dismiss="modal">Kapat</button>
+          <button type="button" class="btn btn-primary"><i class="ti ti-download me-1"></i> PDF İndir</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="assets/js/partials.js"></script>
+  <script src="assets/js/config.js"></script>
+  <script src="assets/js/perfect-scrollbar.js"></script>
+  <script src="assets/js/menu.js"></script>
+  <script src="assets/js/customizer.js"></script>
+  <script src="assets/js/main.js"></script>
+  <script src="assets/js/cari-liste.js"></script>
+</body>
+</html>

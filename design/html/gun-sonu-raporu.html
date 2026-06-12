@@ -1,0 +1,313 @@
+<!doctype html>
+<html lang="tr" data-bs-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#5955D1">
+  <title>Gün Sonu Raporu | e-Cari - Ön Muhasebe</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="assets/css/nexlink/app.css">
+  <link rel="stylesheet" href="assets/css/pages/gun-sonu.css">
+</head>
+<body data-page-script="assets/js/gun-sonu-raporu.js">
+  <div class="page-layout">
+    <div id="nl-sidebar-host"></div>
+    <div class="layout-overlay"></div>
+    <div id="nl-header-host"></div>
+    <main class="app-wrapper">
+      <div class="container-fluid">
+        <div class="gun-sonu-print-header d-none mb-3">
+          <h4 class="mb-1">Gün Sonu Raporu</h4>
+          <p class="text-body-secondary mb-0 small">Tarih: <span id="gsTarihPrint">—</span></p>
+        </div>
+
+        <div class="app-page-head d-flex align-items-center justify-content-between flex-wrap gap-2 no-print">
+          <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-0">
+              <li class="breadcrumb-item"><a href="index.html"><i class="ti ti-smart-home me-1"></i> Ana Sayfa</a></li>
+              <li class="breadcrumb-item"><a href="kasa.html">Finans</a></li>
+              <li class="breadcrumb-item active">Gün Sonu Raporu</li>
+            </ol>
+          </nav>
+          <div class="d-flex flex-wrap gap-2 align-items-center">
+            <div class="input-group input-group-sm" style="width:auto;">
+              <button type="button" class="btn btn-light" id="btnGunOnceki" title="Önceki gün"><i class="ti ti-chevron-left"></i></button>
+              <input type="date" class="form-control" id="gsTarih" aria-label="Rapor tarihi">
+              <button type="button" class="btn btn-light" id="btnGunSonraki" title="Sonraki gün"><i class="ti ti-chevron-right"></i></button>
+            </div>
+            <span class="gun-sonu-date-badge" id="gsTarihBadge">—</span>
+            <button type="button" class="btn btn-sm btn-light"><i class="ti ti-download me-1"></i> Excel</button>
+            <button type="button" class="btn btn-sm btn-primary" id="btnGunSonuYazdir"><i class="ti ti-printer me-1"></i> Yazdır</button>
+          </div>
+        </div>
+
+        <!-- Ana özet KPI -->
+        <div class="row g-3">
+          <div class="col-xxl-3 col-sm-6">
+            <div class="card finance-stat-card h-100">
+              <div class="card-body">
+                <div class="avatar bg-primary-subtle text-primary"><i class="ti ti-shopping-cart"></i></div>
+                <div>
+                  <span class="stat-label">Toplam Satış</span>
+                  <h2 class="amount fw-bold mb-0" id="gsToplamSatis">—</h2>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-xxl-3 col-sm-6">
+            <div class="card finance-stat-card h-100">
+              <div class="card-body">
+                <div class="avatar bg-success-subtle text-success"><i class="ti ti-cash"></i></div>
+                <div>
+                  <span class="stat-label">Toplam Tahsilat</span>
+                  <h2 class="amount fw-bold mb-0" id="gsToplamTahsilat">—</h2>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-xxl-3 col-sm-6">
+            <div class="card finance-stat-card h-100">
+              <div class="card-body">
+                <div class="avatar bg-warning-subtle text-warning"><i class="ti ti-wallet"></i></div>
+                <div>
+                  <span class="stat-label">Kasa Toplamı</span>
+                  <h2 class="amount fw-bold mb-0" id="gsKasaToplam">—</h2>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-xxl-3 col-sm-6">
+            <div class="card finance-stat-card h-100">
+              <div class="card-body">
+                <div class="avatar bg-info-subtle text-info"><i class="ti ti-building-bank"></i></div>
+                <div>
+                  <span class="stat-label">Banka Toplamı</span>
+                  <h2 class="amount fw-bold mb-0" id="gsBankaToplam">—</h2>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Satış türleri -->
+        <div class="row g-3 mt-0">
+          <div class="col-md-4">
+            <div class="card h-100">
+              <div class="card-body">
+                <div class="gun-sonu-breakdown-row">
+                  <div class="d-flex align-items-center gap-3">
+                    <div class="row-icon bg-primary-subtle text-primary"><i class="ti ti-credit-card"></i></div>
+                    <div>
+                      <div class="row-label">POS Satışları</div>
+                      <div class="row-meta" id="gsPosAdet">—</div>
+                    </div>
+                  </div>
+                  <div class="row-amount amount" id="gsPosSatis">—</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="card h-100">
+              <div class="card-body">
+                <div class="gun-sonu-breakdown-row">
+                  <div class="d-flex align-items-center gap-3">
+                    <div class="row-icon bg-success-subtle text-success"><i class="ti ti-cash"></i></div>
+                    <div>
+                      <div class="row-label">Nakit Satışlar</div>
+                      <div class="row-meta" id="gsNakitAdet">—</div>
+                    </div>
+                  </div>
+                  <div class="row-amount amount" id="gsNakitSatis">—</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="card h-100">
+              <div class="card-body">
+                <div class="gun-sonu-breakdown-row">
+                  <div class="d-flex align-items-center gap-3">
+                    <div class="row-icon bg-warning-subtle text-warning"><i class="ti ti-file-time"></i></div>
+                    <div>
+                      <div class="row-label">Veresiye Satışlar</div>
+                      <div class="row-meta" id="gsVeresiyeAdet">—</div>
+                    </div>
+                  </div>
+                  <div class="row-amount amount" id="gsVeresiyeSatis">—</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Detay tablolar -->
+        <div class="row g-3 mt-0">
+          <div class="col-xxl-8">
+            <div class="card finance-table-card h-100">
+              <div class="card-header d-flex align-items-center justify-content-between border-0 pb-2">
+                <h6 class="card-title mb-0">Günlük Hareketler</h6>
+                <a href="hizli-satis.html" class="btn btn-sm btn-light no-print">Hızlı Satış</a>
+              </div>
+              <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                  <thead>
+                    <tr>
+                      <th>Saat</th>
+                      <th>Tip</th>
+                      <th>Açıklama</th>
+                      <th class="text-end">Tutar</th>
+                    </tr>
+                  </thead>
+                  <tbody id="gunSonuHareketler"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-xxl-4">
+            <div class="row g-3">
+              <div class="col-12">
+                <div class="card finance-target-card">
+                  <div class="card-header pb-0 border-0">
+                    <h6 class="card-title mb-0 text-white">Gün Sonu Özeti</h6>
+                  </div>
+                  <div class="card-body pt-2 pb-0">
+                    <div class="d-flex gap-2 align-items-center">
+                      <h2 class="mb-0 text-white" id="gsTargetSatis">—</h2>
+                      <span class="text-white text-1xs">Toplam satış</span>
+                    </div>
+                    <div class="finance-target-visual">
+                      <div class="finance-target-ring" aria-hidden="true"></div>
+                      <div class="finance-target-mid text-white" id="gsIslemSayisi">—</div>
+                    </div>
+                    <div class="text-center px-2">
+                      <p class="text-white mb-0 text-1xs">Tahsilat <strong class="text-warning" id="gsTargetTahsilat">—</strong></p>
+                    </div>
+                  </div>
+                  <div class="card-footer border-0 pt-3 pb-3">
+                    <div class="finance-target-footer bg-body py-3 px-3 rounded-3 d-flex">
+                      <div class="text-center flex-fill py-1">
+                        <h4 class="mb-0 amount" id="gsTargetKasa">—</h4>
+                        <span class="text-primary text-2xs fw-semibold d-block">Kasa</span>
+                      </div>
+                      <div class="vr opacity-50"></div>
+                      <div class="text-center flex-fill py-1">
+                        <h4 class="mb-0 amount" id="gsTargetBanka">—</h4>
+                        <span class="text-primary text-2xs fw-semibold d-block">Banka</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-12">
+                <div class="card finance-side-card mb-0">
+                  <div class="card-header border-0 pb-0">
+                    <h6 class="card-title mb-0">Tahsilat Dağılımı</h6>
+                  </div>
+                  <div class="card-body pt-2">
+                    <div class="mb-2">
+                      <div class="d-flex justify-content-between text-1xs mb-1"><span>Nakit Tahsilat</span><strong class="amount" id="gsTahNakit">—</strong></div>
+                      <div class="progress progress-sm"><div class="progress-bar bg-success" style="width:26%"></div></div>
+                    </div>
+                    <div class="mb-2">
+                      <div class="d-flex justify-content-between text-1xs mb-1"><span>Havale / EFT</span><strong class="amount" id="gsTahHavale">—</strong></div>
+                      <div class="progress progress-sm"><div class="progress-bar" style="width:51%"></div></div>
+                    </div>
+                    <div class="mb-2">
+                      <div class="d-flex justify-content-between text-1xs mb-1"><span>POS Tahsilat</span><strong class="amount" id="gsTahPos">—</strong></div>
+                      <div class="progress progress-sm"><div class="progress-bar bg-info" style="width:23%"></div></div>
+                    </div>
+                    <div>
+                      <div class="d-flex justify-content-between text-1xs mb-1"><span>Çek Tahsilat</span><strong class="amount" id="gsTahCek">—</strong></div>
+                      <div class="progress progress-sm"><div class="progress-bar bg-warning" style="width:0%"></div></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Özet tablo -->
+        <div class="row g-3 mt-0">
+          <div class="col-12">
+            <div class="card">
+              <div class="card-header border-0 pb-0">
+                <h6 class="card-title mb-0">Gün Sonu Mutabakat Özeti</h6>
+              </div>
+              <div class="card-body pt-2">
+                <div class="table-responsive">
+                  <table class="table gun-sonu-summary-table mb-0">
+                    <thead>
+                      <tr>
+                        <th>Kalem</th>
+                        <th class="text-end">Tutar</th>
+                        <th>Açıklama</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td><i class="ti ti-credit-card text-primary me-1"></i> POS Satışları</td>
+                        <td class="text-end amount" id="gsSumPos">—</td>
+                        <td class="text-body-secondary">Kredi / banka kartı ile yapılan satışlar</td>
+                      </tr>
+                      <tr>
+                        <td><i class="ti ti-cash text-success me-1"></i> Nakit Satışlar</td>
+                        <td class="text-end amount" id="gsSumNakit">—</td>
+                        <td class="text-body-secondary">Kasaya giren nakit satış tutarları</td>
+                      </tr>
+                      <tr>
+                        <td><i class="ti ti-file-time text-warning me-1"></i> Veresiye Satışlar</td>
+                        <td class="text-end amount" id="gsSumVeresiye">—</td>
+                        <td class="text-body-secondary">Cari hesaba yazılan açık satışlar</td>
+                      </tr>
+                      <tr class="fw-semibold">
+                        <td>Toplam Satış</td>
+                        <td class="text-end amount" id="gsSumSatisToplam">—</td>
+                        <td class="text-body-secondary">POS + Nakit + Veresiye</td>
+                      </tr>
+                      <tr>
+                        <td colspan="3" class="pt-3 pb-0 border-0"></td>
+                      </tr>
+                      <tr>
+                        <td><i class="ti ti-arrows-exchange text-info me-1"></i> Toplam Tahsilat</td>
+                        <td class="text-end amount" id="gsTahToplam">—</td>
+                        <td class="text-body-secondary">Nakit, havale, POS ve çek tahsilatları</td>
+                      </tr>
+                      <tr>
+                        <td colspan="3" class="pt-3 pb-0 border-0"></td>
+                      </tr>
+                      <tr>
+                        <td><i class="ti ti-wallet text-warning me-1"></i> Kasa Bakiyesi</td>
+                        <td class="text-end amount" id="gsKasaDetay">—</td>
+                        <td class="text-body-secondary">Gün sonu kasa toplamı</td>
+                      </tr>
+                      <tr>
+                        <td><i class="ti ti-building-bank text-info me-1"></i> Banka Bakiyesi</td>
+                        <td class="text-end amount" id="gsBankaDetay">—</td>
+                        <td class="text-body-secondary">Gün sonu banka hesap toplamı</td>
+                      </tr>
+                      <tr class="total-row">
+                        <td>Genel Toplam (Kasa + Banka)</td>
+                        <td class="text-end amount" id="gsGenelToplam">—</td>
+                        <td class="text-body-secondary">Likidite özeti</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="nl-footer-host"></div>
+      </div>
+    </main>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="assets/js/nexlink/main.js"></script>
+</body>
+</html>

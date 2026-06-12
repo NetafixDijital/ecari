@@ -1,0 +1,57 @@
+:root,
+[data-bs-theme="light"] {
+  --nl-primary: #5955d1;
+  --nl-primary-rgb: 89, 85, 209;
+  --bs-primary: #5955d1;
+  --bs-primary-rgb: 89, 85, 209;
+  --bs-info: #00bad1;
+  --bs-info-rgb: 0, 186, 209;
+  --bs-success: #28c76f;
+  --bs-success-rgb: 40, 199, 111;
+  --bs-danger: #ff4c51;
+  --bs-danger-rgb: 255, 76, 81;
+  --bs-warning: #ff9f43;
+  --bs-warning-rgb: 255, 159, 67;
+  --bs-primary-bg-subtle: color-mix(in sRGB, var(--nl-primary) 12%, #fff);
+  --bs-info-bg-subtle: rgba(0, 186, 209, 0.12);
+  --bs-success-bg-subtle: rgba(40, 199, 111, 0.12);
+  --bs-danger-bg-subtle: rgba(255, 76, 81, 0.12);
+  --bs-warning-bg-subtle: rgba(255, 159, 67, 0.12);
+  --bs-link-color: #5955d1;
+  --bs-link-hover-color: #4a46b8;
+  --bs-body-bg: #f4f5fa;
+  --bs-body-color: #64656a;
+  --bs-heading-color: #1c274c;
+  --bs-border-color: #e9eaef;
+  --bs-paper-bg: #ffffff;
+  --nl-rail-width: 4.375rem;
+  --nl-panel-width: 13.75rem;
+  --nl-sidebar-width: calc(var(--nl-rail-width) + var(--nl-panel-width));
+  --nl-header-height: 4.25rem;
+  --font-family-ui: "Instrument Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --bs-body-font-family: var(--font-family-ui);
+  --bs-font-sans-serif: var(--font-family-ui);
+
+  /* NexLink tipografi ölçeği */
+  --nl-fs-base: 0.875rem;    /* 14px — gövde */
+  --nl-fs-sm: 0.8125rem;     /* 13px — tablo, form, menü */
+  --nl-fs-xs: 0.75rem;       /* 12px — badge, buton-sm */
+  --nl-fs-2xs: 0.6875rem;    /* 11px — tablo başlık, caption */
+  --nl-fs-3xs: 0.625rem;     /* 10px — mini etiket */
+  --nl-fs-h1: 1.75rem;
+  --nl-fs-h2: 1.5rem;
+  --nl-fs-h3: 1.25rem;
+  --nl-fs-h4: 1.125rem;      /* sayfa başlığı */
+  --nl-fs-h5: 1rem;
+  --nl-fs-h6: 0.875rem;      /* kart başlığı */
+  --nl-fs-stat: 1.5rem;      /* KPI rakam */
+  --nl-fs-stat-lg: 1.75rem;  /* hedef yüzde */
+}
+
+[data-bs-theme="dark"] {
+  --bs-body-bg: #151823;
+  --bs-body-color: #a9abb4;
+  --bs-heading-color: #e8e9ef;
+  --bs-border-color: #2a2f3f;
+  --bs-paper-bg: #1c2030;
+}

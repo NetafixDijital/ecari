@@ -1,0 +1,18 @@
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: var(--bs-body-font-family);
+  color: var(--bs-body-color);
+  background: var(--bs-body-bg);
+}
+
+a { text-decoration: none; }
+a:hover { color: var(--bs-link-hover-color, var(--bs-primary)); }
+
+.layout-menu a,
+.layout-menu a:hover,
+.layout-menu a:focus,
+.menu-link,
+.menu-link:hover {
+  text-decoration: none !important;
+}

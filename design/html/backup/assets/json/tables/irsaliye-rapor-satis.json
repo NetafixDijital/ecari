@@ -1,0 +1,7 @@
+{
+  "data": [
+    {"id": 1, "cari": "ABC Teknoloji Ltd.", "irsaliye_no": "SI-2026-0156", "tarih": "30.05.2026", "tutar": "4250.00", "kdv": "708.33", "durum": "sevkte"},
+    {"id": 2, "cari": "XYZ Ticaret A.Ş.", "irsaliye_no": "SI-2026-0154", "tarih": "28.05.2026", "tutar": "8900.00", "kdv": "1483.33", "durum": "teslim"},
+    {"id": 3, "cari": "Demir Sanayi Ltd.", "irsaliye_no": "SI-2026-0148", "tarih": "24.05.2026", "tutar": "15600.00", "kdv": "2600.00", "durum": "teslim"}
+  ]
+}

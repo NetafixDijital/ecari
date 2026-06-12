@@ -1,0 +1,140 @@
+/**
+ * Vuexy tarzı DataTables — Ajax server-side
+ */
+@import url("https://cdn.datatables.net/2.1.8/css/dataTables.bootstrap5.min.css");
+
+.card .datatables-ajax {
+  width: 100% !important;
+}
+
+.card .table-responsive:has(.datatables-ajax) {
+  padding: 0 0 0.5rem;
+}
+
+div.dt-container {
+  font-family: var(--bs-body-font-family);
+  font-size: 0.8125rem;
+}
+
+div.dt-container .dt-search input,
+div.dt-container .dt-length select {
+  font-size: 0.8125rem;
+  border-color: var(--bs-border-color);
+  border-radius: 0.375rem;
+  padding: 0.35rem 0.65rem;
+}
+
+div.dt-container .dt-search input:focus {
+  border-color: var(--bs-primary);
+  box-shadow: 0 0 0 0.2rem rgba(var(--bs-primary-rgb), 0.15);
+}
+
+div.dt-container .dt-info {
+  color: var(--bs-secondary-color);
+  font-size: 0.8125rem;
+  padding-top: 0.75rem;
+}
+
+div.dt-container .dt-paging .pagination {
+  margin-bottom: 0;
+  padding-top: 0.75rem;
+}
+
+div.dt-container .dt-paging .page-link {
+  font-size: 0.8125rem;
+  border-radius: 0.375rem !important;
+  margin: 0 0.125rem;
+  min-width: 2rem;
+  text-align: center;
+  color: var(--bs-body-color);
+}
+
+div.dt-container .dt-paging .page-item.active .page-link {
+  background-color: var(--bs-primary);
+  border-color: var(--bs-primary);
+  color: #fff;
+}
+
+div.dt-container .dt-processing {
+  background: rgba(var(--bs-paper-bg-rgb), 0.92);
+  border: 1px solid var(--bs-border-color);
+  border-radius: 0.5rem;
+  color: var(--bs-primary);
+  font-weight: 500;
+  box-shadow: var(--bs-box-shadow-sm);
+}
+
+.datatables-ajax thead th {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--bs-secondary-color);
+  white-space: nowrap;
+}
+
+.datatables-ajax tbody td {
+  vertical-align: middle;
+  font-size: 0.875rem;
+}
+
+.dt-actions .btn-icon,
+.cari-actions .btn-icon {
+  width: 2rem;
+  height: 2rem;
+}
+
+.btn-label-info {
+  color: var(--bs-info);
+  background: var(--bs-info-bg-subtle);
+  border: none;
+}
+
+.btn-label-primary {
+  color: var(--bs-primary);
+  background: var(--bs-primary-bg-subtle);
+  border: none;
+}
+
+.btn-label-success {
+  color: var(--bs-success);
+  background: var(--bs-success-bg-subtle);
+  border: none;
+}
+
+.btn-label-warning {
+  color: var(--bs-warning);
+  background: var(--bs-warning-bg-subtle);
+  border: none;
+}
+
+.btn-label-danger {
+  color: var(--bs-danger);
+  background: var(--bs-danger-bg-subtle);
+  border: none;
+}
+
+.dt-actions .btn-label-info:hover,
+.cari-actions .btn-label-info:hover { background: rgba(var(--bs-info-rgb), 0.22); color: var(--bs-info); }
+
+.dt-actions .btn-label-primary:hover,
+.cari-actions .btn-label-primary:hover { background: rgba(var(--bs-primary-rgb), 0.22); color: var(--bs-primary); }
+
+.dt-actions .btn-label-success:hover,
+.cari-actions .btn-label-success:hover { background: rgba(var(--bs-success-rgb), 0.22); color: var(--bs-success); }
+
+.dt-actions .btn-label-warning:hover,
+.cari-actions .btn-label-warning:hover { background: rgba(var(--bs-warning-rgb), 0.22); color: var(--bs-warning); }
+
+.dt-actions .btn-label-danger:hover,
+.cari-actions .btn-label-danger:hover { background: rgba(var(--bs-danger-rgb), 0.22); color: var(--bs-danger); }
+
+.card .datatables-toolbar-hidden .card-header .table-search-input,
+.card .datatables-toolbar-hidden .card-header input[type="search"] {
+  display: none;
+}
+
+.datatables-ajax-compact + .dt-container .dt-length,
+.datatables-ajax-compact + .dt-container .dt-search {
+  font-size: 0.8125rem;
+}

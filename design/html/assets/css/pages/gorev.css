@@ -1,0 +1,11 @@
+@import url("module-stats.css");
+
+.gorev-status-yapilacak { background: var(--bs-warning-bg-subtle); color: var(--bs-warning); }
+.gorev-status-devam_ediyor { background: var(--bs-info-bg-subtle); color: var(--bs-info); }
+.gorev-status-tamamlandi { background: var(--bs-success-bg-subtle); color: var(--bs-success); }
+.gorev-status-gecikti { background: var(--bs-danger-bg-subtle); color: var(--bs-danger); }
+.gorev-status-iptal { background: rgba(100, 101, 106, 0.12); color: var(--bs-body-color); }
+
+.badge-oncelik-dusuk { background: rgba(100, 101, 106, 0.12); color: var(--bs-body-color); }
+.badge-oncelik-normal { background: color-mix(in sRGB, var(--nl-primary) 12%, white); color: var(--nl-primary); }
+.badge-oncelik-yuksek { background: var(--bs-danger-bg-subtle); color: var(--bs-danger); }

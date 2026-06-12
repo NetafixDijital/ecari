@@ -1,0 +1,116 @@
+:root,
+[data-bs-theme="light"] {
+  --bs-primary: #7367f0;
+  --bs-primary-rgb: 115, 103, 240;
+  --bs-primary-contrast: #fff;
+  --bs-secondary: #808390;
+  --bs-success: #28c76f;
+  --bs-success-rgb: 40, 199, 111;
+  --bs-danger: #ff4c51;
+  --bs-danger-rgb: 255, 76, 81;
+  --bs-warning: #ff9f43;
+  --bs-warning-rgb: 255, 159, 67;
+  --bs-info: #00bad1;
+  --bs-info-rgb: 0, 186, 209;
+  --font-family-ui: "IBM Plex Sans", Tahoma, "Segoe UI", Arial, sans-serif;
+  --font-family-mono: "IBM Plex Mono", Consolas, "Courier New", monospace;
+  --bs-menu-font-family: var(--font-family-ui);
+  --bs-body-font-family: var(--font-family-ui);
+  --bs-font-sans-serif: var(--font-family-ui);
+  --bs-body-font-size: 0.8125rem;
+  --bs-body-color: #6d6b77;
+  --bs-body-bg: #f8f7fa;
+  --bs-body-bg-rgb: 248, 247, 250;
+  --bs-heading-color: #444050;
+  --bs-secondary-color: #acaab1;
+  --bs-emphasis-color: #2f2b3d;
+  --bs-border-color: #e6e6e8;
+  --bs-link-color: #7367f0;
+  --bs-link-hover-color: #685dd8;
+  --bs-paper-bg: #fff;
+  --bs-paper-bg-rgb: 255, 255, 255;
+  --bs-base-color: #2f2b3d;
+  --bs-gray-100: #eaeaec;
+  --bs-gray-200: #e6e6e8;
+  --bs-gray-300: #c1bfc5;
+  --bs-primary-bg-subtle: #e9e7fd;
+  --bs-success-bg-subtle: #ddf6e8;
+  --bs-danger-bg-subtle: #ffe2e3;
+  --bs-warning-bg-subtle: #fff0e1;
+  --bs-info-bg-subtle: #d6f4f8;
+  --bs-box-shadow-sm: 0 0.125rem 0.5rem rgba(47, 43, 61, 0.12);
+  --bs-box-shadow: 0 0.1875rem 0.75rem rgba(47, 43, 61, 0.14);
+  --bs-menu-bg: var(--bs-paper-bg);
+  --bs-menu-bg-rgb: var(--bs-paper-bg-rgb);
+  --bs-menu-color: #444050;
+  --bs-menu-hover-bg: color-mix(in sRGB, var(--bs-base-color) 6%, var(--bs-menu-bg));
+  --bs-menu-sub-active-bg: color-mix(in sRGB, var(--bs-base-color) 8%, var(--bs-menu-bg));
+  --bs-menu-sub-active-color: #444050;
+  --bs-menu-active-color: var(--bs-primary-contrast);
+  --bs-menu-box-shadow: 0 0.125rem 0.5rem rgba(47, 43, 61, 0.12);
+  --bs-menu-width: 16.25rem;
+  --bs-menu-collapsed-width: 4.375rem;
+  --bs-menu-item-spacer: 0.375rem;
+  --bs-menu-vertical-link-padding-y: 0.5rem;
+  --bs-menu-vertical-link-padding-x: 0.75rem;
+  --navbar-height: 62px;
+  --content-padding-y: 1.5rem;
+  --bs-scrollbar-width: 0px;
+  --navbar-bg: #fff;
+  --card-bg: #fff;
+  --footer-bg: #fff;
+}
+
+[data-bs-theme="dark"] {
+  --bs-body-color: #acabc1;
+  --bs-body-bg: #25293c;
+  --bs-body-bg-rgb: 37, 41, 60;
+  --bs-heading-color: #cfcde4;
+  --bs-secondary-color: #76778e;
+  --bs-border-color: #434968;
+  --bs-link-color: #aba4f6;
+  --bs-paper-bg: #2f3349;
+  --bs-paper-bg-rgb: 47, 51, 73;
+  --bs-menu-bg: #2f3349;
+  --bs-menu-bg-rgb: 47, 51, 73;
+  --bs-menu-color: #acabc1;
+  --bs-menu-hover-bg: rgba(255, 255, 255, 0.06);
+  --bs-menu-sub-active-bg: rgba(115, 103, 240, 0.24);
+  --bs-menu-sub-active-color: #aba4f6;
+  --bs-navbar-bg: #2f3349;
+  --navbar-bg: #2f3349;
+  --card-bg: #2f3349;
+  --footer-bg: #2f3349;
+  --bs-primary-bg-subtle: rgba(115, 103, 240, 0.2);
+  --bs-success-bg-subtle: rgba(40, 199, 111, 0.2);
+  --bs-danger-bg-subtle: rgba(255, 76, 81, 0.2);
+  --bs-warning-bg-subtle: rgba(255, 159, 67, 0.2);
+  --bs-info-bg-subtle: rgba(0, 186, 209, 0.2);
+}
+
+html[data-semidark-menu="true"] #layout-menu,
+#layout-menu[data-bs-theme="dark"] {
+  --bs-menu-bg: #2f3349;
+  --bs-menu-bg-rgb: 47, 51, 73;
+  --bs-menu-color: #acabc1;
+  --bs-menu-hover-bg: rgba(255, 255, 255, 0.06);
+  --bs-menu-sub-active-bg: rgba(115, 103, 240, 0.24);
+  --bs-menu-sub-active-color: #aba4f6;
+}
+
+html[data-skin="bordered"] .card,
+html[data-skin="bordered"] .layout-navbar {
+  box-shadow: none !important;
+  border: 1px solid var(--bs-border-color);
+}
+
+html[data-skin="bordered"] .layout-menu {
+  border-right: 1px solid var(--bs-border-color);
+  box-shadow: none !important;
+}
+
+html.layout-wide .container-xxl {
+  max-width: 100%;
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+}

@@ -1,0 +1,62 @@
+/**
+ * Vuexy tarzı kaydırma: Perfect Scrollbar (menü) + ince ana sayfa scrollbar
+ */
+
+.layout-menu-fixed .layout-wrapper,
+.layout-menu-fixed-offcanvas .layout-wrapper {
+  overflow: hidden;
+}
+
+.menu-vertical {
+  overflow: hidden;
+  flex-direction: column;
+}
+
+@media (min-width: 1200px) {
+  #layout-menu .menu-inner {
+    flex: 1 1 auto;
+    overflow: hidden;
+    max-block-size: calc(100vh - 4rem);
+  }
+
+  #layout-menu .menu-inner.overflow-auto {
+    overflow-y: auto !important;
+  }
+}
+
+@media (max-width: 1199.98px) {
+  #layout-menu .menu-inner {
+    overflow-y: auto;
+    max-block-size: calc(100vh - 4rem);
+  }
+}
+
+/* Ana sayfa — ince native scrollbar (Firefox) */
+html {
+  scrollbar-width: thin;
+  scrollbar-color: var(--bs-gray-400) transparent;
+}
+
+/* Ana sayfa — ince native scrollbar (Chrome / Edge) */
+::-webkit-scrollbar {
+  width: 0.375rem;
+  height: 0.375rem;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: var(--bs-gray-400);
+  border-radius: 50rem;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: var(--bs-gray-700);
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* Bildirim dropdown */
+.navbar-dropdown .scrollable-container {
+  max-block-size: 18.75rem;
+}

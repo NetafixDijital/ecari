@@ -1,0 +1,35 @@
+/* Tablo arama araç çubuğu */
+.table-search-toolbar {
+  padding: 0.875rem 1.25rem;
+  border-bottom: 1px solid var(--bs-border-color);
+  background: var(--bs-paper-bg);
+}
+
+.table-search-toolbar .table-search-group {
+  max-width: 22rem;
+}
+
+.table-search-toolbar .table-search-count {
+  font-size: 0.8125rem;
+  color: var(--bs-secondary-color);
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums lining-nums;
+}
+
+.card > .table-search-toolbar:first-child {
+  border-radius: 0.5rem 0.5rem 0 0;
+}
+
+.card-header .table-search-input {
+  max-width: 14rem;
+}
+
+.table-search-empty td {
+  text-align: center;
+  color: var(--bs-secondary-color);
+  padding: 2rem 1rem !important;
+}
+
+.table-search-active tbody tr[style*="display: none"] + tr.table-search-empty-row {
+  display: none;
+}

@@ -1,0 +1,164 @@
+/**
+ * Tipografi — muhasebe / ERP arayüzü (IBM Plex Sans)
+ */
+@import url("https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap");
+
+:root {
+  --font-family-ui: "IBM Plex Sans", Tahoma, "Segoe UI", Arial, sans-serif;
+  --font-family-mono: "IBM Plex Mono", Consolas, "Courier New", monospace;
+  --bs-body-font-family: var(--font-family-ui);
+  --bs-font-sans-serif: var(--font-family-ui);
+  --bs-font-family-base: var(--font-family-ui);
+  --bs-font-monospace: var(--font-family-mono);
+  --bs-menu-font-family: var(--font-family-ui);
+  --bs-body-font-size: 0.8125rem;
+  --typography-letter-spacing: 0;
+  --typography-line-height: 1.45;
+  --typography-line-height-tight: 1.3;
+}
+
+html {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+body,
+.btn,
+.form-control,
+.form-select,
+.dropdown-menu,
+.modal-content,
+.card,
+.menu,
+.layout-navbar,
+.content-footer {
+  font-family: var(--font-family-ui);
+  letter-spacing: var(--typography-letter-spacing);
+  line-height: var(--typography-line-height);
+}
+
+h1, h2, h3, h4, h5, h6,
+.h1, .h2, .h3, .h4, .h5, .h6 {
+  font-family: var(--font-family-ui);
+  line-height: var(--typography-line-height-tight);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.page-header h4,
+.card-header,
+.card-title {
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+/* Muhasebe tabloları — kompakt, okunaklı */
+.table,
+.table td,
+.table th,
+div.dt-container,
+div.dt-container .dt-search input,
+div.dt-container .dt-length select {
+  font-size: 0.8125rem;
+  letter-spacing: 0;
+}
+
+.table thead th {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--bs-heading-color);
+}
+
+/* Rakam yoğun alanlar — lining + tabular figures */
+.tabular-nums,
+.data-numeric,
+table,
+.table,
+.table td,
+.table th,
+.stat-value,
+.stat-card h4,
+.servis-stat-card h4,
+.hs-cart-summary,
+.hs-cart-summary span,
+.hs-product-price,
+.hs-cart-item .fw-semibold,
+.card-header h4,
+.card-title,
+input[type="number"],
+input[inputmode="decimal"],
+input[inputmode="numeric"],
+.form-control[data-numeric="true"],
+.apexcharts-text,
+.apexcharts-text tspan,
+#hsSubtotal,
+#hsKdv,
+#hsTotal,
+#modalOdemeTutar,
+.display-6,
+.badge.rounded-pill {
+  font-variant-numeric: tabular-nums lining-nums;
+  font-feature-settings: "tnum" 1, "lnum" 1;
+}
+
+/* Tablo hücreleri — rakam sütunları */
+.table td.text-end,
+.table th.text-end,
+.table .text-success,
+.table .text-danger,
+td[class*="text-end"] {
+  font-variant-numeric: tabular-nums lining-nums;
+  font-feature-settings: "tnum" 1, "lnum" 1;
+}
+
+/* Finansal tutar sınıfı */
+.amount,
+.currency,
+.text-money {
+  font-variant-numeric: tabular-nums lining-nums;
+  font-feature-settings: "tnum" 1, "lnum" 1;
+  white-space: nowrap;
+}
+
+/* Kod / seri no — monospace, karışıklık önleme */
+code,
+.font-mono,
+.servis-no,
+[data-cari-kod] {
+  font-family: var(--font-family-mono);
+  font-variant-numeric: tabular-nums lining-nums;
+  font-feature-settings: "tnum" 1, "lnum" 1;
+  letter-spacing: 0.02em;
+}
+
+input,
+textarea,
+select {
+  font-family: inherit;
+}
+
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  opacity: 0.6;
+}
+
+small,
+.small,
+.text-body-secondary {
+  font-size: max(0.8125rem, 13px);
+}
+
+.menu-link,
+.menu-header-text,
+.app-brand-text {
+  font-family: var(--bs-menu-font-family);
+  letter-spacing: 0;
+}
+
+.apexcharts-canvas,
+.swiper-container {
+  font-family: var(--font-family-ui) !important;
+}

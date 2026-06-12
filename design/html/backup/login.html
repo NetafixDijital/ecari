@@ -1,0 +1,113 @@
+﻿<!doctype html>
+<html lang="tr" data-bs-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#5955D1">
+  <title>Giriş | e-Cari - Ön Muhasebe</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="assets/css/nexlink/app.css">
+</head>
+<body>
+  <div class="page-layout">
+    <div class="auth-wrapper min-vh-100 px-2 auth-wrapper-animated">
+      <div class="auth-bg-blob auth-bg-blob-1" aria-hidden="true"></div>
+      <div class="auth-bg-blob auth-bg-blob-2" aria-hidden="true"></div>
+      <div class="auth-bg-blob auth-bg-blob-3" aria-hidden="true"></div>
+
+      <div class="row g-0 min-vh-100 position-relative" style="z-index:1;">
+        <div class="col-xl-5 col-lg-6 ms-auto px-sm-4 align-self-center py-4 d-none d-lg-block">
+          <div class="auth-vector-wrap">
+            <svg class="auth-vector" viewBox="0 0 480 420" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <circle cx="240" cy="210" r="160" fill="rgba(89,85,209,0.08)"/>
+              <circle cx="240" cy="210" r="120" fill="rgba(89,85,209,0.06)" class="auth-vector-pulse"/>
+              <rect x="120" y="90" width="240" height="180" rx="20" fill="#fff" stroke="rgba(89,85,209,0.15)" stroke-width="2"/>
+              <rect x="145" y="120" width="90" height="12" rx="6" fill="rgba(89,85,209,0.35)"/>
+              <rect x="145" y="145" width="160" height="8" rx="4" fill="rgba(89,85,209,0.12)"/>
+              <rect x="145" y="165" width="130" height="8" rx="4" fill="rgba(89,85,209,0.08)"/>
+              <rect x="145" y="200" width="190" height="40" rx="8" fill="rgba(89,85,209,0.06)"/>
+              <circle cx="330" cy="130" r="36" fill="rgba(89,85,209,0.12)"/>
+              <path d="M315 130 L327 142 L348 118" stroke="#5955D1" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+              <g class="auth-float-slow">
+                <rect x="60" y="260" width="72" height="72" rx="16" fill="#5955D1" opacity="0.85"/>
+                <path d="M84 295 L96 307 L118 283" stroke="#fff" stroke-width="3" stroke-linecap="round"/>
+              </g>
+              <g class="auth-float-fast">
+                <circle cx="390" cy="280" r="28" fill="rgba(40,199,111,0.2)"/>
+                <path d="M378 280 L388 290 L404 272" stroke="#28c76f" stroke-width="3" stroke-linecap="round"/>
+              </g>
+            </svg>
+          </div>
+        </div>
+
+        <div class="col-xl-5 col-lg-6 ms-auto px-sm-4 align-self-center py-4">
+          <div class="card card-body p-4 p-sm-5 maxw-450px m-auto rounded-4 auth-card-enter shadow-sm border-0">
+            <div class="mb-4 text-center">
+              <a href="index.html" aria-label="e-Cari" class="text-decoration-none">
+                <span class="auth-logo-mark d-inline-flex">eC</span>
+              </a>
+            </div>
+            <div class="text-center mb-4">
+              <h5 class="mb-1">e-Cari'ye Hoş Geldiniz</h5>
+              <p class="text-body-secondary mb-0">Güvenli ön muhasebe panelinize giriş yapın.</p>
+            </div>
+            <form action="index.html" method="get">
+              <div class="mb-4">
+                <label class="form-label" for="loginEmail">E-posta Adresi</label>
+                <input type="email" class="form-control" id="loginEmail" placeholder="admin@e-cari.com" value="admin@e-cari.com">
+              </div>
+              <div class="mb-4">
+                <label class="form-label" for="loginPassword">Şifre</label>
+                <div class="password-wrapper">
+                  <input type="password" class="form-control password-input" id="loginPassword" placeholder="********" value="123456">
+                  <button type="button" id="togglePassword" class="toggle-password" aria-pressed="false" aria-label="Şifreyi göster">
+                    <i class="ti ti-eye-off close"></i>
+                    <i class="ti ti-eye open"></i>
+                  </button>
+                </div>
+              </div>
+              <div class="mb-4">
+                <div class="d-flex justify-content-between">
+                  <div class="form-check mb-0">
+                    <input class="form-check-input" type="checkbox" id="rememberMe" checked>
+                    <label class="form-check-label" for="rememberMe">Beni hatırla</label>
+                  </div>
+                  <a href="javascript:void(0)">Şifremi unuttum?</a>
+                </div>
+              </div>
+              <div class="mb-3">
+                <button type="submit" class="btn btn-primary waves-effect waves-light w-100">Giriş Yap</button>
+              </div>
+              <p class="mb-5 text-center text-body-secondary">Hesabınız yok mu? <a href="javascript:void(0)">Kayıt olun</a></p>
+              <div class="border-bottom position-relative my-4 text-center">
+                <span class="px-3 position-absolute translate-middle top-50 start-50 bg-body">veya şununla devam edin</span>
+              </div>
+              <button type="button" class="btn btn-light waves-effect waves-light w-100">
+                <svg width="18" height="18" viewBox="0 0 24 24" class="me-1" aria-hidden="true"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+                Google ile Giriş
+              </button>
+              <p class="text-center small text-body-secondary mt-4 mb-0">
+                <a href="v1/login.html">Klasik arayüz (v1)</a>
+              </p>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+    (function () {
+      var btn = document.getElementById('togglePassword');
+      var input = document.getElementById('loginPassword');
+      if (!btn || !input) return;
+      btn.addEventListener('click', function () {
+        var show = input.type === 'password';
+        input.type = show ? 'text' : 'password';
+        btn.classList.toggle('is-visible', show);
+        btn.setAttribute('aria-pressed', show ? 'true' : 'false');
+      });
+    })();
+  </script>
+</body>
+</html>

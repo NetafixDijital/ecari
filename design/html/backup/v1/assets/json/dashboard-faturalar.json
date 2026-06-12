@@ -1,0 +1,9 @@
+{
+  "data": [
+    {"id": 1, "project_name": "FT-2026-0142", "project_leader": "ABC Ticaret Ltd.", "date": "28.05.2026", "status": "100", "team": []},
+    {"id": 2, "project_name": "FT-2026-0141", "project_leader": "XYZ Sanayi A.Ş.", "date": "27.05.2026", "status": "75", "team": []},
+    {"id": 3, "project_name": "FT-2026-0140", "project_leader": "Demo Cari", "date": "26.05.2026", "status": "45", "team": []},
+    {"id": 4, "project_name": "FT-2026-0139", "project_leader": "Perakende Müşteri", "date": "25.05.2026", "status": "90", "team": []},
+    {"id": 5, "project_name": "FT-2026-0138", "project_leader": "Anadolu Ltd.", "date": "24.05.2026", "status": "60", "team": []}
+  ]
+}

@@ -1,0 +1,10 @@
+{
+  "data": [
+    {"id": 1, "cari_kod": "CR-001", "cari_tipi": "tuzel", "cari_unvan": "ABC Teknoloji Ltd.", "vkn_tckn": "1234567890", "vergi_dairesi": "Kadıköy", "adres": "Caferağa Mah. Moda Cad. No:12", "il": "İstanbul", "ilce": "Kadıköy", "eposta": "info@abcteknoloji.com", "telefon": "0212 555 0101", "bakiye": "12450.00", "bakiye_tip": "A", "durum": "aktif"},
+    {"id": 2, "cari_kod": "CR-002", "cari_tipi": "tuzel", "cari_unvan": "XYZ Ticaret A.Ş.", "vkn_tckn": "9876543210", "vergi_dairesi": "Ümraniye", "adres": "Atatürk Mah. Sanayi Cad. No:45", "il": "İstanbul", "ilce": "Ümraniye", "eposta": "iletisim@xyzticaret.com", "telefon": "0216 555 0202", "bakiye": "3200.00", "bakiye_tip": "B", "durum": "aktif"},
+    {"id": 3, "cari_kod": "CR-003", "cari_tipi": "gercek", "cari_unvan": "Mehmet Yılmaz", "vkn_tckn": "12345678901", "vergi_dairesi": "", "adres": "Cumhuriyet Mah. Atatürk Bulvarı No:8", "il": "Ankara", "ilce": "Çankaya", "eposta": "mehmet.yilmaz@email.com", "telefon": "0532 555 0303", "bakiye": "0.00", "bakiye_tip": "", "durum": "pasif"},
+    {"id": 4, "cari_kod": "CR-004", "cari_tipi": "tuzel", "cari_unvan": "Demir Sanayi Ltd.", "vkn_tckn": "1122334455", "vergi_dairesi": "Osmangazi", "adres": "Organize Sanayi Bölgesi 3. Cad.", "il": "Bursa", "ilce": "Osmangazi", "eposta": "info@demirsanayi.com", "telefon": "0224 555 0404", "bakiye": "8750.00", "bakiye_tip": "A", "durum": "aktif"},
+    {"id": 5, "cari_kod": "CR-005", "cari_tipi": "tuzel", "cari_unvan": "Yılmaz Gıda", "vkn_tckn": "5566778899", "vergi_dairesi": "Muratpaşa", "adres": "Lara Cad. No:22", "il": "Antalya", "ilce": "Muratpaşa", "eposta": "satis@yilmazgida.com", "telefon": "0242 555 0505", "bakiye": "1450.00", "bakiye_tip": "B", "durum": "aktif"},
+    {"id": 6, "cari_kod": "CR-006", "cari_tipi": "tuzel", "cari_unvan": "Kaya İnşaat", "vkn_tckn": "6677889900", "vergi_dairesi": "Çankaya", "adres": "Kızılırmak Mah. 1450. Sok. No:5", "il": "Ankara", "ilce": "Çankaya", "eposta": "proje@kayainsaat.com", "telefon": "0312 555 0606", "bakiye": "22100.00", "bakiye_tip": "A", "durum": "aktif"}
+  ]
+}

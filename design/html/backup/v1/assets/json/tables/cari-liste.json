@@ -1,0 +1,10 @@
+{
+  "data": [
+    {"id": 1, "cari_kod": "CR-001", "cari_unvan": "ABC Teknoloji Ltd.", "telefon": "0212 555 0101", "bakiye": "12450.00", "bakiye_tip": "A", "durum": "aktif"},
+    {"id": 2, "cari_kod": "CR-002", "cari_unvan": "XYZ Ticaret A.Ş.", "telefon": "0216 555 0202", "bakiye": "3200.00", "bakiye_tip": "B", "durum": "aktif"},
+    {"id": 3, "cari_kod": "CR-003", "cari_unvan": "Mehmet Yılmaz", "telefon": "0532 555 0303", "bakiye": "0.00", "bakiye_tip": "", "durum": "pasif"},
+    {"id": 4, "cari_kod": "CR-004", "cari_unvan": "Demir Sanayi Ltd.", "telefon": "0224 555 0404", "bakiye": "8750.00", "bakiye_tip": "A", "durum": "aktif"},
+    {"id": 5, "cari_kod": "CR-005", "cari_unvan": "Yılmaz Gıda", "telefon": "0242 555 0505", "bakiye": "1450.00", "bakiye_tip": "B", "durum": "aktif"},
+    {"id": 6, "cari_kod": "CR-006", "cari_unvan": "Kaya İnşaat", "telefon": "0312 555 0606", "bakiye": "22100.00", "bakiye_tip": "A", "durum": "aktif"}
+  ]
+}

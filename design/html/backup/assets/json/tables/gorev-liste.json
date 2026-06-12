@@ -1,0 +1,11 @@
+{
+  "data": [
+    {"id": 1, "gorev_no": "GRV-2026-001", "baslik": "Mayıs cari mutabakatları", "atanan": "Ayşe Yılmaz", "oncelik": "yuksek", "son_tarih": "05.06.2026", "olusturma": "28.05.2026", "status": "devam_ediyor", "durum": "devam_ediyor"},
+    {"id": 2, "gorev_no": "GRV-2026-002", "baslik": "Stok sayımı — Ana depo", "atanan": "Mehmet Kaya", "oncelik": "normal", "son_tarih": "10.06.2026", "olusturma": "29.05.2026", "status": "yapilacak", "durum": "yapilacak"},
+    {"id": 3, "gorev_no": "GRV-2026-003", "baslik": "e-Fatura entegrasyon testi", "atanan": "Can Öztürk", "oncelik": "yuksek", "son_tarih": "02.06.2026", "olusturma": "25.05.2026", "status": "gecikti", "durum": "gecikti"},
+    {"id": 4, "gorev_no": "GRV-2026-004", "baslik": "Yeni personel oryantasyonu", "atanan": "Zeynep Ak", "oncelik": "dusuk", "son_tarih": "15.06.2026", "olusturma": "27.05.2026", "status": "yapilacak", "durum": "yapilacak"},
+    {"id": 5, "gorev_no": "GRV-2026-005", "baslik": "KDV beyannamesi hazırlığı", "atanan": "Ayşe Yılmaz", "oncelik": "normal", "son_tarih": "20.05.2026", "olusturma": "10.05.2026", "status": "tamamlandi", "durum": "tamamlandi"},
+    {"id": 6, "gorev_no": "GRV-2026-006", "baslik": "Müşteri ziyaret planı Q2", "atanan": "Ali Demir", "oncelik": "normal", "son_tarih": "30.06.2026", "olusturma": "01.06.2026", "status": "devam_ediyor", "durum": "devam_ediyor"},
+    {"id": 7, "gorev_no": "GRV-2026-007", "baslik": "Eski fatura arşivi temizliği", "atanan": "—", "oncelik": "dusuk", "son_tarih": "01.07.2026", "olusturma": "03.06.2026", "status": "iptal", "durum": "iptal"}
+  ]
+}

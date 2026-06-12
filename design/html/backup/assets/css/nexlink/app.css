@@ -1,0 +1,30 @@
+@import url("variables.css");
+@import url("typography.css");
+@import url("layout.css");
+@import url("components.css");
+@import url("dashboard.css");
+@import url("../datatables.css");
+@import url("tables.css");
+@import url("elf-panel.css");
+@import url("../notifications.css");
+@import url("../pages/dashboard-shortcuts.css");
+
+body {
+  font-family: var(--bs-body-font-family);
+  background: var(--bs-body-bg);
+  color: var(--bs-body-color);
+}
+
+.text-primary { color: var(--nl-primary) !important; }
+.bg-label-success { background: rgba(40, 199, 111, 0.12) !important; color: #28c76f !important; }
+.bg-label-warning { background: rgba(255, 159, 67, 0.12) !important; color: #ff9f43 !important; }
+.bg-label-danger { background: rgba(255, 76, 81, 0.12) !important; color: #ff4c51 !important; }
+.bg-label-info { background: rgba(0, 186, 209, 0.12) !important; color: #00bad1 !important; }
+.bg-label-secondary { background: var(--bs-body-bg) !important; color: var(--bs-body-color) !important; }
+.btn-label-info { color: #00bad1; background: rgba(0, 186, 209, 0.12); border: 0; }
+.btn-label-primary { color: var(--nl-primary); background: color-mix(in sRGB, var(--nl-primary) 12%, white); border: 0; }
+.btn-label-success { color: #28c76f; background: rgba(40, 199, 111, 0.12); border: 0; }
+.btn-label-warning { color: #ff9f43; background: rgba(255, 159, 67, 0.12); border: 0; }
+.btn-label-danger { color: #ff4c51; background: rgba(255, 76, 81, 0.12); border: 0; }
+.btn-label-secondary { color: var(--bs-body-color); background: var(--bs-body-bg); border: 0; }
+.amount { font-variant-numeric: tabular-nums; white-space: nowrap; }

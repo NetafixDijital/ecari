@@ -1,0 +1,17 @@
+@import url("module-stats.css");
+
+.masraf-status-onay_bekliyor { background: var(--bs-warning-bg-subtle); color: var(--bs-warning); }
+.masraf-status-onaylandi { background: var(--bs-success-bg-subtle); color: var(--bs-success); }
+.masraf-status-reddedildi { background: var(--bs-danger-bg-subtle); color: var(--bs-danger); }
+.masraf-status-odendi { background: color-mix(in sRGB, var(--nl-primary) 12%, white); color: var(--nl-primary); }
+
+.badge-kat-yakit { background: var(--bs-warning-bg-subtle); color: var(--bs-warning); }
+.badge-kat-yemek { background: var(--bs-success-bg-subtle); color: var(--bs-success); }
+.badge-kat-kirtasiye { background: var(--bs-info-bg-subtle); color: var(--bs-info); }
+.badge-kat-ulasim { background: color-mix(in sRGB, var(--nl-primary) 12%, white); color: var(--nl-primary); }
+.badge-kat-diger { background: rgba(100, 101, 106, 0.12); color: var(--bs-body-color); }
+
+.masraf-summary-card .amount {
+  font-size: var(--nl-fs-h4);
+  font-weight: 700;
+}

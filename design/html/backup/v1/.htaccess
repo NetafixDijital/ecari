@@ -1,0 +1,6 @@
+# UTF-8 — Türkçe karakterler (menü, partials.js, içerik)
+AddDefaultCharset UTF-8
+
+<IfModule mod_mime.c>
+  AddCharset UTF-8 .html .htm .css .js .json
+</IfModule>

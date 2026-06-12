@@ -1,0 +1,9 @@
+{
+  "data": [
+    {"id": 1, "irsaliye_no": "SI-2026-0156", "cari": "ABC Teknoloji Ltd.", "tarih": "30.05.2026", "adres": "İstanbul / Kadıköy", "durum": "sevkte"},
+    {"id": 2, "irsaliye_no": "SI-2026-0154", "cari": "XYZ Ticaret A.Ş.", "tarih": "28.05.2026", "adres": "Ankara / Çankaya", "durum": "teslim"},
+    {"id": 3, "irsaliye_no": "SI-2026-0151", "cari": "Mehmet Yılmaz", "tarih": "26.05.2026", "adres": "İzmir / Konak", "durum": "hazirlaniyor"},
+    {"id": 4, "irsaliye_no": "SI-2026-0148", "cari": "Demir Sanayi Ltd.", "tarih": "24.05.2026", "adres": "Bursa / Nilüfer", "durum": "teslim"},
+    {"id": 5, "irsaliye_no": "SI-2026-0145", "cari": "Yılmaz Gıda", "tarih": "22.05.2026", "adres": "Antalya / Muratpaşa", "durum": "iptal"}
+  ]
+}

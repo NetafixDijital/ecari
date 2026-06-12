@@ -1,0 +1,42 @@
+@import url("variables.css");
+@import url("typography.css");
+@import url("layout.css");
+@import url("vuexy-menu-extract.css");
+@import url("vuexy-layout-menu.css");
+@import url("menu.css");
+@import url("vuexy-utils.css");
+@import url("components.css");
+@import url("demo.css");
+@import url("perfect-scrollbar.css");
+@import url("scrollbars.css");
+@import url("customizer.css");
+@import url("table-search.css");
+@import url("datatables.css");
+@import url("notifications.css");
+@import url("elf-assistant.css");
+
+.btn-primary {
+  --bs-btn-bg: var(--bs-primary);
+  --bs-btn-border-color: var(--bs-primary);
+}
+
+.text-primary { color: var(--bs-primary) !important; }
+.text-body-secondary { color: var(--bs-secondary-color) !important; }
+.bg-navbar-theme { background-color: var(--navbar-bg) !important; }
+.bg-footer-theme { background-color: var(--footer-bg) !important; }
+.bg-label-primary { background-color: var(--bs-primary-bg-subtle) !important; color: var(--bs-primary) !important; }
+.icon-md { font-size: 1.25rem; }
+.icon-22px { font-size: 1.375rem; }
+.w-px-200 { width: 200px !important; }
+.btn-label-secondary { color: var(--bs-secondary-color); background: var(--bs-gray-100, #f3f2f3); border-color: transparent; }
+.btn-label-info { color: var(--bs-info); background: var(--bs-info-bg-subtle); border-color: transparent; }
+.btn-label-success { color: var(--bs-success); background: var(--bs-success-bg-subtle); border-color: transparent; }
+.btn-label-warning { color: var(--bs-warning); background: var(--bs-warning-bg-subtle); border-color: transparent; }
+.btn-label-danger { color: var(--bs-danger); background: var(--bs-danger-bg-subtle); border-color: transparent; }
+.btn-label-primary { color: var(--bs-primary); background: var(--bs-primary-bg-subtle); border-color: transparent; }
+
+/* layout-content-navbar: demo.css padding override güvencesi */
+.layout-wrapper.layout-content-navbar .layout-page {
+  padding-block-start: 0 !important;
+  padding-top: 0 !important;
+}

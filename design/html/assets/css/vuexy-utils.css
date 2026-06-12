@@ -1,0 +1,19 @@
+.g-6,.gx-6{--bs-gutter-x: 1.5rem}
+.g-6,.gy-6{--bs-gutter-y: 1.5rem}
+.text-body[href]:hover,.text-heading[href]:hover{color:var(--bs-primary) !important}
+.icon-18px,.icon-18px::before{block-size:18px !important;font-size:18px !important;inline-size:18px !important}
+[data-bs-theme=dark] .btn-text-secondary{--bs-btn-hover-bg: color-mix(in sRGB, var(--bs-secondary) 8%, var(--bs-paper-bg));--bs-btn-active-bg: color-mix(in sRGB, var(--bs-secondary) 8%, var(--bs-paper-bg))}
+.mt-6{margin-block-start:1.5rem !important}
+.p-1_5{padding:.375rem !important}
+.pt-6{padding-block-start:1.5rem !important}
+.text-body{--bs-text-opacity: 1;color:var(--bs-body-color) !important}
+.divider.divider-vertical{position:relative;display:flex;align-items:center;justify-content:center;margin:unset;block-size:100%}
+.divider.divider-vertical::before,.divider.divider-vertical::after{position:absolute;border-inline-start:1px solid var(--bs-divider-color);content:"";inset-inline-start:50%}
+.divider.divider-vertical::before{inset-block:0 50%}
+.divider.divider-vertical::after{inset-block:50% 0}
+.divider.divider-vertical.divider-dashed::before,.divider.divider-vertical.divider-dashed::after{border-width:1px 1px 1px 0;border-style:dashed}
+.divider.divider-vertical.divider-dotted::before,.divider.divider-vertical.divider-dotted::after{border-width:1px 1px 1px 0;border-style:dotted}
+.divider.divider-vertical:has(.badge-divider-bg)::after,.divider.divider-vertical:has(.badge-divider-bg)::before{inset-inline-start:49%}
+.divider.divider-vertical .divider-text{z-index:1;padding:.5125rem;background-color:var(--bs-paper-bg)}
+.divider.divider-vertical .divider-text::before,.divider.divider-vertical .divider-text::after{content:unset}
+.divider.divider-vertical .divider-text .badge-divider-bg{border-radius:50%;background-color:var(--bs-gray-50);color:var(--bs-secondary-color);font-size:.75rem;padding-block:.313rem;padding-inline:.252rem}

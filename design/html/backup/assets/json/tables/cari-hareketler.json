@@ -1,0 +1,18 @@
+{
+  "data": [
+    {"id": 1, "tarih": "28.05.2026", "cari_kod": "CR-001", "cari": "ABC Teknoloji Ltd.", "islem": "Fatura #FT-2026/0142", "borc": "4250.00", "alacak": "", "bakiye": "12450.00"},
+    {"id": 2, "tarih": "20.05.2026", "cari_kod": "CR-001", "cari": "ABC Teknoloji Ltd.", "islem": "Tahsilat — Kasa Merkez", "borc": "", "alacak": "2000.00", "bakiye": "8200.00"},
+    {"id": 3, "tarih": "10.05.2026", "cari_kod": "CR-001", "cari": "ABC Teknoloji Ltd.", "islem": "Fatura #FT-2026/0098", "borc": "6150.00", "alacak": "", "bakiye": "10200.00"},
+    {"id": 4, "tarih": "27.05.2026", "cari_kod": "CR-002", "cari": "XYZ Ticaret A.Ş.", "islem": "Tahsilat — Havale", "borc": "", "alacak": "5000.00", "bakiye": "3200.00"},
+    {"id": 5, "tarih": "25.05.2026", "cari_kod": "CR-002", "cari": "XYZ Ticaret A.Ş.", "islem": "Tediye — Banka Ziraat", "borc": "", "alacak": "1500.00", "bakiye": "3200.00"},
+    {"id": 6, "tarih": "15.05.2026", "cari_kod": "CR-002", "cari": "XYZ Ticaret A.Ş.", "islem": "Fatura #FT-2026/0110", "borc": "4700.00", "alacak": "", "bakiye": "4700.00"},
+    {"id": 7, "tarih": "25.05.2026", "cari_kod": "CR-003", "cari": "Mehmet Yılmaz", "islem": "Fatura #FT-2026/0140", "borc": "850.00", "alacak": "", "bakiye": "850.00"},
+    {"id": 8, "tarih": "01.04.2026", "cari_kod": "CR-003", "cari": "Mehmet Yılmaz", "islem": "Virman — CR-001", "borc": "", "alacak": "500.00", "bakiye": "0.00"},
+    {"id": 9, "tarih": "24.05.2026", "cari_kod": "CR-004", "cari": "Demir Sanayi Ltd.", "islem": "Virman", "borc": "", "alacak": "1200.00", "bakiye": "8750.00"},
+    {"id": 10, "tarih": "18.05.2026", "cari_kod": "CR-004", "cari": "Demir Sanayi Ltd.", "islem": "Fatura #FT-2026/0105", "borc": "3200.00", "alacak": "", "bakiye": "9950.00"},
+    {"id": 11, "tarih": "22.05.2026", "cari_kod": "CR-005", "cari": "Yılmaz Gıda", "islem": "Tediye", "borc": "600.00", "alacak": "", "bakiye": "1450.00"},
+    {"id": 12, "tarih": "12.05.2026", "cari_kod": "CR-005", "cari": "Yılmaz Gıda", "islem": "Fatura #FT-2026/0095", "borc": "2050.00", "alacak": "", "bakiye": "2050.00"},
+    {"id": 13, "tarih": "20.05.2026", "cari_kod": "CR-006", "cari": "Kaya İnşaat", "islem": "Fatura #FT-2026/0132", "borc": "9800.00", "alacak": "", "bakiye": "22100.00"},
+    {"id": 14, "tarih": "08.05.2026", "cari_kod": "CR-006", "cari": "Kaya İnşaat", "islem": "Tahsilat — Havale", "borc": "", "alacak": "5000.00", "bakiye": "12300.00"}
+  ]
+}

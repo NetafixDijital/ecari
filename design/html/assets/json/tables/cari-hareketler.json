@@ -1,0 +1,18 @@
+{
+  "data": [
+    {"id": 1, "movement_date": "28.05.2026", "account_code": "CR-001", "account_title": "ABC Teknoloji Ltd.", "description": "Fatura #FT-2026/0142", "debit_amount": "4250.00", "credit_amount": "", "balance": "12450.00"},
+    {"id": 2, "movement_date": "20.05.2026", "account_code": "CR-001", "account_title": "ABC Teknoloji Ltd.", "description": "Tahsilat — Kasa Merkez", "debit_amount": "", "credit_amount": "2000.00", "balance": "8200.00"},
+    {"id": 3, "movement_date": "10.05.2026", "account_code": "CR-001", "account_title": "ABC Teknoloji Ltd.", "description": "Fatura #FT-2026/0098", "debit_amount": "6150.00", "credit_amount": "", "balance": "10200.00"},
+    {"id": 4, "movement_date": "27.05.2026", "account_code": "CR-002", "account_title": "XYZ Ticaret A.Ş.", "description": "Tahsilat — Havale", "debit_amount": "", "credit_amount": "5000.00", "balance": "3200.00"},
+    {"id": 5, "movement_date": "25.05.2026", "account_code": "CR-002", "account_title": "XYZ Ticaret A.Ş.", "description": "Tediye — Banka Ziraat", "debit_amount": "", "credit_amount": "1500.00", "balance": "3200.00"},
+    {"id": 6, "movement_date": "15.05.2026", "account_code": "CR-002", "account_title": "XYZ Ticaret A.Ş.", "description": "Fatura #FT-2026/0110", "debit_amount": "4700.00", "credit_amount": "", "balance": "4700.00"},
+    {"id": 7, "movement_date": "25.05.2026", "account_code": "CR-003", "account_title": "Mehmet Yılmaz", "description": "Fatura #FT-2026/0140", "debit_amount": "850.00", "credit_amount": "", "balance": "850.00"},
+    {"id": 8, "movement_date": "01.04.2026", "account_code": "CR-003", "account_title": "Mehmet Yılmaz", "description": "Virman — CR-001", "debit_amount": "", "credit_amount": "500.00", "balance": "0.00"},
+    {"id": 9, "movement_date": "24.05.2026", "account_code": "CR-004", "account_title": "Demir Sanayi Ltd.", "description": "Virman", "debit_amount": "", "credit_amount": "1200.00", "balance": "8750.00"},
+    {"id": 10, "movement_date": "18.05.2026", "account_code": "CR-004", "account_title": "Demir Sanayi Ltd.", "description": "Fatura #FT-2026/0105", "debit_amount": "3200.00", "credit_amount": "", "balance": "9950.00"},
+    {"id": 11, "movement_date": "22.05.2026", "account_code": "CR-005", "account_title": "Yılmaz Gıda", "description": "Tediye", "debit_amount": "600.00", "credit_amount": "", "balance": "1450.00"},
+    {"id": 12, "movement_date": "12.05.2026", "account_code": "CR-005", "account_title": "Yılmaz Gıda", "description": "Fatura #FT-2026/0095", "debit_amount": "2050.00", "credit_amount": "", "balance": "2050.00"},
+    {"id": 13, "movement_date": "20.05.2026", "account_code": "CR-006", "account_title": "Kaya İnşaat", "description": "Fatura #FT-2026/0132", "debit_amount": "9800.00", "credit_amount": "", "balance": "22100.00"},
+    {"id": 14, "movement_date": "08.05.2026", "account_code": "CR-006", "account_title": "Kaya İnşaat", "description": "Tahsilat — Havale", "debit_amount": "", "credit_amount": "5000.00", "balance": "12300.00"}
+  ]
+}

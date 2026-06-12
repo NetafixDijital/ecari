@@ -1,0 +1,63 @@
+.dashboard-shortcuts {
+  margin-bottom: 1.5rem;
+}
+
+.dashboard-shortcuts .card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.dashboard-shortcuts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(7.5rem, 1fr));
+  gap: 0.75rem;
+}
+
+.dashboard-shortcut-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 1rem 0.5rem;
+  border-radius: 0.5rem;
+  border: 1px solid var(--bs-border-color);
+  background: var(--bs-paper-bg);
+  text-align: center;
+  color: var(--bs-heading-color);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
+  min-height: 6.5rem;
+}
+
+.dashboard-shortcut-card:hover {
+  border-color: var(--bs-primary);
+  box-shadow: var(--bs-box-shadow-sm);
+  color: var(--bs-primary);
+  transform: translateY(-2px);
+}
+
+.dashboard-shortcut-icon {
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bs-primary-bg-subtle);
+  color: var(--bs-primary);
+  font-size: 1.375rem;
+}
+
+.dashboard-shortcut-label {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  line-height: 1.3;
+}
+
+.dashboard-shortcuts-empty {
+  padding: 1.5rem;
+  text-align: center;
+  color: var(--bs-secondary-color);
+}

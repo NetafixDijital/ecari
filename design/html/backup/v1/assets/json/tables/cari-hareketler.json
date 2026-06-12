@@ -1,0 +1,10 @@
+{
+  "data": [
+    {"id": 1, "tarih": "28.05.2026", "cari": "ABC Teknoloji Ltd.", "islem": "Fatura #FT-2026-0142", "borc": "4250.00", "alacak": "", "bakiye": "12450.00"},
+    {"id": 2, "tarih": "27.05.2026", "cari": "XYZ Ticaret A.Ş.", "islem": "Tahsilat", "borc": "", "alacak": "5000.00", "bakiye": "3200.00"},
+    {"id": 3, "tarih": "25.05.2026", "cari": "Mehmet Yılmaz", "islem": "Fatura #FT-2026-0140", "borc": "850.00", "alacak": "", "bakiye": "850.00"},
+    {"id": 4, "tarih": "24.05.2026", "cari": "Demir Sanayi Ltd.", "islem": "Virman", "borc": "", "alacak": "1200.00", "bakiye": "8750.00"},
+    {"id": 5, "tarih": "22.05.2026", "cari": "Yılmaz Gıda", "islem": "Tediye", "borc": "600.00", "alacak": "", "bakiye": "1450.00"},
+    {"id": 6, "tarih": "20.05.2026", "cari": "Kaya İnşaat", "islem": "Fatura #FT-2026-0132", "borc": "9800.00", "alacak": "", "bakiye": "22100.00"}
+  ]
+}

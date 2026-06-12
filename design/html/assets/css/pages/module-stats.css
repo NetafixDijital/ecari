@@ -1,0 +1,31 @@
+/* Modül KPI kartları — NexLink */
+.module-stat-card {
+  border: 1px solid var(--bs-border-color);
+  border-radius: 0.75rem;
+  padding: 1.25rem;
+  background: var(--bs-paper-bg);
+  height: 100%;
+}
+
+.module-stat-card .stat-label {
+  font-size: var(--nl-fs-xs);
+  color: var(--bs-body-color);
+  margin-bottom: 0.25rem;
+}
+
+.module-stat-card h4 {
+  font-size: var(--nl-fs-h4);
+  font-weight: 700;
+  color: var(--bs-heading-color);
+  margin-bottom: 0;
+}
+
+.module-stat-card .stat-icon {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 0.625rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+}

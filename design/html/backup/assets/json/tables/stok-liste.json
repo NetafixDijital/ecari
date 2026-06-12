@@ -1,0 +1,10 @@
+{
+  "data": [
+    {"id": 1, "stok_kod": "STK-001", "urun": "Laptop Stand Pro", "birim": "Adet", "miktar": "48", "alis": "320.00", "satis": "450.00", "durum": "aktif"},
+    {"id": 2, "stok_kod": "STK-002", "urun": "Kablosuz Mouse", "birim": "Adet", "miktar": "120", "alis": "85.00", "satis": "149.00", "durum": "aktif"},
+    {"id": 3, "stok_kod": "STK-003", "urun": "USB-C Hub 7 Port", "birim": "Adet", "miktar": "5", "alis": "410.00", "satis": "599.00", "durum": "kritik"},
+    {"id": 4, "stok_kod": "STK-004", "urun": "Mekanik Klavye", "birim": "Adet", "miktar": "22", "alis": "890.00", "satis": "1290.00", "durum": "aktif"},
+    {"id": 5, "stok_kod": "STK-005", "urun": "27\" Monitör", "birim": "Adet", "miktar": "14", "alis": "4200.00", "satis": "5490.00", "durum": "aktif"},
+    {"id": 6, "stok_kod": "STK-006", "urun": "Yazıcı Toneri", "birim": "Adet", "miktar": "3", "alis": "280.00", "satis": "420.00", "durum": "kritik"}
+  ]
+}

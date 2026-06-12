@@ -1,0 +1,95 @@
+{
+  "data": [
+    {
+      "id": 1,
+      "task_code": "GRV-2026-001",
+      "title": "Mayıs cari mutabakatları",
+      "assignee_name": "Ayşe Yılmaz",
+      "priority": "YUKSEK",
+      "oncelik": "yuksek",
+      "end_date": "05.06.2026",
+      "start_date": "28.05.2026",
+      "task_status": "DEVAM_EDIYOR",
+      "status": "devam_ediyor",
+      "durum": "devam_ediyor"
+    },
+    {
+      "id": 2,
+      "task_code": "GRV-2026-002",
+      "title": "Stok sayımı — Ana depo",
+      "assignee_name": "Mehmet Kaya",
+      "priority": "ORTA",
+      "oncelik": "normal",
+      "end_date": "10.06.2026",
+      "start_date": "29.05.2026",
+      "task_status": "BEKLIYOR",
+      "status": "yapilacak",
+      "durum": "yapilacak"
+    },
+    {
+      "id": 3,
+      "task_code": "GRV-2026-003",
+      "title": "e-Fatura entegrasyon testi",
+      "assignee_name": "Can Öztürk",
+      "priority": "YUKSEK",
+      "oncelik": "yuksek",
+      "end_date": "02.06.2026",
+      "start_date": "25.05.2026",
+      "task_status": "GECIKTI",
+      "status": "gecikti",
+      "durum": "gecikti"
+    },
+    {
+      "id": 4,
+      "task_code": "GRV-2026-004",
+      "title": "Yeni personel oryantasyonu",
+      "assignee_name": "Zeynep Ak",
+      "priority": "DUSUK",
+      "oncelik": "dusuk",
+      "end_date": "15.06.2026",
+      "start_date": "27.05.2026",
+      "task_status": "BEKLIYOR",
+      "status": "yapilacak",
+      "durum": "yapilacak"
+    },
+    {
+      "id": 5,
+      "task_code": "GRV-2026-005",
+      "title": "KDV beyannamesi hazırlığı",
+      "assignee_name": "Ayşe Yılmaz",
+      "priority": "ORTA",
+      "oncelik": "normal",
+      "end_date": "20.05.2026",
+      "start_date": "10.05.2026",
+      "task_status": "TAMAMLANDI",
+      "status": "tamamlandi",
+      "durum": "tamamlandi"
+    },
+    {
+      "id": 6,
+      "task_code": "GRV-2026-006",
+      "title": "Müşteri ziyaret planı Q2",
+      "assignee_name": "Ali Demir",
+      "priority": "ORTA",
+      "oncelik": "normal",
+      "end_date": "30.06.2026",
+      "start_date": "01.06.2026",
+      "task_status": "DEVAM_EDIYOR",
+      "status": "devam_ediyor",
+      "durum": "devam_ediyor"
+    },
+    {
+      "id": 7,
+      "task_code": "GRV-2026-007",
+      "title": "Eski fatura arşivi temizliği",
+      "assignee_name": "—",
+      "priority": "DUSUK",
+      "oncelik": "dusuk",
+      "end_date": "01.07.2026",
+      "start_date": "03.06.2026",
+      "task_status": "IPTAL",
+      "status": "iptal",
+      "durum": "iptal"
+    }
+  ]
+}

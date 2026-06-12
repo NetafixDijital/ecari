@@ -1,0 +1,8 @@
+{
+  "data": [
+    {"id": 1, "cari": "Ofis Malzemeleri A.Ş.", "fatura_no": "AF-2026-0088", "tarih": "29.05.2026", "tutar": "2340.00", "kdv": "390.00", "durum": "bekliyor"},
+    {"id": 2, "cari": "Tech Tedarik Ltd.", "fatura_no": "AF-2026-0087", "tarih": "26.05.2026", "tutar": "18900.00", "kdv": "3150.00", "durum": "odendi"},
+    {"id": 3, "cari": "Kırtasiye Dünyası", "fatura_no": "AF-2026-0085", "tarih": "22.05.2026", "tutar": "560.00", "kdv": "93.33", "durum": "odendi"},
+    {"id": 4, "cari": "Elektronik Pazarı", "fatura_no": "AF-2026-0082", "tarih": "19.05.2026", "tutar": "7420.00", "kdv": "1236.67", "durum": "bekliyor"}
+  ]
+}

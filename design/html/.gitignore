@@ -1,0 +1,28 @@
+# OS
+Thumbs.db
+Desktop.ini
+.DS_Store
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Env / secrets
+.env
+.env.*
+*.pem
+credentials.json
+
+# Logs & temp
+*.log
+npm-debug.log*
+tmp/
+temp/
+_cache/
+
+# Agent / tooling artifacts
+agent-tools/
+terminals/
+.tools/

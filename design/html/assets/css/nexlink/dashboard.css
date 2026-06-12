@@ -1,0 +1,151 @@
+/* NexLink Finance Dashboard — finance.html referans */
+/* https://nexlink.layoutdrop.com/demo/finance.html */
+
+/* KPI kartları */
+.finance-stat-card .card-body {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  padding: 1.25rem;
+}
+.finance-stat-card .avatar {
+  width: 3rem;
+  height: 3rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  font-size: 1.25rem;
+  flex-shrink: 0;
+}
+.finance-stat-card .stat-label {
+  display: block;
+  font-weight: 600;
+  color: var(--bs-secondary-color);
+  margin-bottom: 0;
+}
+.finance-stat-card h2 {
+  margin-top: 0.25rem;
+}
+
+/* Grafik kartı */
+.finance-chart-card .card-header { padding-bottom: 0.5rem; }
+.finance-chart-bars {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.5rem;
+  height: 9rem;
+  padding: 0.5rem 0.25rem 0;
+  margin-top: 0.5rem;
+}
+.finance-chart-bars span {
+  flex: 1;
+  border-radius: 0.375rem 0.375rem 0 0;
+  background: linear-gradient(180deg, var(--nl-primary) 0%, rgba(var(--nl-primary-rgb), 0.35) 100%);
+  min-height: 1.5rem;
+  transition: height 0.3s ease;
+}
+.finance-chart-bars span:nth-child(even) { opacity: 0.55; }
+.finance-chart-bars span.bar-alt {
+  background: linear-gradient(180deg, rgba(var(--nl-primary-rgb), 0.45) 0%, rgba(var(--nl-primary-rgb), 0.12) 100%);
+}
+
+/* Donut + legend */
+.finance-donut-wrap {
+  position: relative;
+  width: 7.5rem;
+  height: 7.5rem;
+  margin: 0 auto 1rem;
+}
+.finance-donut-wrap .chart-donut { width: 100%; height: 100%; margin: 0; }
+.finance-donut-center {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--nl-fs-h5);
+  font-weight: 700;
+  color: var(--bs-heading-color);
+}
+.finance-legend-nl { gap: 0.125rem; }
+.finance-legend-nl-item {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.25rem 0.35rem;
+  font-size: var(--nl-fs-xs);
+}
+.finance-legend-nl-item strong {
+  color: var(--bs-heading-color);
+  font-weight: 600;
+}
+.finance-legend-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: var(--nl-fs-xs);
+  padding: 0.35rem 0;
+}
+.finance-legend-item .dot {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  margin-right: 0.5rem;
+  flex-shrink: 0;
+}
+
+/* Aylık hedef — mor gradient kart (NexLink Monthly Target) */
+.finance-target-card {
+  background-color: var(--nl-primary);
+  position: relative;
+  border: 0 !important;
+  overflow: hidden;
+}
+.finance-target-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(var(--nl-primary-rgb), 0.85) 0%, rgba(var(--bs-info-rgb), 0.95) 100%);
+  pointer-events: none;
+}
+.finance-target-card > * { position: relative; z-index: 1; }
+
+.finance-target-visual {
+  position: relative;
+  min-height: 5.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.finance-target-ring {
+  width: 6.5rem;
+  height: 6.5rem;
+  border-radius: 50%;
+  border: 0.35rem solid rgba(255, 255, 255, 0.2);
+  border-top-color: #fff;
+  border-right-color: rgba(255, 255, 255, 0.65);
+  transform: rotate(-45deg);
+}
+.finance-target-mid {
+  position: absolute;
+  font-size: var(--nl-fs-xs);
+  font-weight: 500;
+  margin-top: 0.5rem;
+}
+.finance-target-footer { margin: 0; }
+
+.finance-table-card .dt-name-cell {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  min-width: 0;
+}
+
+.finance-side-card .card-body { padding-top: 0.5rem; }
+
+.progress-sm { height: 0.375rem; border-radius: 999px; }
+
+@media (max-width: 1199.98px) {
+  .finance-chart-bars { height: 7rem; }
+}

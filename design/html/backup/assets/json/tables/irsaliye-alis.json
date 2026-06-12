@@ -1,0 +1,8 @@
+{
+  "data": [
+    {"id": 1, "irsaliye_no": "AI-2026-0092", "cari": "Tech Tedarik Ltd.", "tarih": "29.05.2026", "depo": "Merkez Depo", "durum": "teslim"},
+    {"id": 2, "irsaliye_no": "AI-2026-0090", "cari": "Ofis Malzemeleri A.Ş.", "tarih": "27.05.2026", "depo": "Merkez Depo", "durum": "bekliyor"},
+    {"id": 3, "irsaliye_no": "AI-2026-0088", "cari": "Elektronik Pazarı", "tarih": "25.05.2026", "depo": "Şube Depo", "durum": "hazirlaniyor"},
+    {"id": 4, "irsaliye_no": "AI-2026-0085", "cari": "Mobilya Deposu", "tarih": "23.05.2026", "depo": "Merkez Depo", "durum": "teslim"}
+  ]
+}

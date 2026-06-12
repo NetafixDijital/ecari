@@ -1,0 +1,11 @@
+{
+  "data": [
+    {"id": 1, "masraf_no": "MSF-2026-001", "aciklama": "Ankara müşteri ziyareti — yakıt", "kategori": "yakit", "tutar": "1850.00", "tarih": "28.05.2026", "talep_eden": "Ali Demir", "status": "onaylandi", "durum": "onaylandi"},
+    {"id": 2, "masraf_no": "MSF-2026-002", "aciklama": "Ofis kırtasiye alımı", "kategori": "kirtasiye", "tutar": "420.50", "tarih": "29.05.2026", "talep_eden": "Ayşe Yılmaz", "status": "onay_bekliyor", "durum": "onay_bekliyor"},
+    {"id": 3, "masraf_no": "MSF-2026-003", "aciklama": "Ekip yemeği — proje toplantısı", "kategori": "yemek", "tutar": "2340.00", "tarih": "27.05.2026", "talep_eden": "Mehmet Kaya", "status": "odendi", "durum": "odendi"},
+    {"id": 4, "masraf_no": "MSF-2026-004", "aciklama": "Kargo / kurye gideri", "kategori": "ulasim", "tutar": "185.00", "tarih": "26.05.2026", "talep_eden": "Can Öztürk", "status": "onay_bekliyor", "durum": "onay_bekliyor"},
+    {"id": 5, "masraf_no": "MSF-2026-005", "aciklama": "Yazılım lisans yenileme", "kategori": "diger", "tutar": "4500.00", "tarih": "25.05.2026", "talep_eden": "Zeynep Ak", "status": "reddedildi", "durum": "reddedildi"},
+    {"id": 6, "masraf_no": "MSF-2026-006", "aciklama": "Bursa saha ziyareti — otoyol", "kategori": "yakit", "tutar": "620.00", "tarih": "24.05.2026", "talep_eden": "Ali Demir", "status": "odendi", "durum": "odendi"},
+    {"id": 7, "masraf_no": "MSF-2026-007", "aciklama": "Toplantı salonu kiralama", "kategori": "diger", "tutar": "1200.00", "tarih": "22.05.2026", "talep_eden": "Ayşe Yılmaz", "status": "onaylandi", "durum": "onaylandi"}
+  ]
+}

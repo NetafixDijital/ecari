@@ -1,0 +1,12 @@
+{
+  "ConnectionStrings": {
+    "SystemDb": "Server=SUNUCU_IP;Database=ecari_system;User Id=KULLANICI;Password=SIFRE;TrustServerCertificate=True;Encrypt=True",
+    "TenantDbTemplate": "Server=SUNUCU_IP;Database={0};User Id=KULLANICI;Password=SIFRE;TrustServerCertificate=True;Encrypt=True"
+  },
+  "Jwt": {
+    "Secret": "GELISTIRME-ICIN-UZUN-GIZLI-ANAHTAR-MIN-32-KARAKTER",
+    "Issuer": "ecari.local",
+    "Audience": "ecari.local",
+    "AccessTokenMinutes": 60
+  }
+}

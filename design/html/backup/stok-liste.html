@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="tr" data-bs-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Stok Listesi | e-Cari - Ön Muhasebe</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="assets/css/nexlink/app.css">
+  
+</head>
+<body data-page-script="assets/js/stok-liste.js" data-page-scripts="assets/js/excel-import.js">
+  <div class="page-layout">
+    <div id="nl-sidebar-host"></div>
+    <div class="layout-overlay"></div>
+    <div id="nl-header-host"></div>
+    <main class="app-wrapper">
+      <div class="container-fluid">
+        <div class="app-page-content">
+<div class="page-header d-flex justify-content-between align-items-start mb-4">
+              <h4 class="mb-0">Stok Listesi</h4>
+              <div class="d-flex align-items-center flex-wrap gap-2">
+                <button type="button" class="btn btn-label-secondary" id="btnExcelStok"><i class="ti ti-file-spreadsheet me-1"></i> Excel'den Aktar</button>
+                <button type="button" class="btn btn-primary" id="btnYeniStok"><i class="ti ti-plus me-1"></i> Yeni Stok</button>
+              </div>
+            </div>
+            <div class="card datatables-toolbar-hidden">
+              <div class="table-responsive">
+                <table class="table table-hover datatables-ajax mb-0" data-table="stok-liste" data-search-placeholder="Stok ara...">
+                  <thead class="border-top">
+                    <tr>
+                      <th>Stok Kodu</th>
+                      <th>Ürün Adı</th>
+                      <th>Birim</th>
+                      <th>Miktar</th>
+                      <th>Alış</th>
+                      <th>Satış</th>
+                      <th>Durum</th>
+                      <th class="text-center">İşlemler</th>
+                    </tr>
+                  </thead>
+                  <tbody></tbody>
+                </table>
+              </div>
+            </div>
+        </div>
+        <div id="nl-footer-host"></div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Yeni Stok -->
+  <div class="modal fade nl-modal-form" id="modalYeniStok" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+      <div class="modal-content">
+        <div class="modal-header">
+          <div class="pe-3">
+            <h5 class="modal-title">Yeni Stok Ekle</h5>
+            <p class="modal-desc mb-0">Stok kartı bilgilerini girin. Kayıt sonrası stok listesine eklenir.</p>
+          </div>
+          <button type="button" class="btn-close ms-auto" data-bs-dismiss="modal" aria-label="Kapat"></button>
+        </div>
+        <div class="modal-body">
+          <form id="formYeniStok" novalidate>
+            <div class="form-section">
+              <div class="form-section-title">Stok Bilgileri</div>
+              <div class="row g-3">
+                <div class="col-md-4">
+                  <label class="form-label" for="stokKod">Stok Kodu <span class="text-danger">*</span></label>
+                  <div class="nl-field-icon">
+                    <span class="nl-field-icon__icon" aria-hidden="true"><i class="ti ti-barcode"></i></span>
+                    <input type="text" class="form-control font-mono" id="stokKod" placeholder="STK-007" aria-label="Stok kodu" required>
+                  </div>
+                </div>
+                <div class="col-md-8">
+                  <label class="form-label" for="stokUrun">Ürün Adı <span class="text-danger">*</span></label>
+                  <div class="nl-field-icon">
+                    <span class="nl-field-icon__icon" aria-hidden="true"><i class="ti ti-package"></i></span>
+                    <input type="text" class="form-control" id="stokUrun" placeholder="Ürün adı" aria-label="Ürün adı" required>
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label" for="stokBirim">Birim</label>
+                  <div class="nl-field-icon">
+                    <span class="nl-field-icon__icon" aria-hidden="true"><i class="ti ti-ruler"></i></span>
+                    <select class="form-select ps-5" id="stokBirim" aria-label="Birim">
+                      <option value="Adet" selected>Adet</option>
+                      <option value="Kg">Kg</option>
+                      <option value="Lt">Lt</option>
+                      <option value="Metre">Metre</option>
+                      <option value="Paket">Paket</option>
+                      <option value="Kutu">Kutu</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label" for="stokMiktar">Miktar</label>
+                  <div class="nl-field-icon">
+                    <span class="nl-field-icon__icon" aria-hidden="true"><i class="ti ti-stack-2"></i></span>
+                    <input type="number" class="form-control" id="stokMiktar" min="0" step="1" placeholder="0" aria-label="Miktar" value="0">
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="form-section">
+              <div class="form-section-title">Fiyat Bilgileri</div>
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <label class="form-label" for="stokAlis">Alış Fiyatı (₺)</label>
+                  <div class="nl-field-icon">
+                    <span class="nl-field-icon__icon" aria-hidden="true"><i class="ti ti-arrow-down-right"></i></span>
+                    <input type="number" class="form-control" id="stokAlis" min="0" step="0.01" placeholder="0,00" aria-label="Alış fiyatı">
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label" for="stokSatis">Satış Fiyatı (₺)</label>
+                  <div class="nl-field-icon">
+                    <span class="nl-field-icon__icon" aria-hidden="true"><i class="ti ti-arrow-up-right"></i></span>
+                    <input type="number" class="form-control" id="stokSatis" min="0" step="0.01" placeholder="0,00" aria-label="Satış fiyatı">
+                  </div>
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-label-secondary" data-bs-dismiss="modal">İptal</button>
+          <button type="button" class="btn btn-primary" id="btnStokEkle"><i class="ti ti-plus me-1"></i> Stok Ekle</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Excel'den Aktar — Stok -->
+  <div class="modal fade nl-modal-form" id="modalExcelStok" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <div class="pe-3">
+            <h5 class="modal-title">Excel'den Stok Aktar</h5>
+            <p class="modal-desc mb-0">.xlsx, .xls veya .csv dosyanızı yükleyin. İlk satır sütun başlıkları olmalıdır.</p>
+          </div>
+          <button type="button" class="btn-close ms-auto" data-bs-dismiss="modal" aria-label="Kapat"></button>
+        </div>
+        <div class="modal-body">
+          <div class="nl-excel-dropzone" id="excelStokDropzone" role="button" tabindex="0">
+            <input type="file" id="excelStokFile" accept=".xlsx,.xls,.csv" hidden>
+            <i class="ti ti-file-spreadsheet"></i>
+            <p class="mb-1 fw-medium">Dosyayı sürükleyin veya tıklayarak seçin</p>
+            <p class="file-name mb-0" id="excelStokFileName"></p>
+          </div>
+          <p class="small text-body-secondary mt-3 mb-2">Beklenen sütunlar:</p>
+          <p class="small text-body-secondary mb-0">Stok Kodu, Ürün Adı, Birim, Miktar, Alış, Satış</p>
+          <p class="mt-2 mb-0" id="excelStokStatus"></p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-label-secondary" data-bs-dismiss="modal">İptal</button>
+          <button type="button" class="btn btn-primary" id="btnExcelStokImport" disabled><i class="ti ti-upload me-1"></i> İçe Aktar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="assets/js/nexlink/main.js"></script>
+</body>
+</html>

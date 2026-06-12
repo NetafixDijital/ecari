@@ -1,0 +1,9 @@
+{
+  "data": [
+    {"id": 1, "fatura_no": "AF-2026-0088", "cari": "Ofis Malzemeleri A.Ş.", "tarih": "29.05.2026", "vade": "29.06.2026", "tutar": "2340.00", "durum": "bekliyor", "preview_url": "fatura-onizleme.html"},
+    {"id": 2, "fatura_no": "AF-2026-0087", "cari": "Tech Tedarik Ltd.", "tarih": "26.05.2026", "vade": "26.06.2026", "tutar": "18900.00", "durum": "odendi", "preview_url": "fatura-onizleme.html"},
+    {"id": 3, "fatura_no": "AF-2026-0085", "cari": "Kırtasiye Dünyası", "tarih": "22.05.2026", "vade": "22.06.2026", "tutar": "560.00", "durum": "odendi", "preview_url": "fatura-onizleme.html"},
+    {"id": 4, "fatura_no": "AF-2026-0082", "cari": "Elektronik Pazarı", "tarih": "19.05.2026", "vade": "19.06.2026", "tutar": "7420.00", "durum": "bekliyor", "preview_url": "fatura-onizleme.html"},
+    {"id": 5, "fatura_no": "AF-2026-0079", "cari": "Mobilya Deposu", "tarih": "15.05.2026", "vade": "15.06.2026", "tutar": "11200.00", "durum": "vadesi_gecmis", "preview_url": "fatura-onizleme.html"}
+  ]
+}

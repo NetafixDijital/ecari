@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="tr" data-bs-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hızlı Satış | e-Cari - Ön Muhasebe</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="assets/css/nexlink/app.css">
+  <link rel="stylesheet" href="assets/css/pages/hizli-satis.css">
+</head>
+<body data-page-script="assets/js/hizli-satis.js">
+  <div class="page-layout">
+    <div id="nl-sidebar-host"></div>
+    <div class="layout-overlay"></div>
+    <div id="nl-header-host"></div>
+    <main class="app-wrapper">
+      <div class="container-fluid">
+        <div class="app-page-content">
+          <div class="page-header d-flex justify-content-between align-items-start mb-4 flex-wrap gap-3 hs-page-header" id="hsPageHeader">
+            <div>
+              <h4 class="mb-1"><i class="ti ti-bolt text-primary me-1"></i> Hızlı Satış</h4>
+              <p class="text-body-secondary mb-0 small">Perakende satış ve anında fatura</p>
+            </div>
+            <div class="d-flex align-items-center flex-wrap gap-2">
+              <select class="form-select form-select-sm hs-cari-select" id="hsCari">
+                <option value="">Perakende Müşteri</option>
+                <option>ABC Teknoloji Ltd.</option>
+                <option>XYZ Ticaret A.Ş.</option>
+              </select>
+              <button type="button" class="btn btn-sm btn-label-secondary" id="hsFullscreen" title="Tam ekran">
+                <i class="ti ti-maximize me-1"></i> Tam Ekran
+              </button>
+              <button type="button" class="btn btn-sm btn-label-danger" id="hsClearCart">
+                <i class="ti ti-trash me-1"></i> Sepeti Temizle
+              </button>
+            </div>
+          </div>
+
+          <div class="hs-pos" id="hsPos">
+            <div class="hizli-satis-layout">
+              <div class="hs-products-panel card">
+                <div class="card-header border-0 pb-0">
+                  <h6 class="mb-0"><i class="ti ti-packages me-1"></i> Ürünler</h6>
+                </div>
+                <div class="card-body pt-3">
+                  <div class="nl-field-icon mb-3">
+                    <span class="nl-field-icon__icon" aria-hidden="true"><i class="ti ti-search"></i></span>
+                    <input type="search" class="form-control" id="hsSearch" placeholder="Ürün adı veya barkod ara..." autocomplete="off">
+                  </div>
+                  <ul class="nav nav-pills nav-pills-custom nav-fill p-1 rounded-5 hs-categories mb-3" id="hsCategories" role="tablist">
+                    <li class="nav-item" role="presentation">
+                      <button type="button" class="nav-link rounded-5 active" data-cat="all">Tümü</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                      <button type="button" class="nav-link rounded-5" data-cat="elektronik">Elektronik</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                      <button type="button" class="nav-link rounded-5" data-cat="aksesuar">Aksesuar</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                      <button type="button" class="nav-link rounded-5" data-cat="hizmet">Hizmet</button>
+                    </li>
+                  </ul>
+                  <div class="hs-product-grid" id="hsProductGrid"></div>
+                </div>
+              </div>
+
+              <div class="hs-cart-panel card">
+                <div class="card-header py-3 d-flex justify-content-between align-items-center border-0">
+                  <h6 class="mb-0"><i class="ti ti-shopping-cart me-1"></i> Sepet</h6>
+                  <span class="badge bg-primary rounded-pill" id="hsCartCount">0</span>
+                </div>
+                <div class="card-body">
+                  <div class="hs-cart-items" id="hsCartItems">
+                    <div class="hs-empty-cart" id="hsEmptyCart">
+                      <i class="ti ti-shopping-cart-off d-block"></i>
+                      <p class="mb-0 small">Sepet boş — ürüne tıklayarak ekleyin</p>
+                    </div>
+                  </div>
+                  <div class="hs-cart-summary">
+                    <div class="row-line"><span>Ara Toplam</span><span class="amount" id="hsSubtotal">₺0,00</span></div>
+                    <div class="row-line"><span>KDV</span><span class="amount" id="hsKdv">₺0,00</span></div>
+                    <div class="row-line total-line d-flex justify-content-between">
+                      <span>Toplam</span>
+                      <span class="amount" id="hsTotal">₺0,00</span>
+                    </div>
+                  </div>
+                  <div class="hs-payment-btns">
+                    <button type="button" class="btn btn-label-success btn-payment" data-pay="nakit"><i class="ti ti-cash me-1"></i> Nakit</button>
+                    <button type="button" class="btn btn-label-info btn-payment" data-pay="kart"><i class="ti ti-credit-card me-1"></i> Kart</button>
+                    <button type="button" class="btn btn-label-warning btn-payment" data-pay="cari"><i class="ti ti-user me-1"></i> Cari</button>
+                    <button type="button" class="btn btn-primary btn-payment" data-pay="fatura"><i class="ti ti-file-invoice me-1"></i> Fatura</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div id="nl-footer-host"></div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Ödeme tamamlandı -->
+  <div class="modal fade nl-modal-form" id="modalOdeme" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-sm modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header border-0 pb-0">
+          <h5 class="modal-title" id="modalOdemeTitle">Satış Tamamlandı</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
+        </div>
+        <div class="modal-body text-center py-4">
+          <div class="hs-modal-success-icon mb-3">
+            <i class="ti ti-circle-check"></i>
+          </div>
+          <p class="hs-modal-amount amount mb-2" id="modalOdemeTutar">₺0,00</p>
+          <p class="text-body-secondary small mb-0" id="modalOdemeTip"></p>
+        </div>
+        <div class="modal-footer border-0 pt-0">
+          <button type="button" class="btn btn-primary w-100" data-bs-dismiss="modal" id="modalOdemeTamam">Tamam</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="assets/js/nexlink/main.js"></script>
+</body>
+</html>

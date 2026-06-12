@@ -1,0 +1,10 @@
+{
+  "data": [
+    {"id": 1, "servis_no": "SRV-2026-0048", "musteri": "Mehmet Yılmaz", "cihaz": "Dell Latitude 5520", "ariza": "Ekran açılmıyor, güç LED yanıyor", "teknisyen": "Ali Kaya", "giris": "28.05.2026", "status": "islemde", "durum": "islemde"},
+    {"id": 2, "servis_no": "SRV-2026-0047", "musteri": "ABC Teknoloji Ltd.", "cihaz": "HP LaserJet Pro", "ariza": "Kağıt sıkışması, toner uyarısı", "teknisyen": "—", "giris": "29.05.2026", "status": "beklemede", "durum": "beklemede"},
+    {"id": 3, "servis_no": "SRV-2026-0046", "musteri": "XYZ Ticaret A.Ş.", "cihaz": "Lenovo ThinkPad T14", "ariza": "SSD yükseltme + Windows kurulum", "teknisyen": "Ali Kaya", "giris": "25.05.2026", "status": "tamamlandi", "durum": "tamamlandi"},
+    {"id": 4, "servis_no": "SRV-2026-0045", "musteri": "Ayşe Demir", "cihaz": "iPhone 13 — ekran", "ariza": "Ekran değişimi", "teknisyen": "Can Öztürk", "giris": "24.05.2026", "status": "teslim", "durum": "teslim"},
+    {"id": 5, "servis_no": "SRV-2026-0044", "musteri": "Demir Sanayi Ltd.", "cihaz": "Sunucu — RAID", "ariza": "Disk arızası, veri kurtarma", "teknisyen": "Ali Kaya", "giris": "23.05.2026", "status": "islemde", "durum": "islemde"},
+    {"id": 6, "servis_no": "SRV-2026-0043", "musteri": "Yılmaz Gıda", "cihaz": "POS Yazarkasa", "ariza": "Fiş yazdırmıyor", "teknisyen": "—", "giris": "22.05.2026", "status": "beklemede", "durum": "beklemede"}
+  ]
+}
