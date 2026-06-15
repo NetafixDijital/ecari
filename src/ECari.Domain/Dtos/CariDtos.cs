@@ -100,3 +100,11 @@ public record CariMovementListItemDto(
     decimal Debit,
     decimal Credit,
     decimal RunningBalance);
+
+public record CariTaxIdCheckDto(
+    bool Exists,
+    bool IsValidFormat,
+    long? AccountId,
+    string? AccountCode,
+    string? AccountTitle,
+    string Message);

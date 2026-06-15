@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { useToast } from '../../context/ToastContext'
 import {
   fetchModuleSettings,
   updateModuleSettings,
@@ -83,11 +84,11 @@ function settingDescription(setting: ModuleSetting) {
 }
 
 export default function AyarlarOzelPage() {
+  const toast = useToast()
   const [settings, setSettings] = useState<ModuleSetting[]>([])
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
-  const [success, setSuccess] = useState('')
 
   useEffect(() => {
     fetchModuleSettings()
@@ -120,13 +121,14 @@ export default function AyarlarOzelPage() {
     e.preventDefault()
     setSaving(true)
     setError('')
-    setSuccess('')
     try {
       const updated = await updateModuleSettings({ settings })
       setSettings(mergeSettings(updated))
-      setSuccess('Modül ayarları kaydedildi.')
+      toast.success('Kaydedildi', 'Modül ayarları güncellendi.')
     } catch {
-      setError('Kayıt sırasında hata oluştu.')
+      const msg = 'Kayıt sırasında hata oluştu.'
+      setError(msg)
+      toast.error('Kayıt başarısız', msg)
     } finally {
       setSaving(false)
     }
@@ -163,7 +165,6 @@ export default function AyarlarOzelPage() {
       </div>
 
       {error && <div className="alert alert-danger py-2">{error}</div>}
-      {success && <div className="alert alert-success py-2">{success}</div>}
 
       <form onSubmit={handleSave}>
         <div className="row g-4">

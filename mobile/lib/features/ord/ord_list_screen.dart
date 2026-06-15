@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../../core/api/api_client.dart';
 import '../../core/widgets/module_list_page.dart';
 import '../../core/widgets/module_list_tile.dart';
+import 'ord_detail_screen.dart';
 import 'ord_repository.dart';
 
 class OrdListScreen extends StatefulWidget {
@@ -39,6 +40,9 @@ class _OrdListScreenState extends State<OrdListScreen> {
         trailing: moduleCurrency.format(item.grandTotal),
         badge: item.statusLabel,
         badgeTone: statusTone(item.statusKey),
+        onTap: () => Navigator.of(context).push(
+          MaterialPageRoute(builder: (_) => OrdDetailScreen(id: item.id)),
+        ),
       ),
     );
   }

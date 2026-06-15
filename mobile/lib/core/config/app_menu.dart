@@ -16,7 +16,7 @@ class AppMenuItem {
   final AppMenuSection section;
 }
 
-/// Web menüsü ile uyumlu mobil modül listesi (hızlı satış hariç).
+/// Web menüsü ile uyumlu mobil modül listesi.
 abstract final class AppMenu {
   static const dashboard = AppMenuItem(
     id: 'home',
@@ -36,6 +36,8 @@ abstract final class AppMenu {
     AppMenuItem(id: 'irsaliye-satis', label: 'Satış İrsaliye', icon: Icons.local_shipping_outlined),
     AppMenuItem(id: 'irsaliye-alis', label: 'Alış İrsaliye', icon: Icons.local_shipping_outlined),
     AppMenuItem(id: 'siparis', label: 'Sipariş', icon: Icons.shopping_cart_outlined),
+    AppMenuItem(id: 'teklif', label: 'Teklif', icon: Icons.description_outlined),
+    AppMenuItem(id: 'hizli-satis', label: 'Hızlı Satış', icon: Icons.point_of_sale_outlined),
     AppMenuItem(id: 'servis', label: 'Servis', icon: Icons.build_outlined),
     AppMenuItem(id: 'gorev', label: 'Görev', icon: Icons.checklist_outlined),
     AppMenuItem(id: 'masraf', label: 'Masraf', icon: Icons.request_quote_outlined),
@@ -62,6 +64,7 @@ abstract final class AppMenu {
 
   static const settings = [
     AppMenuItem(id: 'ayarlar', label: 'Genel Ayarlar', icon: Icons.settings_outlined, section: AppMenuSection.settings),
+    AppMenuItem(id: 'ayarlar-kullanicilar', label: 'Kullanıcılar', icon: Icons.people_outline, section: AppMenuSection.settings),
   ];
 
   static List<AppMenuItem> get all => [dashboard, ...modules, ...finance, ...reports, ...settings];

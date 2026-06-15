@@ -45,6 +45,18 @@ const CONFIG: Record<
   },
 }
 
+function downloadCsv(filename: string, headers: string[], rows: string[][]) {
+  const escape = (v: string) => `"${v.replace(/"/g, '""')}"`
+  const lines = [headers.map(escape).join(';'), ...rows.map((r) => r.map(escape).join(';'))]
+  const blob = new Blob(['\uFEFF' + lines.join('\n')], { type: 'text/csv;charset=utf-8;' })
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement('a')
+  a.href = url
+  a.download = filename
+  a.click()
+  URL.revokeObjectURL(url)
+}
+
 export default function BelgeRaporPage({ mode }: { mode: ReportMode }) {
   const cfg = CONFIG[mode]
   const [invoices, setInvoices] = useState<InvInvoiceListItem[]>([])
@@ -85,6 +97,35 @@ export default function BelgeRaporPage({ mode }: { mode: ReportMode }) {
     [cfg.isInvoice, invoiceRows],
   )
 
+  function handleExport() {
+    const date = new Date().toISOString().slice(0, 10)
+    if (cfg.isInvoice) {
+      downloadCsv(
+        `${mode}-${date}.csv`,
+        ['Belge No', 'Cari', 'Tarih', 'Tutar', 'Durum'],
+        invoiceRows.map((r) => [
+          r.documentNo,
+          r.accountTitle,
+          r.documentDate,
+          String(r.grandTotal),
+          r.paymentStatusLabel,
+        ]),
+      )
+      return
+    }
+    downloadCsv(
+      `${mode}-${date}.csv`,
+      ['Belge No', 'Cari', 'Tarih', 'Sevk Adresi', 'Durum'],
+      dlnRows.map((r) => [
+        r.documentNo,
+        r.accountTitle,
+        r.documentDate,
+        r.shippingAddress ?? '',
+        r.statusLabel,
+      ]),
+    )
+  }
+
   return (
     <div className="app-page-content">
       <div className="page-header d-flex flex-wrap justify-content-between align-items-start gap-3 mb-4">
@@ -102,8 +143,13 @@ export default function BelgeRaporPage({ mode }: { mode: ReportMode }) {
             </ol>
           </nav>
         </div>
-        <button type="button" className="btn btn-label-secondary" disabled title="Yakında">
-          <i className="ti ti-file-export me-1" /> Excel
+        <button
+          type="button"
+          className="btn btn-label-secondary"
+          disabled={loading || (cfg.isInvoice ? invoiceRows.length === 0 : dlnRows.length === 0)}
+          onClick={handleExport}
+        >
+          <i className="ti ti-file-export me-1" /> CSV İndir
         </button>
       </div>
 

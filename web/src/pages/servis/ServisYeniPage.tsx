@@ -4,8 +4,11 @@ import { fetchCariAccounts, type CariAccountListItem } from '../../api/cari'
 import CariInfoPanel from '../../components/cari/CariInfoPanel'
 import CariSecModal from '../../components/cari/CariSecModal'
 import { createSvcTicket } from '../../api/svc'
+import { useToast } from '../../context/ToastContext'
+import { apiErrorMessage } from '../../utils/apiError'
 
 const PRIORITIES = [
+  { value: 'LOW', label: 'Düşük' },
   { value: 'NORMAL', label: 'Normal' },
   { value: 'HIGH', label: 'Yüksek' },
   { value: 'URGENT', label: 'Acil' },
@@ -13,6 +16,7 @@ const PRIORITIES = [
 
 export default function ServisYeniPage() {
   const navigate = useNavigate()
+  const toast = useToast()
   const [cariler, setCariler] = useState<CariAccountListItem[]>([])
   const [selectedCari, setSelectedCari] = useState<CariAccountListItem | null>(null)
   const [device, setDevice] = useState('')
@@ -50,12 +54,12 @@ export default function ServisYeniPage() {
         technicianName: technician.trim() || null,
         priority,
       })
+      toast.success('Kayıt oluşturuldu', 'Servis kaydı listeye eklendi.')
       navigate('/servis')
     } catch (err: unknown) {
-      const message =
-        (err as { response?: { data?: { message?: string } } })?.response?.data?.message ||
-        'Servis kaydı oluşturulamadı.'
+      const message = apiErrorMessage(err, 'Servis kaydı oluşturulamadı.')
       setError(message)
+      toast.error('Kayıt başarısız', message)
     } finally {
       setSaving(false)
     }

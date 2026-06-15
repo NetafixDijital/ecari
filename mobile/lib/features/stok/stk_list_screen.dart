@@ -5,6 +5,7 @@ import '../../core/api/api_client.dart';
 import '../../core/widgets/label_badge.dart';
 import '../../core/widgets/module_list_page.dart';
 import '../../core/widgets/module_list_tile.dart';
+import 'stk_detail_screen.dart';
 import 'stk_repository.dart';
 
 class StkListScreen extends StatelessWidget {
@@ -25,6 +26,9 @@ class StkListScreen extends StatelessWidget {
         trailing: item.salesPrice != null ? moduleCurrency.format(item.salesPrice) : null,
         badge: item.isActive ? '${item.stockQuantity.toStringAsFixed(0)} ${item.baseUnitName ?? 'adet'}' : 'Pasif',
         badgeTone: item.stockQuantity > 0 ? LabelBadgeTone.success : LabelBadgeTone.warning,
+        onTap: () => Navigator.of(context).push(
+          MaterialPageRoute(builder: (_) => StkDetailScreen(id: item.id)),
+        ),
       ),
     );
   }

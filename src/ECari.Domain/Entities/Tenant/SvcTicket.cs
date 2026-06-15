@@ -13,8 +13,10 @@ public class SvcTicket
     public string Priority { get; set; } = "NORMAL";
     public string? Resolution { get; set; }
     public DateTime? ClosedAt { get; set; }
+    public long? InvoiceId { get; set; }
     public DateTime CreatedAt { get; set; }
     public bool IsDeleted { get; set; }
 
     public CariAccount Account { get; set; } = null!;
+    public ICollection<SvcTicketLine> Lines { get; set; } = new List<SvcTicketLine>();
 }

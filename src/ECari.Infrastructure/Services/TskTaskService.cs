@@ -79,6 +79,80 @@ public class TskTaskService(
         return MapItem(entity);
     }
 
+    public async Task<TskTaskListItemDto?> GetByIdAsync(long id, CancellationToken ct = default)
+    {
+        var entity = await Db.TskTasks.AsNoTracking()
+            .FirstOrDefaultAsync(t => t.Id == id && !t.IsDeleted, ct);
+        return entity is null ? null : MapItem(entity);
+    }
+
+    public async Task<TskTaskListItemDto?> UpdateAsync(long id, UpdateTskTaskRequest request, CancellationToken ct = default)
+    {
+        if (string.IsNullOrWhiteSpace(request.Title))
+            throw new InvalidOperationException("Görev başlığı zorunlu.");
+
+        var db = Db;
+        var entity = await db.TskTasks.FirstOrDefaultAsync(t => t.Id == id && !t.IsDeleted, ct);
+        if (entity is null) return null;
+
+        var priority = request.Priority.ToUpperInvariant() switch
+        {
+            "LOW" or "DUSUK" => "LOW",
+            "HIGH" or "YUKSEK" => "HIGH",
+            "URGENT" or "ACIL" => "URGENT",
+            _ => "NORMAL",
+        };
+
+        entity.Title = request.Title.Trim();
+        entity.Description = request.Description?.Trim();
+        entity.StartDate = request.StartDate;
+        entity.EndDate = request.EndDate;
+        entity.AssigneeName = request.AssigneeName?.Trim();
+        entity.Priority = priority;
+        if (request.ProgressPercent.HasValue)
+            entity.ProgressPercent = request.ProgressPercent.Value;
+
+        await db.SaveChangesAsync(ct);
+        return MapItem(entity);
+    }
+
+    public async Task<TskTaskListItemDto?> UpdateStatusAsync(long id, UpdateTskTaskStatusRequest request, CancellationToken ct = default)
+    {
+        var status = request.Status.ToUpperInvariant() switch
+        {
+            "PENDING" or "YAPILACAK" => "PENDING",
+            "IN_PROGRESS" or "DEVAM" => "IN_PROGRESS",
+            "OVERDUE" or "GECIKTI" => "OVERDUE",
+            "COMPLETED" or "TAMAMLANDI" => "COMPLETED",
+            _ => throw new InvalidOperationException("Geçerli durum: PENDING, IN_PROGRESS, OVERDUE, COMPLETED"),
+        };
+
+        var db = Db;
+        var entity = await db.TskTasks.FirstOrDefaultAsync(t => t.Id == id && !t.IsDeleted, ct);
+        if (entity is null) return null;
+
+        entity.Status = status;
+        if (request.ProgressPercent.HasValue)
+            entity.ProgressPercent = request.ProgressPercent.Value;
+        else if (status == "COMPLETED")
+            entity.ProgressPercent = 100;
+
+        entity.CompletedAt = status == "COMPLETED" ? DateTime.UtcNow : null;
+        await db.SaveChangesAsync(ct);
+        return MapItem(entity);
+    }
+
+    public async Task<bool> DeleteAsync(long id, CancellationToken ct = default)
+    {
+        var db = Db;
+        var entity = await db.TskTasks.FirstOrDefaultAsync(t => t.Id == id && !t.IsDeleted, ct);
+        if (entity is null) return false;
+
+        entity.IsDeleted = true;
+        await db.SaveChangesAsync(ct);
+        return true;
+    }
+
     private static async Task<string> GenerateTaskNoAsync(TenantDbContext db, CancellationToken ct)
     {
         var year = DateTime.UtcNow.Year;

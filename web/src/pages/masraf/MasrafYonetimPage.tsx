@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { fetchExpenseStats, fetchExpenses, type ExpExpenseListItem } from '../../api/exp'
-import { expenseCategoryLabel, formatTry } from '../../utils/format'
+import { formatTry } from '../../utils/format'
 
 export default function MasrafYonetimPage() {
   const [stats, setStats] = useState<Awaited<ReturnType<typeof fetchExpenseStats>> | null>(null)
@@ -25,14 +25,14 @@ export default function MasrafYonetimPage() {
     loadData()
   }, [loadData])
 
-  const categoryBreakdown = useMemo(() => {
+  const paymentBreakdown = useMemo(() => {
     const map = new Map<string, { count: number; total: number }>()
     for (const row of items) {
-      const prev = map.get(row.category) ?? { count: 0, total: 0 }
-      map.set(row.category, { count: prev.count + 1, total: prev.total + row.amount })
+      const prev = map.get(row.paymentMethodLabel) ?? { count: 0, total: 0 }
+      map.set(row.paymentMethodLabel, { count: prev.count + 1, total: prev.total + row.grandTotal })
     }
     return [...map.entries()]
-      .map(([category, data]) => ({ category, ...data }))
+      .map(([label, data]) => ({ label, ...data }))
       .sort((a, b) => b.total - a.total)
   }, [items])
 
@@ -97,12 +97,12 @@ export default function MasrafYonetimPage() {
       </div>
 
       <div className="card">
-        <div className="card-header">Kategori Dağılımı</div>
+        <div className="card-header">Ödeme Şekline Göre Dağılım</div>
         <div className="table-responsive">
           <table className="table table-hover mb-0">
             <thead className="border-top">
               <tr>
-                <th>Kategori</th>
+                <th>Ödeme Şekli</th>
                 <th>Adet</th>
                 <th>Toplam Tutar</th>
                 <th>Oran</th>
@@ -116,7 +116,7 @@ export default function MasrafYonetimPage() {
                   </td>
                 </tr>
               )}
-              {!loading && categoryBreakdown.length === 0 && (
+              {!loading && paymentBreakdown.length === 0 && (
                 <tr>
                   <td colSpan={4} className="text-center text-body-secondary py-4">
                     Kayıt bulunamadı.
@@ -124,14 +124,14 @@ export default function MasrafYonetimPage() {
                 </tr>
               )}
               {!loading &&
-                categoryBreakdown.map((row) => {
+                paymentBreakdown.map((row) => {
                   const pct =
                     stats && stats.totalAmount > 0
                       ? Math.round((row.total / stats.totalAmount) * 100)
                       : 0
                   return (
-                    <tr key={row.category}>
-                      <td className="fw-medium">{expenseCategoryLabel(row.category)}</td>
+                    <tr key={row.label}>
+                      <td className="fw-medium">{row.label}</td>
                       <td>{row.count}</td>
                       <td>{formatTry(row.total)}</td>
                       <td>

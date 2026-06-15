@@ -92,8 +92,34 @@ class InvRepository {
     return data.map((e) => InvInvoice.fromJson(e as Map<String, dynamic>)).toList();
   }
 
+  Future<Map<String, dynamic>> getById(int id) async {
+    return _api.getJson<Map<String, dynamic>>('/api/inv/invoices/$id');
+  }
+
+  Future<Map<String, dynamic>> create({
+    required String invoiceType,
+    required int accountId,
+    required String documentDate,
+    String? dueDate,
+    String? notes,
+    required List<Map<String, dynamic>> lines,
+  }) async {
+    return _api.postJson<Map<String, dynamic>>('/api/inv/invoices', data: {
+      'invoiceType': invoiceType,
+      'accountId': accountId,
+      'documentDate': documentDate,
+      'dueDate': dueDate,
+      'notes': notes,
+      'lines': lines,
+    });
+  }
+
   Future<InvKdvReport> kdvReport() async {
     final data = await _api.getJson<Map<String, dynamic>>('/api/inv/kdv-report');
     return InvKdvReport.fromJson(data);
+  }
+
+  Future<void> delete(int id) async {
+    await _api.delete('/api/inv/invoices/$id');
   }
 }

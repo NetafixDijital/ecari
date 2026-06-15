@@ -63,4 +63,26 @@ public class DlnController(
             return BadRequest(new { message = ex.Message });
         }
     }
+
+    [HttpPost("delivery-notes/{id:long}/convert-to-invoice")]
+    public async Task<ActionResult<ConvertDlnToInvResultDto>> ConvertToInvoice(long id, CancellationToken ct)
+    {
+        if (!tenant.HasTenantContext())
+            return BadRequest(new { message = "Önce şirket seçin: POST /api/auth/select-company" });
+        try { return Ok(await dlnService.ConvertToInvoiceAsync(id, ct)); }
+        catch (InvalidOperationException ex) { return BadRequest(new { message = ex.Message }); }
+    }
+
+    [HttpDelete("delivery-notes/{id:long}")]
+    public async Task<IActionResult> Delete(long id, CancellationToken ct)
+    {
+        if (!tenant.HasTenantContext())
+            return BadRequest(new { message = "Önce şirket seçin: POST /api/auth/select-company" });
+        try
+        {
+            if (!await dlnService.DeleteAsync(id, ct)) return NotFound();
+            return NoContent();
+        }
+        catch (InvalidOperationException ex) { return BadRequest(new { message = ex.Message }); }
+    }
 }

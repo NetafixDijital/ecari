@@ -6,6 +6,10 @@ import { createInvoice } from '../../api/inv'
 import { fetchStkItems, type StkItemListItem } from '../../api/stk'
 import CariSecModal from '../../components/cari/CariSecModal'
 import { formatTry } from '../../utils/format'
+import { useToast } from '../../context/ToastContext'
+import { apiErrorMessage } from '../../utils/apiError'
+import { useFullscreenState } from '../../context/FullscreenContext'
+import FullscreenIcon from '../../components/icons/FullscreenIcon'
 
 type CartLine = {
   key: string
@@ -37,6 +41,13 @@ function calcLineTotal(line: CartLine, taxRates: TaxRate[]) {
 
 export default function HizliSatisPage() {
   const navigate = useNavigate()
+  const toast = useToast()
+  const { isFullscreen, toggleFullscreen } = useFullscreenState()
+
+  useEffect(() => {
+    document.body.classList.add('hs-fullscreen-pos')
+    return () => document.body.classList.remove('hs-fullscreen-pos')
+  }, [])
   const [items, setItems] = useState<StkItemListItem[]>([])
   const [cariler, setCariler] = useState<CariAccountListItem[]>([])
   const [units, setUnits] = useState<LookupItem[]>([])
@@ -145,12 +156,12 @@ export default function HizliSatisPage() {
         })),
       })
       setCart([])
+      toast.success('Satış tamamlandı', invoice.documentNo ?? 'Fatura oluşturuldu.')
       navigate(`/fatura/onizleme/${invoice.id}`)
     } catch (err: unknown) {
-      const message =
-        (err as { response?: { data?: { message?: string } } })?.response?.data?.message ||
-        'Satış faturası oluşturulamadı.'
+      const message = apiErrorMessage(err, 'Satış faturası oluşturulamadı.')
       setError(message)
+      toast.error('Satış başarısız', message)
     } finally {
       setCheckoutSaving(false)
     }
@@ -158,25 +169,58 @@ export default function HizliSatisPage() {
 
   return (
     <div className="app-page-content">
-      <div className="page-header d-flex flex-wrap justify-content-between align-items-start gap-3 mb-4">
+      <div
+        className="page-header d-flex flex-wrap justify-content-between align-items-start gap-3 mb-4 hs-page-header"
+        id="hsPageHeader"
+      >
         <div>
-          <h4 className="mb-1">Hızlı Satış</h4>
-          <nav aria-label="breadcrumb">
-            <ol className="breadcrumb">
-              <li className="breadcrumb-item">
-                <Link to="/">Ana Sayfa</Link>
-              </li>
-              <li className="breadcrumb-item active">Hızlı Satış</li>
-            </ol>
-          </nav>
+          <h4 className="mb-1">
+            <i className="ti ti-bolt text-primary me-1" /> Hızlı Satış
+          </h4>
+          {!isFullscreen && (
+            <nav aria-label="breadcrumb">
+              <ol className="breadcrumb">
+                <li className="breadcrumb-item">
+                  <Link to="/">Ana Sayfa</Link>
+                </li>
+                <li className="breadcrumb-item active">Hızlı Satış</li>
+              </ol>
+            </nav>
+          )}
+          {isFullscreen && (
+            <p className="text-body-secondary mb-0 small">Perakende satış ve anında fatura</p>
+          )}
+        </div>
+        <div className="d-flex align-items-center flex-wrap gap-2">
+          {isFullscreen && (
+            <button
+              type="button"
+              className="btn btn-icon btn-action-gray rounded-circle border border-primary"
+              title="Tam ekrandan çık"
+              aria-label="Tam ekrandan çık"
+              onClick={toggleFullscreen}
+            >
+              <FullscreenIcon active />
+            </button>
+          )}
+          <button
+            type="button"
+            className="btn btn-sm btn-label-danger"
+            id="hsClearCart"
+            disabled={cart.length === 0}
+            onClick={() => setCart([])}
+          >
+            <i className="ti ti-trash me-1" /> Sepeti Temizle
+          </button>
         </div>
       </div>
 
       {error && <div className="alert alert-danger py-2">{error}</div>}
 
-      <div className="row g-4">
+      <div className="hs-pos" id="hsPos">
+      <div className="row g-4 hizli-satis-layout">
         <div className="col-lg-8">
-          <div className="card">
+          <div className="card hs-products-panel">
             <div className="card-header d-flex flex-wrap justify-content-between align-items-center gap-2">
               <span>Ürünler</span>
               <div className="nl-field-icon" style={{ maxWidth: '20rem' }}>
@@ -198,7 +242,7 @@ export default function HizliSatisPage() {
                 <p className="text-body-secondary mb-0">Ürün bulunamadı.</p>
               )}
               {!loading && (
-                <div className="row g-3">
+                <div className="row g-3 hs-product-grid">
                   {filteredProducts.map((item) => (
                     <div key={item.id} className="col-md-4 col-sm-6">
                       <button
@@ -226,9 +270,9 @@ export default function HizliSatisPage() {
         </div>
 
         <div className="col-lg-4">
-          <div className="card sticky-top" style={{ top: '5rem' }}>
+          <div className="card sticky-top hs-cart-panel" style={{ top: isFullscreen ? '1rem' : '5rem' }}>
             <div className="card-header">Sepet</div>
-            <div className="card-body">
+            <div className="card-body hs-cart-items">
               <div className="mb-3">
                 <label className="form-label small">Müşteri (isteğe bağlı)</label>
                 <div className="d-flex gap-2">
@@ -328,6 +372,7 @@ export default function HizliSatisPage() {
             )}
           </div>
         </div>
+      </div>
       </div>
 
       <CariSecModal

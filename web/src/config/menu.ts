@@ -59,21 +59,30 @@ export const moduleGroups: MenuGroup[] = [
     ],
   },
   {
-    id: 'depo',
-    label: 'Depo',
-    icon: 'ti-building-warehouse',
-    children: [
-      { id: 'depo-liste', label: 'Depo Listesi', icon: 'ti-building-warehouse', to: '/depo' },
-      { id: 'depo-hareketler', label: 'Stok Hareketleri', icon: 'ti-building-warehouse', to: '/depo/hareketler' },
-    ],
-  },
-  {
     id: 'cari',
     label: 'Cari',
     icon: 'ti-users',
     children: [
       { id: 'cari-liste', label: 'Cari Listesi', icon: 'ti-users', to: '/cari' },
       { id: 'cari-hareketler', label: 'Cari Hareketler', icon: 'ti-arrows-exchange', to: '/cari/hareketler' },
+    ],
+  },
+  {
+    id: 'teklif',
+    label: 'Teklif',
+    icon: 'ti-file-description',
+    children: [
+      { id: 'teklif-liste', label: 'Teklif Listesi', icon: 'ti-file-description', to: '/teklif' },
+      { id: 'teklif-yeni', label: 'Yeni Teklif', icon: 'ti-file-description', to: '/teklif/yeni' },
+    ],
+  },
+  {
+    id: 'depo',
+    label: 'Depo',
+    icon: 'ti-building-warehouse',
+    children: [
+      { id: 'depo-liste', label: 'Depo Listesi', icon: 'ti-building-warehouse', to: '/depo' },
+      { id: 'depo-hareketler', label: 'Stok Hareketleri', icon: 'ti-building-warehouse', to: '/depo/hareketler' },
     ],
   },
   {
@@ -119,11 +128,18 @@ export const moduleGroups: MenuGroup[] = [
     to: '/banka',
   },
   {
+    id: 'cek',
+    label: 'Çek & Senet',
+    icon: 'ti-file-check',
+    to: '/cek',
+  },
+  {
     id: 'masraf',
     label: 'Masraf',
     icon: 'ti-receipt-2',
     children: [
       { id: 'masraf-liste', label: 'Masraf Listesi', icon: 'ti-receipt-2', to: '/masraf' },
+      { id: 'masraf-yeni', label: 'Yeni Masraf', icon: 'ti-receipt-2', to: '/masraf/yeni' },
       { id: 'masraf-yonetimi', label: 'Masraf Yönetimi', icon: 'ti-receipt-2', to: '/masraf/yonetim' },
     ],
   },
@@ -132,9 +148,10 @@ export const moduleGroups: MenuGroup[] = [
 export const financeLinks: MenuLink[] = [
   { id: 'kasa', label: 'Kasa', icon: 'ti-cash', to: '/kasa', tone: 'success' },
   { id: 'banka', label: 'Banka', icon: 'ti-building-bank', to: '/banka', tone: 'primary' },
-  { id: 'cek', label: 'Çek & Senet', icon: 'ti-file-check', to: '/cek', tone: 'warning' },
   { id: 'hizli-satis', label: 'Hızlı Satış', icon: 'ti-bolt', to: '/hizli-satis', tone: 'warning' },
+  { id: 'cari', label: 'Cari Hesaplar', icon: 'ti-users', to: '/cari', tone: 'purple' },
   { id: 'cari-hareket', label: 'Cari Hareketler', icon: 'ti-arrows-exchange', to: '/cari/hareketler', tone: 'info' },
+  { id: 'cek', label: 'Çek & Senet', icon: 'ti-file-check', to: '/cek', tone: 'warning' },
   { id: 'gun-sonu', label: 'Gün Sonu Raporu', icon: 'ti-report-money', to: '/kasa/gun-sonu', tone: 'purple' },
 ]
 
@@ -149,28 +166,32 @@ export const reportsLinks: MenuLink[] = [
 
 export const settingsLinks: MenuLink[] = [
   { id: 'ayarlar-genel', label: 'Genel Ayarlar', icon: 'ti-settings', to: '/ayarlar', tone: 'primary' },
+  { id: 'ayarlar-kullanicilar', label: 'Kullanıcılar', icon: 'ti-users', to: '/ayarlar/kullanicilar', tone: 'purple' },
   { id: 'ayarlar-menu', label: 'Menü Düzeni', icon: 'ti-layout-sidebar', to: '/ayarlar/menu', tone: 'info' },
   { id: 'ayarlar-ozel', label: 'Özel Ayarlar', icon: 'ti-adjustments', to: '/ayarlar/ozel', tone: 'warning' },
 ]
 
 export type SidebarTab = 'dashboardTab' | 'modulesTab' | 'financeTab' | 'reportsTab' | 'settingsTab'
 
-const FINANCE_PREFIXES = ['/kasa', '/banka', '/cek', '/hizli-satis']
+const FINANCE_PREFIXES = ['/kasa', '/banka', '/cek', '/hizli-satis', '/cari/hareketler']
 const MODULE_PREFIXES = [
   '/cari',
   '/stok',
   '/fatura',
   '/irsaliye',
   '/siparis',
+  '/teklif',
   '/depo',
   '/servis',
   '/gorev',
   '/masraf',
+  '/cek',
 ]
 
 export function detectActiveTab(pathname: string): SidebarTab {
   if (pathname.startsWith('/ayarlar')) return 'settingsTab'
   if (pathname.startsWith('/raporlar')) return 'reportsTab'
+  if (pathname.startsWith('/cari/hareketler')) return 'financeTab'
   if (FINANCE_PREFIXES.some((p) => pathname.startsWith(p))) return 'financeTab'
   if (MODULE_PREFIXES.some((p) => pathname.startsWith(p))) return 'modulesTab'
   return 'dashboardTab'

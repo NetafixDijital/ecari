@@ -1,0 +1,25 @@
+{
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information",
+      "Microsoft.AspNetCore": "Warning"
+    }
+  },
+  "AllowedHosts": "*",
+  "ConnectionStrings": {
+    "SystemDb": "Server=SUNUCU_IP;Database=ecari_system;User Id=KULLANICI;Password=SIFRE;TrustServerCertificate=True;Encrypt=True",
+    "TenantDbTemplate": "Server=SUNUCU_IP;Database={0};User Id=KULLANICI;Password=SIFRE;TrustServerCertificate=True;Encrypt=True"
+  },
+  "Jwt": {
+    "Secret": "EN-AZ-32-KARAKTER-GIZLI-ANAHTAR-BURAYA",
+    "Issuer": "ecari",
+    "Audience": "ecari",
+    "AccessTokenMinutes": 480
+  },
+  "Cors": {
+    "Origins": [
+      "https://ecari.vercel.app",
+      "https://www.SIZIN-DOMAIN.com"
+    ]
+  }
+}

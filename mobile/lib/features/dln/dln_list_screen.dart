@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../../core/api/api_client.dart';
 import '../../core/widgets/module_list_page.dart';
 import '../../core/widgets/module_list_tile.dart';
+import 'dln_detail_screen.dart';
 import 'dln_repository.dart';
 
 class DlnListScreen extends StatefulWidget {
@@ -51,6 +52,9 @@ class _DlnListScreenState extends State<DlnListScreen> {
         subtitle: '${item.accountTitle} · ${item.documentDate}',
         badge: item.statusLabel,
         badgeTone: statusTone(item.statusKey),
+        onTap: () => Navigator.of(context).push(
+          MaterialPageRoute(builder: (_) => DlnDetailScreen(id: item.id)),
+        ),
       ),
     );
   }

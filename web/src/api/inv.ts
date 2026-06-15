@@ -99,3 +99,7 @@ export async function fetchKdvReport() {
   const { data } = await api.get<InvKdvReport>('/api/inv/kdv-report')
   return data
 }
+
+export async function deleteInvoice(id: number) {
+  await api.delete(`/api/inv/invoices/${id}`)
+}

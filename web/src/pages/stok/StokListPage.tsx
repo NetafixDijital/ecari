@@ -14,9 +14,12 @@ import {
 import IconActionButton from '../../components/ui/IconActionButton'
 import TableSearchToolbar from '../../components/ui/TableSearchToolbar'
 import { formatMoneyOptional, formatQuantity, statusBadge } from '../../utils/format'
+import { useToast } from '../../context/ToastContext'
+import { apiErrorMessage } from '../../utils/apiError'
 import StokListModals from './StokListModals'
 
 export default function StokListPage() {
+  const toast = useToast()
   const [items, setItems] = useState<StkItemListItem[]>([])
   const [units, setUnits] = useState<LookupItem[]>([])
   const [editItem, setEditItem] = useState<StkItemDetail | null>(null)
@@ -64,12 +67,12 @@ export default function StokListPage() {
     setCreateError('')
     try {
       await createStkItem(body)
+      toast.success('Kayıt oluşturuldu', 'Stok kartı eklendi.')
       loadItems()
     } catch (err: unknown) {
-      const message =
-        (err as { response?: { data?: { message?: string } } })?.response?.data?.message ||
-        'Stok kaydı oluşturulamadı.'
+      const message = apiErrorMessage(err, 'Stok kaydı oluşturulamadı.')
       setCreateError(message)
+      toast.error('Kayıt başarısız', message)
       throw err
     } finally {
       setCreating(false)
@@ -82,12 +85,12 @@ export default function StokListPage() {
     setUpdateError('')
     try {
       await updateStkItem(editItem.id, body)
+      toast.success('Güncellendi', 'Stok bilgileri kaydedildi.')
       loadItems()
     } catch (err: unknown) {
-      const message =
-        (err as { response?: { data?: { message?: string } } })?.response?.data?.message ||
-        'Stok güncellenemedi.'
+      const message = apiErrorMessage(err, 'Stok güncellenemedi.')
       setUpdateError(message)
+      toast.error('Kayıt başarısız', message)
       throw err
     } finally {
       setUpdating(false)
@@ -100,7 +103,7 @@ export default function StokListPage() {
       const detail = await fetchStkItem(row.id)
       setEditItem(detail)
     } catch {
-      window.alert('Stok detayı yüklenemedi.')
+      toast.error('Yükleme başarısız', 'Stok detayı yüklenemedi.')
     }
   }
 
@@ -109,9 +112,10 @@ export default function StokListPage() {
     setDeletingId(row.id)
     try {
       await deleteStkItem(row.id)
+      toast.success('Silindi', `"${row.name}" stok kartı kaldırıldı.`)
       loadItems()
     } catch {
-      window.alert('Stok silinemedi.')
+      toast.error('Silme başarısız', 'Stok silinemedi.')
     } finally {
       setDeletingId(null)
     }

@@ -50,4 +50,37 @@ class ChqRepository {
     );
     return data.map((e) => ChqInstrument.fromJson(e as Map<String, dynamic>)).toList();
   }
+
+  Future<ChqInstrument> create({
+    required String instrumentType,
+    required String direction,
+    required int accountId,
+    required String instrumentNo,
+    required String issueDate,
+    required String dueDate,
+    required double amount,
+    String? bankName,
+    String? notes,
+  }) async {
+    final data = await _api.postJson<Map<String, dynamic>>('/api/chq/instruments', data: {
+      'instrumentType': instrumentType,
+      'direction': direction,
+      'accountId': accountId,
+      'bankName': bankName,
+      'instrumentNo': instrumentNo,
+      'issueDate': issueDate,
+      'dueDate': dueDate,
+      'amount': amount,
+      'notes': notes,
+    });
+    return ChqInstrument.fromJson(data);
+  }
+
+  Future<ChqInstrument> updateStatus({required int id, required String status}) async {
+    final data = await _api.patchJsonData<Map<String, dynamic>>(
+      '/api/chq/instruments/$id/status',
+      data: {'status': status},
+    );
+    return ChqInstrument.fromJson(data);
+  }
 }

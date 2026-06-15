@@ -75,11 +75,62 @@ public class CariAccountService(
         return MapDetail(account, balance);
     }
 
+    public async Task<CariTaxIdCheckDto> CheckTaxIdAsync(
+        string personType,
+        string taxId,
+        long? excludeAccountId = null,
+        CancellationToken ct = default)
+    {
+        var normalized = CariTaxIdValidator.Normalize(taxId);
+        var isTuzel = personType == "TUZEL_KISI";
+        var label = isTuzel ? "VKN" : "TCKN";
+
+        if (string.IsNullOrWhiteSpace(normalized))
+        {
+            return new CariTaxIdCheckDto(
+                false,
+                false,
+                null,
+                null,
+                null,
+                $"{label} giriniz.");
+        }
+
+        var existing = await FindByTaxIdAsync(personType, normalized, excludeAccountId, ct);
+        if (existing is null)
+        {
+            return new CariTaxIdCheckDto(
+                false,
+                true,
+                null,
+                null,
+                null,
+                $"Bu {label} ile kayıtlı cari hesap bulunmuyor.");
+        }
+
+        return new CariTaxIdCheckDto(
+            true,
+            true,
+            existing.Id,
+            existing.Code,
+            existing.Title,
+            $"Bu {label} zaten kayıtlı: {existing.Code} — {existing.Title}");
+    }
+
     public async Task<CariAccountDetailDto> CreateAsync(
         CreateCariAccountRequest request,
         CancellationToken ct = default)
     {
-        ValidatePersonType(request.PersonType, request.TaxNumber, request.IdentityNumber);
+        var taxNumber = request.PersonType == "TUZEL_KISI"
+            ? CariTaxIdValidator.Normalize(request.TaxNumber)
+            : null;
+        var identityNumber = request.PersonType == "GERCEK_KISI"
+            ? CariTaxIdValidator.Normalize(request.IdentityNumber)
+            : null;
+
+        ValidatePersonType(request.PersonType, taxNumber, identityNumber);
+        await EnsureTaxIdAvailableAsync(request.PersonType, taxNumber, identityNumber, null, ct);
+        await ValidateReferencesAsync(request.CityId, request.DistrictId, request.PaymentTermId, ct);
 
         var db = Db;
         var currencyId = await db.Currencies.AsNoTracking()
@@ -111,8 +162,8 @@ public class CariAccountService(
             PostalCode = request.PostalCode?.Trim(),
             PaymentTermId = request.PaymentTermId,
             DueDays = await ResolveDueDaysAsync(db, request.PaymentTermId, request.DueDays, ct),
-            TaxNumber = request.PersonType == "TUZEL_KISI" ? request.TaxNumber : null,
-            IdentityNumber = request.PersonType == "GERCEK_KISI" ? request.IdentityNumber : null,
+            TaxNumber = request.PersonType == "TUZEL_KISI" ? taxNumber : null,
+            IdentityNumber = request.PersonType == "GERCEK_KISI" ? identityNumber : null,
             TaxOffice = request.TaxOffice,
             Phone = request.Phone,
             Email = request.Email,
@@ -140,9 +191,20 @@ public class CariAccountService(
         if (account is null)
             return null;
 
+        var taxNumber = account.PersonType == "TUZEL_KISI"
+            ? CariTaxIdValidator.Normalize(request.TaxNumber)
+            : null;
+        var identityNumber = account.PersonType == "GERCEK_KISI"
+            ? CariTaxIdValidator.Normalize(request.IdentityNumber)
+            : null;
+
+        ValidatePersonType(account.PersonType, taxNumber, identityNumber);
+        await EnsureTaxIdAvailableAsync(account.PersonType, taxNumber, identityNumber, id, ct);
+        await ValidateReferencesAsync(request.CityId, request.DistrictId, request.PaymentTermId, ct);
+
         account.Title = request.Title.Trim();
-        account.TaxNumber = account.PersonType == "TUZEL_KISI" ? request.TaxNumber : null;
-        account.IdentityNumber = account.PersonType == "GERCEK_KISI" ? request.IdentityNumber : null;
+        account.TaxNumber = account.PersonType == "TUZEL_KISI" ? taxNumber : null;
+        account.IdentityNumber = account.PersonType == "GERCEK_KISI" ? identityNumber : null;
         account.TaxOffice = request.TaxOffice;
         account.Phone = request.Phone;
         account.Email = request.Email;
@@ -227,11 +289,109 @@ public class CariAccountService(
 
     private static void ValidatePersonType(string personType, string? taxNumber, string? identityNumber)
     {
-        if (personType == "TUZEL_KISI" && string.IsNullOrWhiteSpace(taxNumber))
-            throw new ArgumentException("Tüzel kişi için VKN zorunludur.");
+        if (personType == "TUZEL_KISI")
+        {
+            if (string.IsNullOrWhiteSpace(taxNumber))
+                throw new ArgumentException("Tüzel kişi için VKN zorunludur.");
+            return;
+        }
 
-        if (personType == "GERCEK_KISI" && string.IsNullOrWhiteSpace(identityNumber))
-            throw new ArgumentException("Gerçek kişi için TCKN zorunludur.");
+        if (personType == "GERCEK_KISI")
+        {
+            if (string.IsNullOrWhiteSpace(identityNumber))
+                throw new ArgumentException("Gerçek kişi için TCKN zorunludur.");
+            return;
+        }
+
+        throw new ArgumentException("Geçersiz müşteri tipi.");
+    }
+
+    private async Task<CariAccount?> FindByTaxIdAsync(
+        string personType,
+        string? taxNumber,
+        string? identityNumber,
+        long? excludeAccountId,
+        CancellationToken ct)
+    {
+        var db = Db;
+        var query = db.CariAccounts.AsNoTracking().Where(a => !a.IsDeleted);
+
+        if (excludeAccountId.HasValue)
+            query = query.Where(a => a.Id != excludeAccountId.Value);
+
+        if (personType == "TUZEL_KISI" && !string.IsNullOrWhiteSpace(taxNumber))
+            return await query.FirstOrDefaultAsync(a => a.TaxNumber == taxNumber, ct);
+
+        if (personType == "GERCEK_KISI" && !string.IsNullOrWhiteSpace(identityNumber))
+            return await query.FirstOrDefaultAsync(a => a.IdentityNumber == identityNumber, ct);
+
+        return null;
+    }
+
+    private Task<CariAccount?> FindByTaxIdAsync(
+        string personType,
+        string normalizedTaxId,
+        long? excludeAccountId,
+        CancellationToken ct)
+    {
+        return personType == "TUZEL_KISI"
+            ? FindByTaxIdAsync(personType, normalizedTaxId, null, excludeAccountId, ct)
+            : FindByTaxIdAsync(personType, null, normalizedTaxId, excludeAccountId, ct);
+    }
+
+    private async Task EnsureTaxIdAvailableAsync(
+        string personType,
+        string? taxNumber,
+        string? identityNumber,
+        long? excludeAccountId,
+        CancellationToken ct)
+    {
+        var existing = await FindByTaxIdAsync(personType, taxNumber, identityNumber, excludeAccountId, ct);
+        if (existing is null)
+            return;
+
+        var label = personType == "TUZEL_KISI" ? "VKN" : "TCKN";
+        throw new InvalidOperationException(
+            $"Bu {label} zaten kayıtlı: {existing.Code} — {existing.Title}");
+    }
+
+    private async Task ValidateReferencesAsync(
+        long? cityId,
+        long? districtId,
+        long? paymentTermId,
+        CancellationToken ct)
+    {
+        var db = Db;
+
+        if (cityId.HasValue)
+        {
+            var cityExists = await db.Cities.AsNoTracking()
+                .AnyAsync(c => c.Id == cityId.Value, ct);
+            if (!cityExists)
+                throw new ArgumentException("Seçilen il geçersiz.");
+        }
+
+        if (districtId.HasValue)
+        {
+            var district = await db.Districts.AsNoTracking()
+                .Where(d => d.Id == districtId.Value)
+                .Select(d => new { d.Id, d.CityId })
+                .FirstOrDefaultAsync(ct);
+
+            if (district is null)
+                throw new ArgumentException("Seçilen ilçe geçersiz.");
+
+            if (cityId.HasValue && district.CityId != cityId.Value)
+                throw new ArgumentException("İlçe, seçilen ile ait değil.");
+        }
+
+        if (paymentTermId.HasValue)
+        {
+            var termExists = await db.PaymentTerms.AsNoTracking()
+                .AnyAsync(p => p.Id == paymentTermId.Value, ct);
+            if (!termExists)
+                throw new ArgumentException("Seçilen ödeme vadesi geçersiz.");
+        }
     }
 
     private static async Task<string> GenerateNextCodeAsync(TenantDbContext db, CancellationToken ct)

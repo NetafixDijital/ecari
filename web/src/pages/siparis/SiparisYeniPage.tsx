@@ -9,6 +9,8 @@ import { createOrder } from '../../api/ord'
 import StokLineSearch from '../../components/stok/StokLineSearch'
 import { fetchStkItem, fetchStkItems, type StkItemListItem } from '../../api/stk'
 import { formatMoneyOptional, formatTry } from '../../utils/format'
+import { useToast } from '../../context/ToastContext'
+import { apiErrorMessage } from '../../utils/apiError'
 
 type LineDraft = {
   key: string
@@ -53,6 +55,7 @@ function calcLine(line: LineDraft, taxRates: TaxRate[]) {
 
 export default function SiparisYeniPage() {
   const navigate = useNavigate()
+  const toast = useToast()
   const [searchParams] = useSearchParams()
   const mode = searchParams.get('type') === 'alis' ? 'alis' : 'satis'
   const orderType = mode === 'alis' ? 'PURCHASE' : 'SALES'
@@ -162,12 +165,12 @@ export default function SiparisYeniPage() {
           taxRateId: line.taxRateId,
         })),
       })
+      toast.success('Kayıt oluşturuldu', 'Sipariş listeye eklendi.')
       navigate(listPath)
     } catch (err: unknown) {
-      const message =
-        (err as { response?: { data?: { message?: string } } })?.response?.data?.message ||
-        'Sipariş kaydedilemedi.'
+      const message = apiErrorMessage(err, 'Sipariş kaydedilemedi.')
       setError(message)
+      toast.error('Kayıt başarısız', message)
     } finally {
       setSaving(false)
     }

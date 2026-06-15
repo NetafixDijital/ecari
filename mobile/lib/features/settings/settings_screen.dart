@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../auth_users/auth_user_list_screen.dart';
 import '../../core/api/api_client.dart';
+import '../../core/auth/auth_state.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_spacing.dart';
 import '../../core/widgets/app_empty_state.dart';
@@ -98,6 +100,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     }
 
     final p = _profile!;
+    final auth = context.watch<AuthState>();
     return RefreshIndicator(
       color: AppColors.primary,
       onRefresh: _load,
@@ -122,6 +125,19 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ),
           ),
           const SizedBox(height: AppSpacing.md),
+          if (auth.hasPermission('AUTH.USER.VIEW'))
+            AppCard(
+              child: ListTile(
+                leading: const Icon(Icons.people_outline, color: AppColors.primary),
+                title: const Text('Kullanıcılar', style: TextStyle(fontWeight: FontWeight.w600)),
+                subtitle: const Text('Hesap ve izin yönetimi'),
+                trailing: const Icon(Icons.chevron_right),
+                onTap: () => Navigator.of(context).push(
+                  MaterialPageRoute(builder: (_) => const AuthUserListScreen()),
+                ),
+              ),
+            ),
+          if (auth.hasPermission('AUTH.USER.VIEW')) const SizedBox(height: AppSpacing.md),
           Text(
             'Detaylı düzenleme web panelinden yapılabilir.',
             style: Theme.of(context).textTheme.bodySmall,

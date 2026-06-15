@@ -56,3 +56,23 @@ export async function fetchPaymentTerms() {
   const { data } = await api.get<PaymentTerm[]>('/api/core/payment-terms')
   return data
 }
+
+export type GlobalSearchResultItem = {
+  module: string
+  id: number
+  label: string
+  sublabel: string | null
+  documentNo: string | null
+}
+
+export type GlobalSearchResponse = {
+  query: string
+  results: GlobalSearchResultItem[]
+}
+
+export async function globalSearch(q: string, limit = 20) {
+  const { data } = await api.get<GlobalSearchResponse>('/api/core/search', {
+    params: { q: q || undefined, limit },
+  })
+  return data
+}

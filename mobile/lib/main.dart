@@ -40,7 +40,7 @@ class EcariApp extends StatelessWidget {
         routes: {
           '/login': (_) => const LoginScreen(),
           '/company': (_) => const CompanySelectScreen(),
-          '/home': (_) => const HomeShell(initialMenuId: 'home'),
+          '/home': (_) => const HomeShell(initialMenuId: 'cari'),
         },
       ),
     );
@@ -62,6 +62,6 @@ class _RootGate extends StatelessWidget {
       if (auth.user != null) return const CompanySelectScreen();
       return const LoginScreen();
     }
-    return const HomeShell(initialMenuId: 'home');
+    return const HomeShell(initialMenuId: 'cari');
   }
 }

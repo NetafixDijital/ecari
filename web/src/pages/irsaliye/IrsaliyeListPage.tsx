@@ -130,7 +130,9 @@ export default function IrsaliyeListPage({ mode }: { mode: 'satis' | 'alis' }) {
                   const badge = deliveryStatusBadge(row.statusKey)
                   return (
                     <tr key={row.id}>
-                      <td className="fw-medium">{row.documentNo}</td>
+                      <td className="fw-medium">
+                        <Link to={`/irsaliye/${row.id}`}>{row.documentNo}</Link>
+                      </td>
                       <td>{row.accountTitle}</td>
                       <td>{formatDate(row.documentDate)}</td>
                       <td>{row.shippingAddress ?? '—'}</td>

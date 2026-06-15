@@ -1,14 +1,19 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import {
-  dashboardLinks,
   detectActiveTab,
   financeLinks,
-  moduleGroups,
   reportsLinks,
   settingsLinks,
   type SidebarTab,
 } from '../../config/menu'
+import {
+  getVisibleDashboardLinks,
+  loadMenuOrder,
+  loadShortcutState,
+  MENU_CONFIG_EVENT,
+  sortModuleGroups,
+} from '../../config/menuPreferences'
 import MenuLinkItem from './MenuLinkItem'
 import { useAuth } from '../../context/AuthContext'
 
@@ -43,12 +48,32 @@ function TabPane({
   )
 }
 
-export default function AppSidebar() {
+export default function AppSidebar({ panelOpen }: { panelOpen: boolean }) {
   const navigate = useNavigate()
   const { pathname } = useLocation()
-  const { logout } = useAuth()
+  const { logout, hasPermission } = useAuth()
+  const visibleSettingsLinks = settingsLinks.filter(
+    (item) => item.id !== 'ayarlar-kullanicilar' || hasPermission('AUTH.USER.VIEW'),
+  )
+  const [menuOrder, setMenuOrder] = useState(loadMenuOrder)
+  const [shortcuts, setShortcuts] = useState(loadShortcutState)
+  const orderedModuleGroups = useMemo(() => sortModuleGroups(menuOrder), [menuOrder])
+  const visibleDashboardLinks = useMemo(() => getVisibleDashboardLinks(shortcuts), [shortcuts])
   const activeTab = detectActiveTab(pathname)
   const [openTab, setOpenTab] = useState<SidebarTab>(activeTab)
+
+  useEffect(() => {
+    const refreshMenu = () => {
+      setMenuOrder(loadMenuOrder())
+      setShortcuts(loadShortcutState())
+    }
+    window.addEventListener(MENU_CONFIG_EVENT, refreshMenu)
+    window.addEventListener('storage', refreshMenu)
+    return () => {
+      window.removeEventListener(MENU_CONFIG_EVENT, refreshMenu)
+      window.removeEventListener('storage', refreshMenu)
+    }
+  }, [])
 
   useEffect(() => {
     setOpenTab(activeTab)
@@ -76,7 +101,7 @@ export default function AppSidebar() {
   }
 
   return (
-    <aside className="app-menubar-tabs open" id="appMenubar">
+    <aside className={`app-menubar-tabs${panelOpen ? ' open' : ''}`} id="appMenubar">
       <div className="app-navbar-brand">
         <Link className="navbar-brand-logo" to="/">
           eC
@@ -114,22 +139,22 @@ export default function AppSidebar() {
           <div className="tab-content" id="appMenubarTabsContent">
             <TabPane id="dashboardTab" activeTab={openTab} tabKey="dashboardTab">
               <MenuHeading label="Dashboard" />
-              {dashboardLinks.slice(0, 3).map((item) => (
+              {visibleDashboardLinks.slice(0, 3).map((item) => (
                 <MenuLinkItem key={item.id} item={item} />
               ))}
               <MenuHeading label="Hızlı Erişim" />
-              {dashboardLinks.slice(3, 6).map((item) => (
+              {visibleDashboardLinks.slice(3, 6).map((item) => (
                 <MenuLinkItem key={item.id} item={item} />
               ))}
               <MenuHeading label="Özet" />
-              {dashboardLinks.slice(6).map((item) => (
+              {visibleDashboardLinks.slice(6).map((item) => (
                 <MenuLinkItem key={item.id} item={item} />
               ))}
             </TabPane>
 
             <TabPane id="modulesTab" activeTab={openTab} tabKey="modulesTab">
               <MenuHeading label="Modüller" />
-              {moduleGroups.map((group, idx) => {
+              {orderedModuleGroups.map((group, idx) => {
                 const tone = MODULE_TONES[idx % MODULE_TONES.length]
                 return (
                   <li key={group.id}>
@@ -187,7 +212,7 @@ export default function AppSidebar() {
 
             <TabPane id="settingsTab" activeTab={openTab} tabKey="settingsTab">
               <MenuHeading label="Sistem" />
-              {settingsLinks.map((item) => (
+              {visibleSettingsLinks.map((item) => (
                 <MenuLinkItem key={item.id} item={item} />
               ))}
             </TabPane>

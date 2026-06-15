@@ -127,6 +127,34 @@ public class ChqInstrumentService(
         return MapItem(entity);
     }
 
+    public async Task<ChqInstrumentListItemDto?> UpdateStatusAsync(
+        long id,
+        UpdateChqInstrumentStatusRequest request,
+        CancellationToken ct = default)
+    {
+        var status = request.Status.ToUpperInvariant() switch
+        {
+            "PENDING" => "PENDING",
+            "PORTFOLIO" => "PORTFOLIO",
+            "COLLECTED" => "COLLECTED",
+            "PAID" => "PAID",
+            "BOUNCED" => "BOUNCED",
+            "ENDORSED" => "ENDORSED",
+            _ => throw new InvalidOperationException("Geçerli durum: PENDING, PORTFOLIO, COLLECTED, PAID, BOUNCED, ENDORSED"),
+        };
+
+        var db = Db;
+        var entity = await db.ChqInstruments
+            .Include(i => i.Account)
+            .FirstOrDefaultAsync(i => i.Id == id && !i.IsDeleted, ct);
+
+        if (entity is null) return null;
+
+        entity.Status = status;
+        await db.SaveChangesAsync(ct);
+        return MapItem(entity);
+    }
+
     private static ChqInstrumentListItemDto MapItem(ChqInstrument i)
     {
         var (key, label) = MapStatus(i.Status);

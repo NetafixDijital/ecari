@@ -11,6 +11,7 @@ namespace ECari.Api.Controllers;
 public class CoreController(
     CoreLookupService coreService,
     DashboardService dashboardService,
+    GlobalSearchService searchService,
     ITenantConnectionResolver tenant) : ControllerBase
 {
     [HttpGet("dashboard")]
@@ -60,6 +61,16 @@ public class CoreController(
     {
         if (!tenant.HasTenantContext()) return TenantRequired();
         return Ok(await coreService.GetPaymentTermsAsync(ct));
+    }
+
+    [HttpGet("search")]
+    public async Task<ActionResult<GlobalSearchResponseDto>> Search(
+        [FromQuery] string? q,
+        [FromQuery] int limit = 20,
+        CancellationToken ct = default)
+    {
+        if (!tenant.HasTenantContext()) return TenantRequired();
+        return Ok(await searchService.SearchAsync(q, limit, ct));
     }
 
     private BadRequestObjectResult TenantRequired() =>

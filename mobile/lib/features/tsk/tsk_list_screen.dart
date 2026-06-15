@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../core/api/api_client.dart';
+import '../../core/theme/app_colors.dart';
 import '../../core/widgets/module_list_page.dart';
 import '../../core/widgets/module_list_tile.dart';
+import 'tsk_detail_screen.dart';
 import 'tsk_repository.dart';
 
 class TskListScreen extends StatelessWidget {
@@ -23,6 +25,9 @@ class TskListScreen extends StatelessWidget {
         subtitle: '${item.taskNo} · ${item.endDate}${item.assigneeName != null ? ' · ${item.assigneeName}' : ''}',
         badge: '${item.statusLabel} · %${item.progressPercent}',
         badgeTone: statusTone(item.statusKey),
+        onTap: () => Navigator.of(context).push(
+          MaterialPageRoute(builder: (_) => TskDetailScreen(taskId: item.id)),
+        ),
       ),
     );
   }

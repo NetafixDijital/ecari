@@ -5,10 +5,13 @@ import '../../core/api/api_client.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_spacing.dart';
 import '../../core/widgets/app_surface.dart';
+import '../bnk/bnk_repository.dart';
 import '../cari/cari_models.dart';
 import '../cari/cari_repository.dart';
 import '../csh/csh_repository.dart';
 import 'finance_utils.dart';
+
+enum TahsilatPaymentMethod { cash, bank, check }
 
 class TahsilatScreen extends StatefulWidget {
   const TahsilatScreen({super.key, this.initialCari, this.onSuccess});
@@ -25,14 +28,20 @@ class _TahsilatScreenState extends State<TahsilatScreen> {
   final _amount = TextEditingController();
   final _description = TextEditingController();
   final _date = TextEditingController(text: todayIso());
+  final _checkNo = TextEditingController();
+  final _checkBank = TextEditingController();
+  final _checkDueDate = TextEditingController(text: todayIso());
 
   bool _loading = true;
   bool _saving = false;
   String? _error;
   List<CariAccount> _cariler = [];
   List<CshAccount> _kasalar = [];
+  List<BnkAccount> _bankalar = [];
   CariAccount? _selectedCari;
+  TahsilatPaymentMethod _paymentMethod = TahsilatPaymentMethod.cash;
   int? _cashAccountId;
+  int? _bankAccountId;
 
   @override
   void initState() {
@@ -46,6 +55,9 @@ class _TahsilatScreenState extends State<TahsilatScreen> {
     _amount.dispose();
     _description.dispose();
     _date.dispose();
+    _checkNo.dispose();
+    _checkBank.dispose();
+    _checkDueDate.dispose();
     super.dispose();
   }
 
@@ -55,12 +67,15 @@ class _TahsilatScreenState extends State<TahsilatScreen> {
       final api = context.read<ApiClient>();
       final cariler = await CariRepository(api).list();
       final kasalar = await CshRepository(api).list();
+      final bankalar = await BnkRepository(api).list();
       if (mounted) {
         setState(() {
           _cariler = cariler.where((c) => c.isActive).toList();
           _kasalar = kasalar.where((k) => k.isActive).toList();
+          _bankalar = bankalar.where((b) => b.isActive).toList();
           _selectedCari ??= _cariler.isNotEmpty ? _cariler.first : null;
           _cashAccountId = _kasalar.isNotEmpty ? _kasalar.first.id : null;
+          _bankAccountId = _bankalar.isNotEmpty ? _bankalar.first.id : null;
         });
       }
     } catch (e) {
@@ -76,12 +91,29 @@ class _TahsilatScreenState extends State<TahsilatScreen> {
     if (debt > 0) _amount.text = debt.toStringAsFixed(2);
   }
 
+  String _paymentMethodApi() {
+    return switch (_paymentMethod) {
+      TahsilatPaymentMethod.cash => 'CASH',
+      TahsilatPaymentMethod.bank => 'BANK',
+      TahsilatPaymentMethod.check => 'CHECK',
+    };
+  }
+
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
-    if (_selectedCari == null || _cashAccountId == null) {
-      setState(() => _error = 'Cari ve kasa seçin.');
+    if (_selectedCari == null) {
+      setState(() => _error = 'Cari seçin.');
       return;
     }
+    if (_paymentMethod == TahsilatPaymentMethod.cash && _cashAccountId == null) {
+      setState(() => _error = 'Kasa seçin.');
+      return;
+    }
+    if (_paymentMethod == TahsilatPaymentMethod.bank && _bankAccountId == null) {
+      setState(() => _error = 'Banka hesabı seçin.');
+      return;
+    }
+
     setState(() {
       _saving = true;
       _error = null;
@@ -89,10 +121,17 @@ class _TahsilatScreenState extends State<TahsilatScreen> {
     try {
       await CariRepository(context.read<ApiClient>()).collect(
         accountId: _selectedCari!.id,
-        cashAccountId: _cashAccountId!,
+        paymentMethod: _paymentMethodApi(),
         amount: double.parse(_amount.text.replaceAll(',', '.')),
         transactionDate: _date.text.trim(),
         description: _description.text.trim().isEmpty ? null : _description.text.trim(),
+        cashAccountId: _paymentMethod == TahsilatPaymentMethod.cash ? _cashAccountId : null,
+        bankAccountId: _paymentMethod == TahsilatPaymentMethod.bank ? _bankAccountId : null,
+        checkInstrumentNo: _paymentMethod == TahsilatPaymentMethod.check ? _checkNo.text.trim() : null,
+        checkBankName: _paymentMethod == TahsilatPaymentMethod.check && _checkBank.text.trim().isNotEmpty
+            ? _checkBank.text.trim()
+            : null,
+        checkDueDate: _paymentMethod == TahsilatPaymentMethod.check ? _checkDueDate.text.trim() : null,
       );
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
@@ -127,7 +166,7 @@ class _TahsilatScreenState extends State<TahsilatScreen> {
               children: [
                 const Text('Tahsilat', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 16, color: AppColors.success)),
                 const SizedBox(height: 4),
-                const Text('Cariden kasa hesabına tahsilat kaydı', style: TextStyle(fontSize: 13, color: AppColors.bodyText)),
+                const Text('Cariden tahsilat kaydı (kasa, banka veya çek/senet)', style: TextStyle(fontSize: 13, color: AppColors.bodyText)),
               ],
             ),
           ),
@@ -158,6 +197,18 @@ class _TahsilatScreenState extends State<TahsilatScreen> {
               ),
             ),
           const SizedBox(height: AppSpacing.md),
+          const Text('Ödeme Yöntemi', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
+          const SizedBox(height: AppSpacing.sm),
+          SegmentedButton<TahsilatPaymentMethod>(
+            segments: const [
+              ButtonSegment(value: TahsilatPaymentMethod.cash, label: Text('Kasa'), icon: Icon(Icons.payments_outlined, size: 18)),
+              ButtonSegment(value: TahsilatPaymentMethod.bank, label: Text('Banka'), icon: Icon(Icons.account_balance_outlined, size: 18)),
+              ButtonSegment(value: TahsilatPaymentMethod.check, label: Text('Çek'), icon: Icon(Icons.fact_check_outlined, size: 18)),
+            ],
+            selected: {_paymentMethod},
+            onSelectionChanged: (v) => setState(() => _paymentMethod = v.first),
+          ),
+          const SizedBox(height: AppSpacing.md),
           TextFormField(
             controller: _amount,
             keyboardType: const TextInputType.numberWithOptions(decimal: true),
@@ -169,13 +220,45 @@ class _TahsilatScreenState extends State<TahsilatScreen> {
             },
           ),
           const SizedBox(height: AppSpacing.md),
-          DropdownButtonFormField<int>(
-            value: _cashAccountId,
-            decoration: const InputDecoration(labelText: 'Kasa'),
-            items: _kasalar.map((k) => DropdownMenuItem(value: k.id, child: Text(k.name))).toList(),
-            onChanged: (v) => setState(() => _cashAccountId = v),
-            validator: (v) => v == null ? 'Kasa seçin' : null,
-          ),
+          if (_paymentMethod == TahsilatPaymentMethod.cash)
+            DropdownButtonFormField<int>(
+              value: _cashAccountId,
+              decoration: const InputDecoration(labelText: 'Kasa'),
+              items: _kasalar.map((k) => DropdownMenuItem(value: k.id, child: Text(k.name))).toList(),
+              onChanged: (v) => setState(() => _cashAccountId = v),
+              validator: (v) => v == null ? 'Kasa seçin' : null,
+            ),
+          if (_paymentMethod == TahsilatPaymentMethod.bank)
+            DropdownButtonFormField<int>(
+              value: _bankAccountId,
+              decoration: const InputDecoration(labelText: 'Banka Hesabı'),
+              items: _bankalar
+                  .map((b) => DropdownMenuItem(
+                        value: b.id,
+                        child: Text('${b.bankName} · ${b.accountName}'),
+                      ))
+                  .toList(),
+              onChanged: (v) => setState(() => _bankAccountId = v),
+              validator: (v) => v == null ? 'Banka seçin' : null,
+            ),
+          if (_paymentMethod == TahsilatPaymentMethod.check) ...[
+            TextFormField(
+              controller: _checkNo,
+              decoration: const InputDecoration(labelText: 'Çek / Senet No'),
+              validator: (v) => v == null || v.trim().isEmpty ? 'Çek/senet no gerekli' : null,
+            ),
+            const SizedBox(height: AppSpacing.md),
+            TextFormField(
+              controller: _checkBank,
+              decoration: const InputDecoration(labelText: 'Banka (opsiyonel)'),
+            ),
+            const SizedBox(height: AppSpacing.md),
+            TextFormField(
+              controller: _checkDueDate,
+              decoration: const InputDecoration(labelText: 'Vade Tarihi (YYYY-MM-DD)'),
+              validator: (v) => v == null || v.isEmpty ? 'Vade tarihi gerekli' : null,
+            ),
+          ],
           const SizedBox(height: AppSpacing.md),
           TextFormField(
             controller: _date,

@@ -9,9 +9,9 @@ import '../../core/widgets/app_empty_state.dart';
 import '../../core/widgets/app_search_field.dart';
 import '../../core/widgets/app_surface.dart';
 import '../../core/widgets/label_badge.dart';
+import '../cari/cari_detail_screen.dart';
 import '../finance/tahsilat_screen.dart';
 import '../finance/tediye_screen.dart';
-import '../finance/virman_screen.dart';
 import '../cari/cari_models.dart';
 import '../cari/cari_repository.dart';
 
@@ -73,6 +73,13 @@ class _CariListScreenState extends State<CariListScreen> {
     if (row.balance > 0) return LabelBadgeTone.success;
     if (row.balance < 0) return LabelBadgeTone.danger;
     return null;
+  }
+
+  Future<void> _openDetail(CariAccount row) async {
+    await Navigator.of(context).push(
+      MaterialPageRoute(builder: (_) => CariDetailScreen(accountId: row.id)),
+    );
+    if (mounted) _load();
   }
 
   Future<void> _openFinance(Widget screen) async {
@@ -156,6 +163,7 @@ class _CariListScreenState extends State<CariListScreen> {
                               return Padding(
                                 padding: const EdgeInsets.only(bottom: AppSpacing.md),
                                 child: AppCard(
+                                  onTap: () => _openDetail(row),
                                   padding: const EdgeInsets.all(AppSpacing.lg),
                                   child: Column(
                                     crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -239,6 +247,15 @@ class _CariListScreenState extends State<CariListScreen> {
                                         children: [
                                           Expanded(
                                             child: OutlinedButton.icon(
+                                              onPressed: () => _openDetail(row),
+                                              icon: const Icon(Icons.visibility_outlined, size: 16),
+                                              label: const Text('Detay', style: TextStyle(fontSize: 12)),
+                                              style: OutlinedButton.styleFrom(padding: const EdgeInsets.symmetric(vertical: 8)),
+                                            ),
+                                          ),
+                                          const SizedBox(width: 6),
+                                          Expanded(
+                                            child: OutlinedButton.icon(
                                               onPressed: () => _openFinance(TahsilatScreen(initialCari: row)),
                                               icon: const Icon(Icons.call_received, size: 16),
                                               label: const Text('Tahsilat', style: TextStyle(fontSize: 12)),
@@ -258,17 +275,6 @@ class _CariListScreenState extends State<CariListScreen> {
                                               style: OutlinedButton.styleFrom(
                                                 foregroundColor: AppColors.danger,
                                                 side: const BorderSide(color: AppColors.danger),
-                                                padding: const EdgeInsets.symmetric(vertical: 8),
-                                              ),
-                                            ),
-                                          ),
-                                          const SizedBox(width: 6),
-                                          Expanded(
-                                            child: OutlinedButton.icon(
-                                              onPressed: () => _openFinance(VirmanScreen(initialSource: row)),
-                                              icon: const Icon(Icons.swap_horiz, size: 16),
-                                              label: const Text('Virman', style: TextStyle(fontSize: 12)),
-                                              style: OutlinedButton.styleFrom(
                                                 padding: const EdgeInsets.symmetric(vertical: 8),
                                               ),
                                             ),

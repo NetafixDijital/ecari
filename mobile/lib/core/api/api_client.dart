@@ -46,6 +46,16 @@ class ApiClient {
     await _dio.put(path, data: data);
   }
 
+  Future<T> putJsonData<T>(String path, {Object? data}) async {
+    final response = await _dio.put(path, data: data);
+    return response.data as T;
+  }
+
+  Future<T> patchJsonData<T>(String path, {Object? data}) async {
+    final response = await _dio.patch(path, data: data);
+    return response.data as T;
+  }
+
   Future<void> delete(String path) async {
     await _dio.delete(path);
   }

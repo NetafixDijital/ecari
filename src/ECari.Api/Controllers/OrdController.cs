@@ -64,4 +64,35 @@ public class OrdController(
             return BadRequest(new { message = ex.Message });
         }
     }
+
+    [HttpPost("orders/{id:long}/convert-to-delivery-note")]
+    public async Task<ActionResult<ConvertOrdToDlnResultDto>> ConvertToDeliveryNote(long id, CancellationToken ct)
+    {
+        if (!tenant.HasTenantContext())
+            return BadRequest(new { message = "Önce şirket seçin: POST /api/auth/select-company" });
+        try { return Ok(await ordService.ConvertToDeliveryNoteAsync(id, ct)); }
+        catch (InvalidOperationException ex) { return BadRequest(new { message = ex.Message }); }
+    }
+
+    [HttpPost("orders/{id:long}/convert-to-invoice")]
+    public async Task<ActionResult<ConvertOrdToInvResultDto>> ConvertToInvoice(long id, CancellationToken ct)
+    {
+        if (!tenant.HasTenantContext())
+            return BadRequest(new { message = "Önce şirket seçin: POST /api/auth/select-company" });
+        try { return Ok(await ordService.ConvertToInvoiceAsync(id, ct)); }
+        catch (InvalidOperationException ex) { return BadRequest(new { message = ex.Message }); }
+    }
+
+    [HttpDelete("orders/{id:long}")]
+    public async Task<IActionResult> Delete(long id, CancellationToken ct)
+    {
+        if (!tenant.HasTenantContext())
+            return BadRequest(new { message = "Önce şirket seçin: POST /api/auth/select-company" });
+        try
+        {
+            if (!await ordService.DeleteAsync(id, ct)) return NotFound();
+            return NoContent();
+        }
+        catch (InvalidOperationException ex) { return BadRequest(new { message = ex.Message }); }
+    }
 }

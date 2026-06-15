@@ -47,4 +47,40 @@ class OrdRepository {
     );
     return data.map((e) => OrdOrder.fromJson(e as Map<String, dynamic>)).toList();
   }
+
+  Future<Map<String, dynamic>> getById(int id) async {
+    return _api.getJson<Map<String, dynamic>>('/api/ord/orders/$id');
+  }
+
+  Future<Map<String, dynamic>> create({
+    required String orderType,
+    required int accountId,
+    required String documentDate,
+    String? deliveryDate,
+    int? warehouseId,
+    String? notes,
+    required List<Map<String, dynamic>> lines,
+  }) async {
+    return _api.postJson<Map<String, dynamic>>('/api/ord/orders', data: {
+      'orderType': orderType,
+      'accountId': accountId,
+      'documentDate': documentDate,
+      'deliveryDate': deliveryDate,
+      'warehouseId': warehouseId,
+      'notes': notes,
+      'lines': lines,
+    });
+  }
+
+  Future<Map<String, dynamic>> convertToDeliveryNote(int id) async {
+    return _api.postJson<Map<String, dynamic>>('/api/ord/orders/$id/convert-to-delivery-note');
+  }
+
+  Future<Map<String, dynamic>> convertToInvoice(int id) async {
+    return _api.postJson<Map<String, dynamic>>('/api/ord/orders/$id/convert-to-invoice');
+  }
+
+  Future<void> delete(int id) async {
+    await _api.delete('/api/ord/orders/$id');
+  }
 }

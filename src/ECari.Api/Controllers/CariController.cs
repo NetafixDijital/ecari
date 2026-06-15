@@ -54,6 +54,26 @@ public class CariController(
         {
             return BadRequest(new { message = ex.Message });
         }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
+    }
+
+    [HttpGet("tax-id/check")]
+    public async Task<ActionResult<CariTaxIdCheckDto>> CheckTaxId(
+        [FromQuery] string personType,
+        [FromQuery] string taxId,
+        [FromQuery] long? excludeAccountId,
+        CancellationToken ct)
+    {
+        if (!tenant.HasTenantContext())
+            return BadRequest(new { message = "Önce şirket seçin: POST /api/auth/select-company" });
+
+        if (string.IsNullOrWhiteSpace(personType) || string.IsNullOrWhiteSpace(taxId))
+            return BadRequest(new { message = "Müşteri tipi ve VKN/TCKN zorunludur." });
+
+        return Ok(await cariService.CheckTaxIdAsync(personType, taxId, excludeAccountId, ct));
     }
 
     [HttpPut("accounts/{id:long}")]
@@ -65,11 +85,22 @@ public class CariController(
         if (!tenant.HasTenantContext())
             return BadRequest(new { message = "Önce şirket seçin: POST /api/auth/select-company" });
 
-        var updated = await cariService.UpdateAsync(id, request, ct);
-        if (updated is null)
-            return NotFound();
+        try
+        {
+            var updated = await cariService.UpdateAsync(id, request, ct);
+            if (updated is null)
+                return NotFound();
 
-        return Ok(updated);
+            return Ok(updated);
+        }
+        catch (ArgumentException ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
     }
 
     [HttpDelete("accounts/{id:long}")]

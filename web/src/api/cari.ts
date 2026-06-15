@@ -107,6 +107,26 @@ export async function createCariAccount(body: CreateCariAccountRequest) {
   return data
 }
 
+export type CariTaxIdCheckResult = {
+  exists: boolean
+  isValidFormat: boolean
+  accountId?: number | null
+  accountCode?: string | null
+  accountTitle?: string | null
+  message: string
+}
+
+export async function checkCariTaxId(personType: string, taxId: string, excludeAccountId?: number) {
+  const { data } = await api.get<CariTaxIdCheckResult>('/api/cari/tax-id/check', {
+    params: {
+      personType,
+      taxId,
+      excludeAccountId: excludeAccountId ?? undefined,
+    },
+  })
+  return data
+}
+
 export async function updateCariAccount(id: number, body: UpdateCariAccountRequest) {
   const { data } = await api.put(`/api/cari/accounts/${id}`, body)
   return data

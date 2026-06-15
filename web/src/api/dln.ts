@@ -62,3 +62,18 @@ export async function createDeliveryNote(body: CreateDlnDeliveryNoteRequest) {
   const { data } = await api.post<DlnDeliveryNoteDetail>('/api/dln/delivery-notes', body)
   return data
 }
+
+export type ConvertDlnToInvResult = {
+  deliveryNoteId: number
+  invoiceId: number
+  invoiceDocumentNo: string
+}
+
+export async function convertDeliveryNoteToInvoice(id: number) {
+  const { data } = await api.post<ConvertDlnToInvResult>(`/api/dln/delivery-notes/${id}/convert-to-invoice`)
+  return data
+}
+
+export async function deleteDeliveryNote(id: number) {
+  await api.delete(`/api/dln/delivery-notes/${id}`)
+}

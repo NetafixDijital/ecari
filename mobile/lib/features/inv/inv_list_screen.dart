@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../../core/api/api_client.dart';
 import '../../core/widgets/module_list_page.dart';
 import '../../core/widgets/module_list_tile.dart';
+import 'inv_detail_screen.dart';
 import 'inv_repository.dart';
 
 class InvListScreen extends StatelessWidget {
@@ -27,6 +28,9 @@ class InvListScreen extends StatelessWidget {
         trailing: moduleCurrency.format(item.grandTotal),
         badge: item.paymentStatusLabel,
         badgeTone: statusTone(item.paymentStatusKey),
+        onTap: () => Navigator.of(context).push(
+          MaterialPageRoute(builder: (_) => InvDetailScreen(id: item.id)),
+        ),
       ),
     );
   }

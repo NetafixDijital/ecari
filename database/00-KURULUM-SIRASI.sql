@@ -16,6 +16,11 @@
     8) 07-faz3-misc.sql      (Masraf + Servis + Görev, ecari_sirket_demo)
     9) 08-faz3-chq.sql       (Çek-Senet, ecari_sirket_demo)
     10) 09-cari-kart-alanlari.sql (Ülke/posta kodu, ecari_sirket_demo)
+    11) 10-faz2-qot.sql      (Teklif tabloları, ecari_sirket_demo)
+    12) 11-exp-masraf-refactor.sql (Masraf hizmet tanımları + satırlar)
+    13) 12-svc-invoice.sql   (Servis fatura bağlantısı)
+    14) 13-faz7-auth.sql     (Kullanıcı & yetkilendirme tabloları)
+    15) 14-svc-lines.sql     (Servis malzeme/hizmet kalemleri)
 
   Mobil: mobile/ — Flutter Faz 1 (login + cari). Bkz. mobile/README.md
 

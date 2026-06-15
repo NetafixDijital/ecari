@@ -7,7 +7,8 @@ namespace ECari.Infrastructure.Services;
 
 public class DlnDeliveryNoteService(
     TenantDbContextFactory tenantDbFactory,
-    ITenantConnectionResolver tenant)
+    ITenantConnectionResolver tenant,
+    InvInvoiceService invService)
 {
     private TenantDbContext Db => tenantDbFactory.Create(
         tenant.GetDatabaseName() ?? throw new InvalidOperationException("Şirket seçilmedi. Önce /api/auth/select-company çağırın."));
@@ -191,6 +192,93 @@ public class DlnDeliveryNoteService(
         await tx.CommitAsync(ct);
 
         return (await GetByIdAsync(note.Id, ct))!;
+    }
+
+    public async Task<ConvertDlnToInvResultDto> ConvertToInvoiceAsync(long id, CancellationToken ct = default)
+    {
+        var db = Db;
+        var note = await db.DlnDeliveryNotes.FirstOrDefaultAsync(n => n.Id == id && !n.IsDeleted, ct)
+            ?? throw new InvalidOperationException("İrsaliye bulunamadı.");
+
+        if (note.Status == "CANCELLED")
+            throw new InvalidOperationException("İptal edilmiş irsaliye faturalandırılamaz.");
+
+        var lines = await db.DlnDeliveryNoteLines
+            .Where(l => l.DeliveryNoteId == id && !l.IsDeleted)
+            .OrderBy(l => l.LineNo)
+            .ToListAsync(ct);
+
+        if (lines.Count == 0)
+            throw new InvalidOperationException("İrsaliyede satır bulunamadı.");
+
+        var sourceLineIds = lines.Where(l => l.SourceLineId.HasValue).Select(l => l.SourceLineId!.Value).ToList();
+        var orderLines = sourceLineIds.Count > 0
+            ? await db.OrdOrderLines.AsNoTracking()
+                .Where(l => sourceLineIds.Contains(l.Id))
+                .ToDictionaryAsync(l => l.Id, ct)
+            : new Dictionary<long, OrdOrderLine>();
+
+        var invLines = new List<CreateInvInvoiceLineRequest>();
+        foreach (var line in lines)
+        {
+            decimal unitPrice = 0;
+            long taxRateId = 1;
+
+            if (line.SourceLineId.HasValue && orderLines.TryGetValue(line.SourceLineId.Value, out var ordLine))
+            {
+                unitPrice = ordLine.UnitPrice;
+                taxRateId = ordLine.TaxRateId;
+            }
+            else
+            {
+                var defaultTax = await db.TaxRates.AsNoTracking()
+                    .Where(t => t.IsActive)
+                    .OrderBy(t => t.Rate)
+                    .FirstOrDefaultAsync(ct);
+                if (defaultTax is not null)
+                    taxRateId = defaultTax.Id;
+            }
+
+            invLines.Add(new CreateInvInvoiceLineRequest(
+                line.ItemId,
+                line.Description,
+                line.Quantity,
+                line.UnitId,
+                unitPrice,
+                taxRateId));
+        }
+
+        var invoiceType = note.DocumentType == "PURCHASE" ? "PURCHASE" : "SALES";
+        var invoice = await invService.CreateAsync(new CreateInvInvoiceRequest(
+            invoiceType,
+            note.AccountId,
+            DateOnly.FromDateTime(DateTime.UtcNow),
+            null,
+            note.Notes,
+            invLines,
+            "BEKLIYOR"), ct);
+
+        note.Status = "DELIVERED";
+        note.UpdatedAt = DateTime.UtcNow;
+        await db.SaveChangesAsync(ct);
+
+        return new ConvertDlnToInvResultDto(note.Id, invoice.Id, invoice.DocumentNo);
+    }
+
+    public async Task<bool> DeleteAsync(long id, CancellationToken ct = default)
+    {
+        var db = Db;
+        var note = await db.DlnDeliveryNotes.FirstOrDefaultAsync(n => n.Id == id && !n.IsDeleted, ct);
+        if (note is null) return false;
+
+        if (note.Status == "DELIVERED")
+            throw new InvalidOperationException("Teslim edilmiş irsaliye silinemez.");
+
+        note.IsDeleted = true;
+        note.Status = "CANCELLED";
+        note.DeletedAt = DateTime.UtcNow;
+        await db.SaveChangesAsync(ct);
+        return true;
     }
 
     private static async Task<string> GenerateDocumentNoAsync(

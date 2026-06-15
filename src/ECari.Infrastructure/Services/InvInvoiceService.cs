@@ -180,11 +180,11 @@ public class InvInvoiceService(
             AccountId = account.Id,
             BranchId = branchId,
             CurrencyId = account.CurrencyId,
-            DueDate = request.DueDate,
+            DueDate = request.PaymentStatus == "ODENDI" ? request.DocumentDate : request.DueDate,
             Subtotal = subtotal,
             TaxTotal = taxTotal,
             GrandTotal = grandTotal,
-            PaymentStatus = "BEKLIYOR",
+            PaymentStatus = request.PaymentStatus ?? "BEKLIYOR",
             Notes = request.Notes,
             CreatedAt = DateTime.UtcNow,
         };
@@ -278,6 +278,24 @@ public class InvInvoiceService(
             purchaseTax,
             salesTax - purchaseTax,
             rows);
+    }
+
+    public async Task<bool> DeleteAsync(long id, CancellationToken ct = default)
+    {
+        var db = Db;
+        var invoice = await db.InvInvoices.FirstOrDefaultAsync(i => i.Id == id && !i.IsDeleted, ct);
+        if (invoice is null) return false;
+
+        var linkedExpense = await db.ExpExpenses.AsNoTracking()
+            .AnyAsync(e => !e.IsDeleted && e.PurchaseInvoiceId == id, ct);
+        if (linkedExpense)
+            throw new InvalidOperationException("Masrafa bağlı fatura silinemez.");
+
+        invoice.IsDeleted = true;
+        invoice.Status = "CANCELLED";
+        invoice.DeletedAt = DateTime.UtcNow;
+        await db.SaveChangesAsync(ct);
+        return true;
     }
 
     private static async Task<string> GenerateDocumentNoAsync(

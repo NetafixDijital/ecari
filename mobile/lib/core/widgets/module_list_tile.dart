@@ -19,6 +19,7 @@ class ModuleListTile extends StatelessWidget {
     this.leadingIcon,
     this.leadingText,
     this.onTap,
+    this.onLongPress,
   });
 
   final String title;
@@ -29,6 +30,7 @@ class ModuleListTile extends StatelessWidget {
   final IconData? leadingIcon;
   final String? leadingText;
   final VoidCallback? onTap;
+  final VoidCallback? onLongPress;
 
   @override
   Widget build(BuildContext context) {
@@ -36,6 +38,7 @@ class ModuleListTile extends StatelessWidget {
       padding: const EdgeInsets.only(bottom: AppSpacing.md),
       child: AppCard(
         onTap: onTap,
+        onLongPress: onLongPress,
         padding: const EdgeInsets.all(AppSpacing.lg),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,

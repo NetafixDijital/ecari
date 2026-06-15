@@ -23,6 +23,7 @@ public static class DependencyInjection
 
         services.AddSingleton<TenantDbContextFactory>();
         services.AddScoped<AuthService>();
+        services.AddScoped<AuthUserService>();
         services.AddScoped<CariAccountService>();
         services.AddScoped<StkItemService>();
         services.AddScoped<CoreLookupService>();
@@ -31,6 +32,7 @@ public static class DependencyInjection
         services.AddScoped<InvInvoiceService>();
         services.AddScoped<DlnDeliveryNoteService>();
         services.AddScoped<OrdOrderService>();
+        services.AddScoped<QotQuotationService>();
         services.AddScoped<BnkAccountService>();
         services.AddScoped<ChqInstrumentService>();
         services.AddScoped<StkMovementService>();
@@ -38,6 +40,7 @@ public static class DependencyInjection
         services.AddScoped<SvcTicketService>();
         services.AddScoped<TskTaskService>();
         services.AddScoped<CshAccountService>();
+        services.AddScoped<GlobalSearchService>();
         services.AddScoped<JwtTokenService>();
 
         return services;

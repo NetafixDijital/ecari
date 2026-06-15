@@ -4,6 +4,7 @@ import {
   createChqInstrument,
   fetchChqInstruments,
   fetchChqStats,
+  updateChqInstrumentStatus,
   type ChqInstrumentListItem,
   type ChqInstrumentStats,
 } from '../../api/chq'
@@ -13,6 +14,24 @@ import TableSearchToolbar from '../../components/ui/TableSearchToolbar'
 import { checkStatusBadge, formatDate, formatTry } from '../../utils/format'
 
 type DirectionTab = 'RECEIVED' | 'ISSUED'
+
+const CHQ_STATUS_OPTIONS = [
+  { value: 'PENDING', label: 'Beklemede' },
+  { value: 'PORTFOLIO', label: 'Portföyde' },
+  { value: 'COLLECTED', label: 'Tahsil edildi' },
+  { value: 'PAID', label: 'Ödendi' },
+  { value: 'BOUNCED', label: 'Karşılıksız' },
+  { value: 'ENDORSED', label: 'Ciro edildi' },
+] as const
+
+const CHQ_STATUS_KEY_TO_API: Record<string, string> = {
+  pending: 'PENDING',
+  portfolio: 'PORTFOLIO',
+  collected: 'COLLECTED',
+  paid: 'PAID',
+  bounced: 'BOUNCED',
+  endorsed: 'ENDORSED',
+}
 
 function todayIso() {
   return new Date().toISOString().slice(0, 10)
@@ -42,6 +61,7 @@ export default function CekListPage() {
   const [notes, setNotes] = useState('')
   const [creating, setCreating] = useState(false)
   const [createError, setCreateError] = useState('')
+  const [statusUpdatingId, setStatusUpdatingId] = useState<number | null>(null)
 
   const loadData = useCallback(() => {
     setLoading(true)
@@ -121,6 +141,20 @@ export default function CekListPage() {
       setCreateError('Kayıt oluşturulamadı.')
     } finally {
       setCreating(false)
+    }
+  }
+
+  async function handleStatusChange(row: ChqInstrumentListItem, status: string) {
+    if (CHQ_STATUS_KEY_TO_API[row.statusKey] === status) return
+    setStatusUpdatingId(row.id)
+    try {
+      const updated = await updateChqInstrumentStatus(row.id, status)
+      setItems((prev) => prev.map((item) => (item.id === row.id ? updated : item)))
+      fetchChqStats(direction).then(setStats).catch(() => {})
+    } catch {
+      setError('Durum güncellenemedi.')
+    } finally {
+      setStatusUpdatingId(null)
     }
   }
 
@@ -223,12 +257,13 @@ export default function CekListPage() {
                 <th>Vade</th>
                 <th className="text-end">Tutar</th>
                 <th>Durum</th>
+                <th>Durum Güncelle</th>
               </tr>
             </thead>
             <tbody>
               {loading && (
                 <tr>
-                  <td colSpan={8} className="text-center py-4 text-body-secondary">
+                  <td colSpan={9} className="text-center py-4 text-body-secondary">
                     Yükleniyor…
                   </td>
                 </tr>
@@ -248,12 +283,26 @@ export default function CekListPage() {
                       <td>
                         <span className={`badge ${badge.className}`}>{badge.label}</span>
                       </td>
+                      <td style={{ minWidth: '10rem' }}>
+                        <select
+                          className="form-select form-select-sm"
+                          value={CHQ_STATUS_KEY_TO_API[row.statusKey] ?? 'PENDING'}
+                          disabled={statusUpdatingId === row.id}
+                          onChange={(e) => handleStatusChange(row, e.target.value)}
+                        >
+                          {CHQ_STATUS_OPTIONS.map((opt) => (
+                            <option key={opt.value} value={opt.value}>
+                              {opt.label}
+                            </option>
+                          ))}
+                        </select>
+                      </td>
                     </tr>
                   )
                 })}
               {!loading && !filteredItems.length && (
                 <tr>
-                  <td colSpan={8} className="text-center py-4 text-body-secondary">
+                  <td colSpan={9} className="text-center py-4 text-body-secondary">
                     Kayıt bulunamadı.
                   </td>
                 </tr>

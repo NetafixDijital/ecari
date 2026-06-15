@@ -1,8 +1,9 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { fetchInvoices, type InvInvoiceListItem } from '../../api/inv'
+import { fetchInvoices, deleteInvoice, type InvInvoiceListItem } from '../../api/inv'
 import IconActionButton from '../../components/ui/IconActionButton'
 import TableSearchToolbar from '../../components/ui/TableSearchToolbar'
+import { apiErrorMessage } from '../../utils/apiError'
 import { formatDate, formatMoneyOptional, statusBadge } from '../../utils/format'
 
 type FaturaListConfig = {
@@ -43,6 +44,7 @@ export default function FaturaListPage({ mode }: { mode: 'satis' | 'alis' }) {
   const [tableSearch, setTableSearch] = useState('')
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+  const [deletingId, setDeletingId] = useState<number | null>(null)
 
   const loadItems = useCallback(() => {
     setLoading(true)
@@ -65,6 +67,20 @@ export default function FaturaListPage({ mode }: { mode: 'satis' | 'alis' }) {
       return haystack.includes(q)
     })
   }, [items, tableSearch])
+
+  async function handleDelete(row: InvInvoiceListItem) {
+    if (!window.confirm(`${row.documentNo} faturası silinsin mi?`)) return
+    setDeletingId(row.id)
+    setError('')
+    try {
+      await deleteInvoice(row.id)
+      loadItems()
+    } catch (err: unknown) {
+      setError(apiErrorMessage(err, 'Fatura silinemedi.'))
+    } finally {
+      setDeletingId(null)
+    }
+  }
 
   return (
     <div className="app-page-content">
@@ -149,6 +165,13 @@ export default function FaturaListPage({ mode }: { mode: 'satis' | 'alis' }) {
                             color="secondary"
                             title="Yazdır"
                             onClick={() => navigate(`/fatura/onizleme/${row.id}`, { state: { print: true } })}
+                          />
+                          <IconActionButton
+                            icon="ti-trash"
+                            color="danger"
+                            title="Sil"
+                            disabled={deletingId === row.id}
+                            onClick={() => handleDelete(row)}
                           />
                         </div>
                       </td>

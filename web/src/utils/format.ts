@@ -133,6 +133,20 @@ export function svcStatusBadge(key: string) {
   return SVC_STATUS_MAP[key] ?? { label: key, className: 'bg-label-secondary' }
 }
 
+const QUOTATION_STATUS_MAP: Record<string, { label: string; className: string }> = {
+  taslak: { label: 'Taslak', className: 'bg-label-secondary' },
+  gonderildi: { label: 'Gönderildi', className: 'bg-label-info' },
+  kabul: { label: 'Kabul', className: 'bg-label-success' },
+  red: { label: 'Red', className: 'bg-label-danger' },
+  suresi_doldu: { label: 'Süresi Doldu', className: 'bg-label-warning' },
+  iptal: { label: 'İptal', className: 'bg-label-secondary' },
+  donusturuldu: { label: 'Siparişe Dönüştü', className: 'bg-label-primary' },
+}
+
+export function quotationStatusBadge(key: string) {
+  return QUOTATION_STATUS_MAP[key] ?? { label: key, className: 'bg-label-secondary' }
+}
+
 const TASK_STATUS_MAP: Record<string, { label: string; className: string }> = {
   yapilacak: { label: 'Yapılacak', className: 'bg-label-secondary' },
   devam_ediyor: { label: 'Devam Ediyor', className: 'bg-label-info' },

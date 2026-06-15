@@ -48,10 +48,72 @@ class StkRepository {
     return data.map((e) => StkItem.fromJson(e as Map<String, dynamic>)).toList();
   }
 
-  Future<List<StkMovement>> movements({String? search}) async {
+  Future<Map<String, dynamic>> getById(int id) async {
+    return _api.getJson<Map<String, dynamic>>('/api/stk/items/$id');
+  }
+
+  Future<StkItem?> getByBarcode(String barcode) async {
+    try {
+      final data = await _api.getJson<Map<String, dynamic>>('/api/stk/items/by-barcode/$barcode');
+      return StkItem.fromJson(data);
+    } catch (_) {
+      return null;
+    }
+  }
+
+  Future<Map<String, dynamic>> create({
+    required String name,
+    String? barcode,
+    String? brandName,
+    double? purchasePrice,
+    double? salesPrice,
+    int? baseUnitId,
+    int? taxRateId,
+  }) async {
+    return _api.postJson<Map<String, dynamic>>('/api/stk/items', data: {
+      'name': name,
+      'barcode': barcode,
+      'brandName': brandName,
+      'purchasePrice': purchasePrice,
+      'salesPrice': salesPrice,
+      'baseUnitId': baseUnitId,
+      'taxRateId': taxRateId,
+      'itemType': 'PRODUCT',
+    });
+  }
+
+  Future<Map<String, dynamic>> update({
+    required int id,
+    required String name,
+    String? barcode,
+    String? brandName,
+    double? purchasePrice,
+    double? salesPrice,
+    String? shelfNo,
+    bool? isWeighable,
+    String? description,
+    required bool isActive,
+  }) async {
+    return _api.putJsonData<Map<String, dynamic>>('/api/stk/items/$id', data: {
+      'name': name,
+      'barcode': barcode,
+      'brandName': brandName,
+      'purchasePrice': purchasePrice,
+      'salesPrice': salesPrice,
+      'shelfNo': shelfNo,
+      'isWeighable': isWeighable ?? false,
+      'description': description,
+      'isActive': isActive,
+    });
+  }
+
+  Future<List<StkMovement>> movements({int? itemId, String? search}) async {
     final data = await _api.getJson<List<dynamic>>(
       '/api/stk/movements',
-      query: search != null && search.isNotEmpty ? {'search': search} : null,
+      query: {
+        if (itemId != null) 'itemId': itemId,
+        if (search != null && search.isNotEmpty) 'search': search,
+      },
     );
     return data.map((e) => StkMovement.fromJson(e as Map<String, dynamic>)).toList();
   }

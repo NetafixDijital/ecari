@@ -49,3 +49,30 @@ export async function createTask(body: CreateTaskRequest) {
   const { data } = await api.post<TskTaskListItem>('/api/tsk/tasks', body)
   return data
 }
+
+export type UpdateTaskRequest = {
+  title: string
+  description?: string | null
+  startDate: string
+  endDate: string
+  assigneeName?: string | null
+  priority: string
+  progressPercent?: number | null
+}
+
+export async function updateTask(id: number, body: UpdateTaskRequest) {
+  const { data } = await api.put<TskTaskListItem>(`/api/tsk/tasks/${id}`, body)
+  return data
+}
+
+export async function updateTaskStatus(id: number, status: string, progressPercent?: number | null) {
+  const { data } = await api.patch<TskTaskListItem>(`/api/tsk/tasks/${id}/status`, {
+    status,
+    progressPercent,
+  })
+  return data
+}
+
+export async function deleteTask(id: number) {
+  await api.delete(`/api/tsk/tasks/${id}`)
+}

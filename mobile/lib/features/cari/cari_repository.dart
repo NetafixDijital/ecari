@@ -13,24 +13,44 @@ class CariRepository {
     return data.map((e) => CariAccount.fromJson(e as Map<String, dynamic>)).toList();
   }
 
-  Future<void> create(CreateCariRequest request) async {
-    await _api.postJson('/api/cari/accounts', data: request.toJson());
+  Future<CariAccountDetail> getById(int id) async {
+    final data = await _api.getJson<Map<String, dynamic>>('/api/cari/accounts/$id');
+    return CariAccountDetail.fromJson(data);
+  }
+
+  Future<CariAccountDetail> create(CreateCariRequest request) async {
+    final data = await _api.postJson<Map<String, dynamic>>('/api/cari/accounts', data: request.toJson());
+    return CariAccountDetail.fromJson(data);
+  }
+
+  Future<CariAccountDetail> update(int id, UpdateCariRequest request) async {
+    final data = await _api.putJsonData<Map<String, dynamic>>('/api/cari/accounts/$id', data: request.toJson());
+    return CariAccountDetail.fromJson(data);
   }
 
   Future<void> collect({
     required int accountId,
-    required int cashAccountId,
+    required String paymentMethod,
     required double amount,
     required String transactionDate,
     String? description,
+    int? cashAccountId,
+    int? bankAccountId,
+    String? checkInstrumentNo,
+    String? checkBankName,
+    String? checkDueDate,
   }) async {
     await _api.postJson('/api/cari/collections', data: {
       'accountId': accountId,
-      'paymentMethod': 'CASH',
+      'paymentMethod': paymentMethod,
       'amount': amount,
       'transactionDate': transactionDate,
       'description': description,
       'cashAccountId': cashAccountId,
+      'bankAccountId': bankAccountId,
+      'checkInstrumentNo': checkInstrumentNo,
+      'checkBankName': checkBankName,
+      'checkDueDate': checkDueDate,
     });
   }
 

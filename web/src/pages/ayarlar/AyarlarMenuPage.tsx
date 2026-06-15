@@ -1,54 +1,31 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { dashboardLinks, moduleGroups, type MenuGroup, type MenuLink } from '../../config/menu'
-
-const MENU_ORDER_KEY = 'ecari_menu_order'
-const DASHBOARD_SHORTCUTS_KEY = 'ecari_dashboard_shortcuts'
+import { dashboardLinks, type MenuLink } from '../../config/menu'
+import {
+  DASHBOARD_SHORTCUTS_KEY,
+  loadMenuOrder,
+  loadShortcutState,
+  MENU_ORDER_KEY,
+  notifyMenuConfigChanged,
+  sortModuleGroups,
+} from '../../config/menuPreferences'
 
 type ShortcutState = Record<string, boolean>
 
-function loadMenuOrder(): string[] {
-  try {
-    const raw = localStorage.getItem(MENU_ORDER_KEY)
-    if (!raw) return moduleGroups.map((g) => g.id)
-    const parsed = JSON.parse(raw) as string[]
-    const ids = moduleGroups.map((g) => g.id)
-    const valid = parsed.filter((id) => ids.includes(id))
-    const missing = ids.filter((id) => !valid.includes(id))
-    return [...valid, ...missing]
-  } catch {
-    return moduleGroups.map((g) => g.id)
-  }
+function loadMenuOrderState() {
+  return loadMenuOrder()
 }
 
-function loadShortcutState(): ShortcutState {
-  try {
-    const raw = localStorage.getItem(DASHBOARD_SHORTCUTS_KEY)
-    if (!raw) {
-      return Object.fromEntries(dashboardLinks.map((l) => [l.id, true]))
-    }
-    const parsed = JSON.parse(raw) as ShortcutState
-    const state: ShortcutState = {}
-    for (const link of dashboardLinks) {
-      state[link.id] = parsed[link.id] ?? true
-    }
-    return state
-  } catch {
-    return Object.fromEntries(dashboardLinks.map((l) => [l.id, true]))
-  }
-}
-
-function sortGroups(order: string[]): MenuGroup[] {
-  const map = new Map(moduleGroups.map((g) => [g.id, g]))
-  return order.map((id) => map.get(id)).filter((g): g is MenuGroup => Boolean(g))
+function loadShortcutStateLocal(): ShortcutState {
+  return loadShortcutState()
 }
 
 export default function AyarlarMenuPage() {
-  const [menuOrder, setMenuOrder] = useState<string[]>(loadMenuOrder)
-  const [shortcuts, setShortcuts] = useState<ShortcutState>(loadShortcutState)
+  const [menuOrder, setMenuOrder] = useState<string[]>(loadMenuOrderState)
+  const [shortcuts, setShortcuts] = useState<ShortcutState>(loadShortcutStateLocal)
   const [saved, setSaved] = useState(false)
 
-  const orderedGroups = sortGroups(menuOrder)
+  const orderedGroups = sortModuleGroups(menuOrder)
 
   useEffect(() => {
     localStorage.setItem(MENU_ORDER_KEY, JSON.stringify(menuOrder))
@@ -79,6 +56,7 @@ export default function AyarlarMenuPage() {
   function handleSave() {
     localStorage.setItem(MENU_ORDER_KEY, JSON.stringify(menuOrder))
     localStorage.setItem(DASHBOARD_SHORTCUTS_KEY, JSON.stringify(shortcuts))
+    notifyMenuConfigChanged()
     setSaved(true)
   }
 

@@ -8,6 +8,8 @@ import CariInfoPanel from '../../components/cari/CariInfoPanel'
 import CariSecModal from '../../components/cari/CariSecModal'
 import StokLineSearch from '../../components/stok/StokLineSearch'
 import { fetchStkItem, fetchStkItems, type StkItemListItem } from '../../api/stk'
+import { useToast } from '../../context/ToastContext'
+import { apiErrorMessage } from '../../utils/apiError'
 
 type LineDraft = {
   key: string
@@ -33,6 +35,7 @@ function newLine(units: LookupItem[]): LineDraft {
 
 export default function IrsaliyeYeniPage() {
   const navigate = useNavigate()
+  const toast = useToast()
   const [searchParams] = useSearchParams()
   const mode = searchParams.get('type') === 'alis' ? 'alis' : 'satis'
   const documentType = mode === 'alis' ? 'PURCHASE' : 'SALES'
@@ -112,12 +115,12 @@ export default function IrsaliyeYeniPage() {
           unitId: line.unitId,
         })),
       })
+      toast.success('Kayıt oluşturuldu', 'İrsaliye listeye eklendi.')
       navigate(listPath)
     } catch (err: unknown) {
-      const message =
-        (err as { response?: { data?: { message?: string } } })?.response?.data?.message ||
-        'İrsaliye kaydedilemedi.'
+      const message = apiErrorMessage(err, 'İrsaliye kaydedilemedi.')
       setError(message)
+      toast.error('Kayıt başarısız', message)
     } finally {
       setSaving(false)
     }

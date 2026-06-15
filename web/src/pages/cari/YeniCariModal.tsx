@@ -1,9 +1,10 @@
 import { type FormEvent, useCallback, useEffect, useState } from 'react'
 import type { City, District, PaymentTerm } from '../../api/core'
-import type { CreateCariAccountRequest } from '../../api/cari'
+import { checkCariTaxId, type CreateCariAccountRequest } from '../../api/cari'
 import { fetchDistricts } from '../../api/core'
 import { COUNTRIES } from '../../data/countries'
 import { GIB_DEMO } from '../../data/gib-demo'
+import { hasTaxId, normalizeTaxId } from '../../utils/taxId'
 
 interface YeniCariModalProps {
   cities: City[]
@@ -33,14 +34,25 @@ export default function YeniCariModal({ cities, paymentTerms, onCreate, creating
   const [form, setForm] = useState(EMPTY_FORM)
   const [districts, setDistricts] = useState<District[]>([])
   const [invalid, setInvalid] = useState<{ title?: boolean; vknTckn?: boolean }>({})
+  const [taxIdStatus, setTaxIdStatus] = useState<{
+    loading: boolean
+    exists: boolean
+    isValidFormat: boolean
+    message: string
+    accountCode?: string | null
+    accountTitle?: string | null
+    gibFound?: boolean
+  } | null>(null)
 
   const isTuzel = form.personType === 'tuzel'
   const expectedIdLen = isTuzel ? 10 : 11
+  const personTypeApi = isTuzel ? 'TUZEL_KISI' : 'GERCEK_KISI'
 
   const resetForm = useCallback(() => {
     setForm(EMPTY_FORM)
     setDistricts([])
     setInvalid({})
+    setTaxIdStatus(null)
   }, [])
 
   useEffect(() => {
@@ -76,35 +88,85 @@ export default function YeniCariModal({ cities, paymentTerms, onCreate, creating
       taxOffice: personType === 'gercek' ? '' : prev.taxOffice,
     }))
     setInvalid({})
+    setTaxIdStatus(null)
   }
+
+  useEffect(() => {
+    const digits = normalizeTaxId(form.vknTckn)
+    if (!hasTaxId(digits)) {
+      setTaxIdStatus(null)
+      return
+    }
+
+    let cancelled = false
+    setTaxIdStatus({
+      loading: true,
+      exists: false,
+      isValidFormat: true,
+      message: 'VKN/TCKN kontrol ediliyor...',
+    })
+
+    const timer = window.setTimeout(() => {
+      checkCariTaxId(personTypeApi, digits)
+        .then((result) => {
+          if (cancelled) return
+          const gib = GIB_DEMO[digits]
+          setTaxIdStatus({
+            loading: false,
+            exists: result.exists,
+            isValidFormat: result.isValidFormat,
+            message: result.message,
+            accountCode: result.accountCode,
+            accountTitle: result.accountTitle,
+            gibFound: Boolean(gib),
+          })
+          if (!result.exists && gib) {
+            setForm((prev) => ({
+              ...prev,
+              title: gib.unvan,
+              taxOffice: isTuzel && gib.vergi_dairesi ? gib.vergi_dairesi : prev.taxOffice,
+            }))
+          }
+        })
+        .catch(() => {
+          if (cancelled) return
+          setTaxIdStatus({
+            loading: false,
+            exists: false,
+            isValidFormat: true,
+            message: 'VKN/TCKN sorgusu yapılamadı.',
+            gibFound: Boolean(GIB_DEMO[digits]),
+          })
+        })
+    }, 350)
+
+    return () => {
+      cancelled = true
+      window.clearTimeout(timer)
+    }
+  }, [expectedIdLen, form.vknTckn, isTuzel, personTypeApi])
 
   function handleVknChange(raw: string) {
     const digits = raw.replace(/\D/g, '').slice(0, expectedIdLen)
     setField('vknTckn', digits)
-    if (digits.length === expectedIdLen) {
-      const gib = GIB_DEMO[digits]
-      if (gib) {
-        setForm((prev) => ({
-          ...prev,
-          vknTckn: digits,
-          title: gib.unvan,
-          taxOffice: isTuzel && gib.vergi_dairesi ? gib.vergi_dairesi : prev.taxOffice,
-        }))
-      }
-    }
   }
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()
     const nextInvalid = {
       title: !form.title.trim(),
-      vknTckn: form.vknTckn.length !== expectedIdLen,
+      vknTckn: !hasTaxId(form.vknTckn),
     }
     setInvalid(nextInvalid)
     if (nextInvalid.title || nextInvalid.vknTckn) return
 
+    if (taxIdStatus?.exists) {
+      setInvalid((prev) => ({ ...prev, vknTckn: true }))
+      return
+    }
+
     const body: CreateCariAccountRequest = {
-      personType: isTuzel ? 'TUZEL_KISI' : 'GERCEK_KISI',
+      personType: personTypeApi,
       title: form.title.trim(),
       taxNumber: isTuzel ? form.vknTckn : undefined,
       identityNumber: !isTuzel ? form.vknTckn : undefined,
@@ -141,7 +203,7 @@ export default function YeniCariModal({ cities, paymentTerms, onCreate, creating
             <div className="pe-3">
               <h5 className="modal-title">Yeni Cari Ekle</h5>
               <p className="modal-desc mb-0">
-                VKN/TCKN girildiğinde GİB üzerinden unvan/ad-soyad getirilir; kayıt sonrası e-Fatura durumu kontrol edilir.
+                VKN/TCKN girildiğinde mükerrer kayıt kontrolü yapılır; GİB demo verisi varsa unvan otomatik doldurulur.
               </p>
             </div>
             <button type="button" className="btn-close ms-auto" data-bs-dismiss="modal" aria-label="Kapat" />
@@ -202,9 +264,51 @@ export default function YeniCariModal({ cities, paymentTerms, onCreate, creating
                     </div>
                     <div className="form-text">
                       {isTuzel
-                        ? '10 hane girildiğinde GİB üzerinden unvan getirilir.'
-                        : '11 hane girildiğinde GİB üzerinden ad-soyad getirilir.'}
+                        ? '10 hane girildiğinde GİB ve kayıt sorgusu yapılır.'
+                        : '11 hane girildiğinde GİB ve kayıt sorgusu yapılır.'}
                     </div>
+                    {taxIdStatus && (
+                      <div
+                        className={`small mt-2 ${
+                          taxIdStatus.exists || !taxIdStatus.isValidFormat
+                            ? 'text-danger'
+                            : taxIdStatus.loading
+                              ? 'text-body-secondary'
+                              : 'text-success'
+                        }`}
+                      >
+                        {taxIdStatus.loading ? (
+                          <>
+                            <i className="ti ti-loader me-1" />
+                            {taxIdStatus.message}
+                          </>
+                        ) : (
+                          <>
+                            <i
+                              className={`ti ${
+                                taxIdStatus.exists || !taxIdStatus.isValidFormat
+                                  ? 'ti-alert-circle'
+                                  : 'ti-circle-check'
+                              } me-1`}
+                            />
+                            {taxIdStatus.message}
+                            {taxIdStatus.exists && taxIdStatus.accountCode && (
+                              <span className="d-block mt-1 font-mono">
+                                {taxIdStatus.accountCode}
+                                {taxIdStatus.accountTitle ? ` — ${taxIdStatus.accountTitle}` : ''}
+                              </span>
+                            )}
+                            {!taxIdStatus.exists &&
+                              taxIdStatus.isValidFormat &&
+                              taxIdStatus.gibFound === false && (
+                                <span className="d-block mt-1 text-warning">
+                                  GİB kaydı bulunamadı; unvanı manuel girebilirsiniz.
+                                </span>
+                              )}
+                          </>
+                        )}
+                      </div>
+                    )}
                   </div>
                   <div className="col-md-8">
                     <label className="form-label" htmlFor="cariUnvan">
@@ -414,7 +518,12 @@ export default function YeniCariModal({ cities, paymentTerms, onCreate, creating
               <button type="button" className="btn btn-label-secondary" data-bs-dismiss="modal" disabled={creating}>
                 İptal
               </button>
-              <button type="submit" className="btn btn-primary" id="btnCariEkle" disabled={creating}>
+              <button
+                type="submit"
+                className="btn btn-primary"
+                id="btnCariEkle"
+                disabled={creating || taxIdStatus?.loading || taxIdStatus?.exists}
+              >
                 <i className="ti ti-plus me-1" /> {creating ? 'Kaydediliyor…' : 'Cari Ekle'}
               </button>
             </div>

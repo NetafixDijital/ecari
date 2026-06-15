@@ -71,6 +71,13 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("DevCors", policy =>
         policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod());
+
+    options.AddPolicy("ProductionCors", policy =>
+    {
+        var origins = builder.Configuration.GetSection("Cors:Origins").Get<string[]>()
+            ?? ["https://ecari.vercel.app"];
+        policy.WithOrigins(origins).AllowAnyHeader().AllowAnyMethod();
+    });
 });
 
 var app = builder.Build();
@@ -80,6 +87,10 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
     app.UseCors("DevCors");
+}
+else
+{
+    app.UseCors("ProductionCors");
 }
 
 app.UseHttpsRedirection();

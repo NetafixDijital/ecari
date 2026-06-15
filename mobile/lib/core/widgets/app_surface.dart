@@ -10,12 +10,14 @@ class AppCard extends StatelessWidget {
     required this.child,
     this.padding,
     this.onTap,
+    this.onLongPress,
     this.margin,
   });
 
   final Widget child;
   final EdgeInsetsGeometry? padding;
   final VoidCallback? onTap;
+  final VoidCallback? onLongPress;
   final EdgeInsetsGeometry? margin;
 
   BoxDecoration get _decoration => BoxDecoration(
@@ -32,7 +34,7 @@ class AppCard extends StatelessWidget {
       child: child,
     );
 
-    if (onTap == null) {
+    if (onTap == null && onLongPress == null) {
       return Container(margin: margin, decoration: _decoration, child: content);
     }
 
@@ -42,7 +44,7 @@ class AppCard extends StatelessWidget {
       clipBehavior: Clip.antiAlias,
       child: Material(
         color: Colors.transparent,
-        child: InkWell(onTap: onTap, child: content),
+        child: InkWell(onTap: onTap, onLongPress: onLongPress, child: content),
       ),
     );
   }

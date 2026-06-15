@@ -2,11 +2,13 @@ import {
   createContext,
   useCallback,
   useContext,
+  useEffect,
   useMemo,
   useState,
   type ReactNode,
 } from 'react'
 import * as authApi from '../api/auth'
+import { fetchMe } from '../api/authUsers'
 import type { AuthSession, Company, UserSummary } from '../types/auth'
 
 interface PendingLogin {
@@ -20,6 +22,8 @@ interface AuthContextValue {
   pendingLogin: PendingLogin | null
   isAuthenticated: boolean
   isLoading: boolean
+  permissions: string[]
+  hasPermission: (code: string) => boolean
   login: (email: string, password: string, remember: boolean) => Promise<'home' | 'select-company'>
   selectCompany: (companyId: number) => Promise<void>
   logout: () => void
@@ -31,6 +35,7 @@ const STORAGE = {
   token: 'ecari_access_token',
   user: 'ecari_user',
   company: 'ecari_company',
+  permissions: 'ecari_permissions',
   rememberEmail: 'ecari_remember_email',
 } as const
 
@@ -38,15 +43,26 @@ function loadSession(): AuthSession | null {
   const token = localStorage.getItem(STORAGE.token)
   const userRaw = localStorage.getItem(STORAGE.user)
   const companyRaw = localStorage.getItem(STORAGE.company)
+  const permsRaw = localStorage.getItem(STORAGE.permissions)
   if (!token || !userRaw || !companyRaw) return null
   try {
     return {
       accessToken: token,
       user: JSON.parse(userRaw) as UserSummary,
       company: JSON.parse(companyRaw) as Company,
+      permissions: permsRaw ? (JSON.parse(permsRaw) as string[]) : [],
     }
   } catch {
     return null
+  }
+}
+
+async function loadPermissions(): Promise<string[]> {
+  try {
+    const me = await fetchMe()
+    return me.permissions
+  } catch {
+    return []
   }
 }
 
@@ -64,6 +80,7 @@ function buildSession(
       code: selected.companyCode,
       databaseName: selected.databaseName,
     },
+    permissions: [],
   }
 }
 
@@ -72,13 +89,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [pendingLogin, setPendingLogin] = useState<PendingLogin | null>(null)
   const [isLoading, setIsLoading] = useState(false)
 
+  useEffect(() => {
+    if (!session || session.permissions.length > 0) return
+    loadPermissions().then((permissions) => {
+      if (permissions.length === 0) return
+      const updated = { ...session, permissions }
+      localStorage.setItem(STORAGE.permissions, JSON.stringify(permissions))
+      setSession(updated)
+    })
+  }, [session])
+
   const finalizeCompany = useCallback(
     async (loginToken: string, user: UserSummary, company: Company) => {
       const selected = await authApi.selectCompany(loginToken, company.id)
-      const newSession = buildSession(selected, user, company)
+      const permissions = await loadPermissions()
+      const newSession: AuthSession = { ...buildSession(selected, user, company), permissions }
       localStorage.setItem(STORAGE.token, newSession.accessToken)
       localStorage.setItem(STORAGE.user, JSON.stringify(newSession.user))
       localStorage.setItem(STORAGE.company, JSON.stringify(newSession.company))
+      localStorage.setItem(STORAGE.permissions, JSON.stringify(permissions))
       setSession(newSession)
       setPendingLogin(null)
     },
@@ -135,9 +164,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     localStorage.removeItem(STORAGE.token)
     localStorage.removeItem(STORAGE.user)
     localStorage.removeItem(STORAGE.company)
+    localStorage.removeItem(STORAGE.permissions)
     setSession(null)
     setPendingLogin(null)
   }, [])
+
+  const hasPermission = useCallback(
+    (code: string) => (session?.permissions ?? []).includes(code),
+    [session?.permissions],
+  )
 
   const value = useMemo(
     () => ({
@@ -145,11 +180,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       pendingLogin,
       isAuthenticated: !!session,
       isLoading,
+      permissions: session?.permissions ?? [],
+      hasPermission,
       login,
       selectCompany,
       logout,
     }),
-    [session, pendingLogin, isLoading, login, selectCompany, logout],
+    [session, pendingLogin, isLoading, hasPermission, login, selectCompany, logout],
   )
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>

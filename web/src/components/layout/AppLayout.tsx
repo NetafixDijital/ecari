@@ -1,48 +1,67 @@
 import { useCallback, useEffect, useState } from 'react'
-import { Link, Outlet } from 'react-router-dom'
+import { Link, Outlet, useLocation } from 'react-router-dom'
 import AppHeader from './AppHeader'
 import AppSidebar from './AppSidebar'
 import SearchResultsModal from './SearchResultsModal'
+import { FullscreenProvider, useFullscreenState } from '../../context/FullscreenContext'
+
+function FullscreenRouteSync() {
+  const location = useLocation()
+  const { setFullscreen } = useFullscreenState()
+
+  useEffect(() => {
+    setFullscreen(false)
+  }, [location.pathname, setFullscreen])
+
+  return null
+}
+
+function syncSidebarOverlay(panelOpen: boolean) {
+  const layout = document.querySelector('.page-layout')
+  if (!layout) return
+  const w = window.innerWidth
+  if (!panelOpen) {
+    layout.classList.remove('sidebar-open')
+    return
+  }
+  if (w < 1480) layout.classList.add('sidebar-open')
+  else layout.classList.remove('sidebar-open')
+}
+
+function closeSidebarPanel(setPanelOpen: (v: boolean) => void) {
+  const toggler = document.getElementById('nl-sidebar-toggle')
+  toggler?.classList.remove('active')
+  setPanelOpen(false)
+  syncSidebarOverlay(false)
+}
 
 export default function AppLayout() {
-  const [sidebarOpen, setSidebarOpen] = useState(true)
+  const [panelOpen, setPanelOpen] = useState(false)
 
   const toggleSidebar = useCallback(() => {
     const toggler = document.getElementById('nl-sidebar-toggle')
     toggler?.classList.toggle('active')
 
-    setSidebarOpen((v) => {
-      const next = !v
-      if (window.innerWidth >= 1280) {
-        const docEl = document.documentElement
-        const current = docEl.getAttribute('data-app-sidebar')
-        if (current === 'mini' || current === 'mini-hover') {
-          docEl.setAttribute('data-app-sidebar', 'full')
-        } else {
-          docEl.setAttribute('data-app-sidebar', 'mini')
-        }
-      }
+    setPanelOpen((prev) => {
+      const next = !prev
+      syncSidebarOverlay(next)
       return next
     })
+
+    if (window.innerWidth >= 1280) {
+      const docEl = document.documentElement
+      const current = docEl.getAttribute('data-app-sidebar')
+      if (current === 'mini' || current === 'mini-hover') {
+        docEl.setAttribute('data-app-sidebar', 'full')
+      } else {
+        docEl.setAttribute('data-app-sidebar', 'mini')
+      }
+    }
   }, [])
 
   useEffect(() => {
     document.documentElement.setAttribute('data-app-sidebar', 'full')
   }, [])
-
-  useEffect(() => {
-    const menubar = document.getElementById('appMenubar')
-    const layout = document.querySelector('.page-layout')
-    if (!menubar || !layout) return
-
-    if (sidebarOpen) {
-      menubar.classList.add('open')
-      if (window.innerWidth < 1480) layout.classList.add('sidebar-open')
-    } else {
-      menubar.classList.remove('open')
-      layout.classList.remove('sidebar-open')
-    }
-  }, [sidebarOpen])
 
   useEffect(() => {
     const menubar = document.getElementById('appMenubar')
@@ -69,31 +88,35 @@ export default function AppLayout() {
 
   useEffect(() => {
     const onResize = () => {
-      const layout = document.querySelector('.page-layout')
-      const menubar = document.getElementById('appMenubar')
-      if (!layout || !menubar) return
-      if (!sidebarOpen) {
-        layout.classList.remove('sidebar-open')
+      const w = window.innerWidth
+      if (w >= 1480) {
+        closeSidebarPanel(setPanelOpen)
         return
       }
-      if (window.innerWidth < 1480) layout.classList.add('sidebar-open')
-      else layout.classList.remove('sidebar-open')
+      if (w >= 1200 && w < 1480) {
+        setPanelOpen(false)
+        syncSidebarOverlay(false)
+        return
+      }
+      syncSidebarOverlay(panelOpen)
     }
     window.addEventListener('resize', onResize)
     return () => window.removeEventListener('resize', onResize)
-  }, [sidebarOpen])
+  }, [panelOpen])
 
   return (
+    <FullscreenProvider>
+    <FullscreenRouteSync />
     <div className="page-layout">
-      <AppSidebar />
+      <AppSidebar panelOpen={panelOpen} />
       <div
         className="layout-overlay"
-        onClick={() => setSidebarOpen(false)}
+        onClick={() => closeSidebarPanel(setPanelOpen)}
         onKeyDown={() => undefined}
         role="presentation"
       />
       <AppHeader onToggleSidebar={toggleSidebar} />
-      <main className="app-wrapper">
+      <main className="app-wrapper" id="appMainContent">
         <div className="container-fluid">
           <Outlet />
           <footer className="app-content-footer">
@@ -113,5 +136,6 @@ export default function AppLayout() {
       </main>
       <SearchResultsModal />
     </div>
+    </FullscreenProvider>
   )
 }

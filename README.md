@@ -84,10 +84,10 @@ Script sırası: `01` → `02` → `03` ([database/](./database/))
 | SQL scriptleri (`01`–`09`) | ✅ |
 | HTML tasarım (`design/html/`) | ✅ |
 | Backend API (Cari, Stok, Fatura, İrsaliye, Sipariş, Kasa, Banka, Çek-Senet, Servis, Görev) | ✅ |
-| Backend API Masraf (`/api/exp`) | 🔲 Son faz (API hazır, UI bekliyor) |
-| Web React uygulaması | ✅ (Ana panel canlı API; Masraf UI son fazda) |
+| Backend API Masraf (`/api/exp`) | ✅ (onay akışı dahil) |
+| Web React uygulaması | ✅ (tüm modüller + iş akışları) |
 | API entegrasyon testi (`scripts/test-api.ps1`) | ✅ |
-| Mobil Flutter (`mobile/`) | 🔲 Faz 1 iskelet (login + cari) — Flutter SDK gerekli |
+| Mobil Flutter (`mobile/`) | ✅ (web paritesi — belge, finans, görev, masraf) |
 
 ### Çalıştırma
 

@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { createTask, fetchTaskStats, fetchTasks, type TskTaskListItem } from '../../api/tsk'
+import { createTask, deleteTask, fetchTaskStats, fetchTasks, updateTask, updateTaskStatus, type TskTaskListItem } from '../../api/tsk'
+import IconActionButton from '../../components/ui/IconActionButton'
 import TableSearchToolbar from '../../components/ui/TableSearchToolbar'
 import {
   formatDate,
@@ -47,6 +48,15 @@ export default function GorevListPage() {
   const [priority, setPriority] = useState('NORMAL')
   const [creating, setCreating] = useState(false)
   const [createError, setCreateError] = useState('')
+  const [editingTask, setEditingTask] = useState<TskTaskListItem | null>(null)
+  const [editTitle, setEditTitle] = useState('')
+  const [editStartDate, setEditStartDate] = useState(todayIso())
+  const [editEndDate, setEditEndDate] = useState(addDaysIso(todayIso(), 7))
+  const [editAssignee, setEditAssignee] = useState('')
+  const [editPriority, setEditPriority] = useState('NORMAL')
+  const [editProgress, setEditProgress] = useState('0')
+  const [saving, setSaving] = useState(false)
+  const [actionError, setActionError] = useState('')
 
   const loadItems = useCallback(() => {
     setLoading(true)
@@ -113,6 +123,79 @@ export default function GorevListPage() {
     }
   }
 
+  function openEditModal(row: TskTaskListItem) {
+    setEditingTask(row)
+    setEditTitle(row.title)
+    setEditStartDate(row.startDate)
+    setEditEndDate(row.endDate)
+    setEditAssignee(row.assigneeName ?? '')
+    setEditPriority(row.priorityKey === 'dusuk' ? 'LOW' : row.priorityKey === 'yuksek' ? 'HIGH' : row.priorityKey === 'acil' ? 'URGENT' : 'NORMAL')
+    setEditProgress(String(row.progressPercent))
+    setActionError('')
+  }
+
+  async function handleComplete(row: TskTaskListItem) {
+    setSaving(true)
+    setActionError('')
+    try {
+      await updateTaskStatus(row.id, 'COMPLETED', 100)
+      loadItems()
+    } catch (err: unknown) {
+      setActionError(
+        (err as { response?: { data?: { message?: string } } })?.response?.data?.message ||
+          'Görev tamamlanamadı.',
+      )
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  async function handleEditSave() {
+    if (!editingTask || !editTitle.trim()) {
+      setActionError('Görev başlığı zorunludur.')
+      return
+    }
+    setSaving(true)
+    setActionError('')
+    try {
+      await updateTask(editingTask.id, {
+        title: editTitle.trim(),
+        startDate: editStartDate,
+        endDate: editEndDate,
+        assigneeName: editAssignee.trim() || null,
+        priority: editPriority,
+        progressPercent: Number(editProgress) || 0,
+      })
+      closeModal('modalDuzenleGorev')
+      setEditingTask(null)
+      loadItems()
+    } catch (err: unknown) {
+      setActionError(
+        (err as { response?: { data?: { message?: string } } })?.response?.data?.message ||
+          'Görev güncellenemedi.',
+      )
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  async function handleDelete(row: TskTaskListItem) {
+    if (!window.confirm(`"${row.title}" görevi silinsin mi?`)) return
+    setSaving(true)
+    setActionError('')
+    try {
+      await deleteTask(row.id)
+      loadItems()
+    } catch (err: unknown) {
+      setActionError(
+        (err as { response?: { data?: { message?: string } } })?.response?.data?.message ||
+          'Görev silinemedi.',
+      )
+    } finally {
+      setSaving(false)
+    }
+  }
+
   return (
     <div className="app-page-content">
       <div className="page-header d-flex flex-wrap justify-content-between align-items-start gap-3 mb-4">
@@ -139,6 +222,7 @@ export default function GorevListPage() {
       </div>
 
       {error && <div className="alert alert-danger py-2">{error}</div>}
+      {actionError && <div className="alert alert-warning py-2">{actionError}</div>}
 
       <div className="row g-4 mb-4">
         <div className="col-md-3 col-sm-6">
@@ -212,19 +296,20 @@ export default function GorevListPage() {
                 <th>Öncelik</th>
                 <th>Durum</th>
                 <th>İlerleme</th>
+                <th className="text-center">İşlemler</th>
               </tr>
             </thead>
             <tbody>
               {loading && (
                 <tr>
-                  <td colSpan={8} className="text-center text-body-secondary py-4">
+                  <td colSpan={9} className="text-center text-body-secondary py-4">
                     Yükleniyor...
                   </td>
                 </tr>
               )}
               {!loading && filteredItems.length === 0 && (
                 <tr>
-                  <td colSpan={8} className="text-center text-body-secondary py-4">
+                  <td colSpan={9} className="text-center text-body-secondary py-4">
                     Kayıt bulunamadı.
                   </td>
                 </tr>
@@ -252,6 +337,37 @@ export default function GorevListPage() {
                             <div className="progress-bar" style={{ width: `${row.progressPercent}%` }} />
                           </div>
                           <span className="small">{row.progressPercent}%</span>
+                        </div>
+                      </td>
+                      <td className="text-center">
+                        <div className="d-inline-flex gap-1">
+                          {row.statusKey !== 'tamamlandi' && (
+                            <IconActionButton
+                              icon="ti-check"
+                              color="success"
+                              title="Tamamla"
+                              disabled={saving}
+                              onClick={() => handleComplete(row)}
+                            />
+                          )}
+                          <IconActionButton
+                            icon="ti-edit"
+                            color="primary"
+                            title="Düzenle"
+                            disabled={saving}
+                            onClick={() => {
+                              openEditModal(row)
+                              const el = document.getElementById('modalDuzenleGorev')
+                              if (el && window.bootstrap) window.bootstrap.Modal.getOrCreateInstance(el).show()
+                            }}
+                          />
+                          <IconActionButton
+                            icon="ti-trash"
+                            color="danger"
+                            title="Sil"
+                            disabled={saving}
+                            onClick={() => handleDelete(row)}
+                          />
                         </div>
                       </td>
                     </tr>
@@ -331,6 +447,58 @@ export default function GorevListPage() {
               </button>
               <button type="button" className="btn btn-primary" disabled={creating} onClick={handleCreate}>
                 {creating ? 'Kaydediliyor...' : 'Kaydet'}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="modal fade" id="modalDuzenleGorev" tabIndex={-1} aria-hidden="true">
+        <div className="modal-dialog modal-dialog-centered">
+          <div className="modal-content">
+            <div className="modal-header">
+              <h5 className="modal-title">Görev Düzenle</h5>
+              <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Kapat" />
+            </div>
+            <div className="modal-body">
+              {actionError && <div className="alert alert-danger py-2">{actionError}</div>}
+              <div className="mb-3">
+                <label className="form-label">Görev Başlığı</label>
+                <input type="text" className="form-control" value={editTitle} onChange={(e) => setEditTitle(e.target.value)} />
+              </div>
+              <div className="row g-3 mb-3">
+                <div className="col-md-6">
+                  <label className="form-label">Başlangıç Tarihi</label>
+                  <input type="date" className="form-control" value={editStartDate} onChange={(e) => setEditStartDate(e.target.value)} />
+                </div>
+                <div className="col-md-6">
+                  <label className="form-label">Bitiş Tarihi</label>
+                  <input type="date" className="form-control" value={editEndDate} onChange={(e) => setEditEndDate(e.target.value)} />
+                </div>
+              </div>
+              <div className="mb-3">
+                <label className="form-label">Atanan Kişi</label>
+                <input type="text" className="form-control" value={editAssignee} onChange={(e) => setEditAssignee(e.target.value)} />
+              </div>
+              <div className="row g-3">
+                <div className="col-md-6">
+                  <label className="form-label">Öncelik</label>
+                  <select className="form-select" value={editPriority} onChange={(e) => setEditPriority(e.target.value)}>
+                    {PRIORITIES.map((p) => (
+                      <option key={p.value} value={p.value}>{p.label}</option>
+                    ))}
+                  </select>
+                </div>
+                <div className="col-md-6">
+                  <label className="form-label">İlerleme (%)</label>
+                  <input type="number" min="0" max="100" className="form-control" value={editProgress} onChange={(e) => setEditProgress(e.target.value)} />
+                </div>
+              </div>
+            </div>
+            <div className="modal-footer">
+              <button type="button" className="btn btn-label-secondary" data-bs-dismiss="modal">İptal</button>
+              <button type="button" className="btn btn-primary" disabled={saving} onClick={handleEditSave}>
+                {saving ? 'Kaydediliyor...' : 'Kaydet'}
               </button>
             </div>
           </div>

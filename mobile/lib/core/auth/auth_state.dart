@@ -42,12 +42,31 @@ class AuthState extends ChangeNotifier {
   AuthUser? _user;
   String? _companyCode;
   String? _companyName;
+  List<String> _permissions = const [];
 
   bool get loading => _loading;
   AuthUser? get user => _user;
   String? get companyCode => _companyCode;
   String? get companyName => _companyName;
+  List<String> get permissions => _permissions;
   bool get isAuthenticated => _user != null && _companyCode != null;
+
+  bool hasPermission(String code) => _permissions.contains(code);
+
+  Future<void> _loadPermissions() async {
+    try {
+      final data = await _api.getJson<Map<String, dynamic>>('/api/auth/me');
+      _permissions = (data['permissions'] as List<dynamic>? ?? []).map((e) => e as String).toList();
+      final userJson = data;
+      _user = AuthUser(
+        id: userJson['orgUserId'] as int? ?? _user?.id ?? 0,
+        fullName: userJson['fullName'] as String? ?? _user?.fullName ?? 'Kullanıcı',
+        email: userJson['email'] as String? ?? _user?.email ?? '',
+      );
+    } catch (_) {
+      _permissions = const [];
+    }
+  }
 
   Future<void> bootstrap() async {
     _loading = true;
@@ -62,6 +81,7 @@ class AuthState extends ChangeNotifier {
         );
         _companyCode = await _storage.getCompanyCode();
         _companyName = await _storage.getCompanyName();
+        await _loadPermissions();
       }
     } finally {
       _loading = false;
@@ -80,6 +100,7 @@ class AuthState extends ChangeNotifier {
       fullName: userJson['fullName'] as String,
       email: userJson['email'] as String,
     );
+    _permissions = const [];
     await _storage.saveSession(
       token: data['accessToken'] as String,
       userName: _user!.fullName,
@@ -105,6 +126,7 @@ class AuthState extends ChangeNotifier {
       companyCode: company.code,
       companyName: company.name,
     );
+    await _loadPermissions();
     notifyListeners();
   }
 
@@ -113,6 +135,7 @@ class AuthState extends ChangeNotifier {
     _user = null;
     _companyCode = null;
     _companyName = null;
+    _permissions = const [];
     notifyListeners();
   }
 }

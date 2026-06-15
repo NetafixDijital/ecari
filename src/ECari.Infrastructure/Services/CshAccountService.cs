@@ -51,6 +51,47 @@ public class CshAccountService(
         }).ToList();
     }
 
+    public async Task<IReadOnlyList<CshTransactionListItemDto>> ListMovementsAsync(
+        long? cashAccountId,
+        string? search,
+        CancellationToken ct = default)
+    {
+        var db = Db;
+        var query = from t in db.CshTransactions.AsNoTracking()
+                    join a in db.CshAccounts.AsNoTracking() on t.CashAccountId equals a.Id
+                    where !t.IsDeleted && !a.IsDeleted
+                    select new { t, a };
+
+        if (cashAccountId.HasValue)
+            query = query.Where(x => x.t.CashAccountId == cashAccountId.Value);
+
+        if (!string.IsNullOrWhiteSpace(search))
+        {
+            var term = search.Trim();
+            query = query.Where(x =>
+                (x.t.Description != null && x.t.Description.Contains(term)) ||
+                (x.t.ReferenceNo != null && x.t.ReferenceNo.Contains(term)) ||
+                x.a.Name.Contains(term));
+        }
+
+        var items = await query
+            .OrderByDescending(x => x.t.TransactionDate)
+            .ThenByDescending(x => x.t.Id)
+            .Take(500)
+            .ToListAsync(ct);
+
+        return items.Select(x => new CshTransactionListItemDto(
+            x.t.Id,
+            x.t.CashAccountId,
+            x.a.Name,
+            x.t.TransactionDate,
+            x.t.TransactionType,
+            x.t.TransactionType == "IN" ? "Giriş" : "Çıkış",
+            x.t.Amount,
+            x.t.Description,
+            x.t.ReferenceNo)).ToList();
+    }
+
     public async Task RecordCollectionAsync(CshPaymentRequest request, CancellationToken ct = default)
     {
         if (request.Amount <= 0)

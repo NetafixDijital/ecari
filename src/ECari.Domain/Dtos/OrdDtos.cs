@@ -52,3 +52,9 @@ public record OrdOrderLineDto(
     decimal UnitPrice,
     decimal TaxAmount,
     decimal LineTotal);
+
+public record ConvertOrdToDlnResultDto(long OrderId, long DeliveryNoteId, string DeliveryNoteDocumentNo);
+
+public record ConvertOrdToInvResultDto(long OrderId, long InvoiceId, string InvoiceDocumentNo);
+
+public record ConvertDlnToInvResultDto(long DeliveryNoteId, long InvoiceId, string InvoiceDocumentNo);

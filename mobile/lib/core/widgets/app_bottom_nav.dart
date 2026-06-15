@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../config/bottom_nav_config.dart';
 import '../theme/app_colors.dart';
 
 class AppBottomNav extends StatelessWidget {
@@ -32,27 +33,14 @@ class AppBottomNav extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
           child: Row(
             children: [
-              _NavItem(
-                icon: Icons.space_dashboard_outlined,
-                activeIcon: Icons.space_dashboard_rounded,
-                label: 'Ana Panel',
-                selected: selectedIndex == 0,
-                onTap: () => onTap(0),
-              ),
-              _NavItem(
-                icon: Icons.people_outline_rounded,
-                activeIcon: Icons.people_rounded,
-                label: 'Cari',
-                selected: selectedIndex == 1,
-                onTap: () => onTap(1),
-              ),
-              _NavItem(
-                icon: Icons.grid_view_rounded,
-                activeIcon: Icons.grid_view_rounded,
-                label: 'Menü',
-                selected: selectedIndex == 2,
-                onTap: () => onTap(2),
-              ),
+              for (var i = 0; i < BottomNavConfig.groups.length; i++)
+                _NavItem(
+                  icon: BottomNavConfig.groups[i].icon,
+                  activeIcon: BottomNavConfig.groups[i].activeIcon,
+                  label: BottomNavConfig.groups[i].label,
+                  selected: selectedIndex == i,
+                  onTap: () => onTap(i),
+                ),
             ],
           ),
         ),

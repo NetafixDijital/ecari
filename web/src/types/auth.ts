@@ -31,4 +31,5 @@ export interface AuthSession {
   accessToken: string
   user: UserSummary
   company: Company
+  permissions: string[]
 }

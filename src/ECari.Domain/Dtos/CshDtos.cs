@@ -14,3 +14,14 @@ public record CshPaymentRequest(
     decimal Amount,
     DateOnly TransactionDate,
     string? Description);
+
+public record CshTransactionListItemDto(
+    long Id,
+    long CashAccountId,
+    string CashAccountName,
+    DateOnly TransactionDate,
+    string TransactionType,
+    string TransactionTypeLabel,
+    decimal Amount,
+    string? Description,
+    string? ReferenceNo);

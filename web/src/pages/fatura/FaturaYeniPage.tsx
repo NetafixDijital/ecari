@@ -8,6 +8,8 @@ import { createInvoice } from '../../api/inv'
 import StokLineSearch from '../../components/stok/StokLineSearch'
 import { fetchStkItem, fetchStkItems, type StkItemListItem } from '../../api/stk'
 import { formatMoneyOptional, formatTry } from '../../utils/format'
+import { useToast } from '../../context/ToastContext'
+import { apiErrorMessage } from '../../utils/apiError'
 
 type LineDraft = {
   key: string
@@ -52,6 +54,7 @@ function calcLine(line: LineDraft, taxRates: TaxRate[]) {
 
 export default function FaturaYeniPage() {
   const navigate = useNavigate()
+  const toast = useToast()
   const [searchParams] = useSearchParams()
   const mode = searchParams.get('type') === 'alis' ? 'alis' : 'satis'
   const invoiceType = mode === 'alis' ? 'PURCHASE' : 'SALES'
@@ -149,12 +152,12 @@ export default function FaturaYeniPage() {
           taxRateId: line.taxRateId,
         })),
       })
+      toast.success('Kayıt oluşturuldu', result.documentNo ?? 'Fatura oluşturuldu.')
       navigate(`/fatura/onizleme/${result.id}`)
     } catch (err: unknown) {
-      const message =
-        (err as { response?: { data?: { message?: string } } })?.response?.data?.message ||
-        'Fatura kaydedilemedi.'
+      const message = apiErrorMessage(err, 'Fatura kaydedilemedi.')
       setError(message)
+      toast.error('Kayıt başarısız', message)
     } finally {
       setSaving(false)
     }

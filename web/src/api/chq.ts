@@ -53,3 +53,8 @@ export async function createChqInstrument(body: CreateChqInstrumentRequest) {
   const { data } = await api.post<ChqInstrumentListItem>('/api/chq/instruments', body)
   return data
 }
+
+export async function updateChqInstrumentStatus(id: number, status: string) {
+  const { data } = await api.patch<ChqInstrumentListItem>(`/api/chq/instruments/${id}/status`, { status })
+  return data
+}

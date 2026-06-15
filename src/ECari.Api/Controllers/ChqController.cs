@@ -59,4 +59,25 @@ public class ChqController(
             return BadRequest(new { message = ex.Message });
         }
     }
+
+    [HttpPatch("instruments/{id:long}/status")]
+    public async Task<ActionResult<ChqInstrumentListItemDto>> UpdateStatus(
+        long id,
+        [FromBody] UpdateChqInstrumentStatusRequest request,
+        CancellationToken ct)
+    {
+        if (!tenant.HasTenantContext())
+            return BadRequest(new { message = "Önce şirket seçin: POST /api/auth/select-company" });
+
+        try
+        {
+            var item = await chqService.UpdateStatusAsync(id, request, ct);
+            if (item is null) return NotFound();
+            return Ok(item);
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
+    }
 }

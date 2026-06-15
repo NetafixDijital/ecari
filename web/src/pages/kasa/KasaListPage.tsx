@@ -1,20 +1,25 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { fetchCshAccounts, type CshAccountListItem } from '../../api/csh'
+import { fetchCshAccounts, fetchCshMovements, type CshAccountListItem, type CshTransactionListItem } from '../../api/csh'
 import TableSearchToolbar from '../../components/ui/TableSearchToolbar'
-import { formatTry } from '../../utils/format'
+import { formatDate, formatTry } from '../../utils/format'
 
 export default function KasaListPage() {
   const [items, setItems] = useState<CshAccountListItem[]>([])
+  const [movements, setMovements] = useState<CshTransactionListItem[]>([])
   const [tableSearch, setTableSearch] = useState('')
+  const [movementSearch, setMovementSearch] = useState('')
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
 
   const loadItems = useCallback(() => {
     setLoading(true)
     setError('')
-    fetchCshAccounts()
-      .then(setItems)
+    Promise.all([fetchCshAccounts(), fetchCshMovements()])
+      .then(([accounts, movementRows]) => {
+        setItems(accounts)
+        setMovements(movementRows)
+      })
       .catch(() => setError('Kasa listesi yüklenemedi.'))
       .finally(() => setLoading(false))
   }, [])
@@ -33,6 +38,23 @@ export default function KasaListPage() {
     () => filteredItems.reduce((sum, row) => sum + row.balance, 0),
     [filteredItems],
   )
+
+  const filteredMovements = useMemo(() => {
+    const q = movementSearch.trim().toLowerCase()
+    if (!q) return movements
+    return movements.filter((row) =>
+      [
+        row.cashAccountName,
+        row.transactionTypeLabel,
+        row.referenceNo,
+        row.description,
+      ]
+        .filter(Boolean)
+        .join(' ')
+        .toLowerCase()
+        .includes(q),
+    )
+  }, [movements, movementSearch])
 
   return (
     <div className="app-page-content">
@@ -119,6 +141,56 @@ export default function KasaListPage() {
                         {row.isActive ? 'Aktif' : 'Pasif'}
                       </span>
                     </td>
+                  </tr>
+                ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div className="card datatables-toolbar-hidden">
+        <div className="card-header d-flex justify-content-between align-items-center">
+          <span>Kasa hareketleri</span>
+        </div>
+        <TableSearchToolbar placeholder="Hareket ara..." onSearch={setMovementSearch} />
+        <div className="table-responsive">
+          <table className="table table-hover mb-0">
+            <thead className="border-top">
+              <tr>
+                <th>Tarih</th>
+                <th>Kasa</th>
+                <th>Tip</th>
+                <th>Tutar</th>
+                <th>Referans</th>
+                <th>Açıklama</th>
+              </tr>
+            </thead>
+            <tbody>
+              {loading && (
+                <tr>
+                  <td colSpan={6} className="text-center text-body-secondary py-4">
+                    Yükleniyor...
+                  </td>
+                </tr>
+              )}
+              {!loading && filteredMovements.length === 0 && (
+                <tr>
+                  <td colSpan={6} className="text-center text-body-secondary py-4">
+                    Kayıt bulunamadı.
+                  </td>
+                </tr>
+              )}
+              {!loading &&
+                filteredMovements.map((row) => (
+                  <tr key={row.id}>
+                    <td>{formatDate(row.transactionDate)}</td>
+                    <td>{row.cashAccountName}</td>
+                    <td>{row.transactionTypeLabel}</td>
+                    <td className={row.transactionType === 'IN' ? 'text-success' : 'text-danger'}>
+                      {formatTry(row.amount)}
+                    </td>
+                    <td className="font-mono small">{row.referenceNo || '—'}</td>
+                    <td>{row.description || '—'}</td>
                   </tr>
                 ))}
             </tbody>

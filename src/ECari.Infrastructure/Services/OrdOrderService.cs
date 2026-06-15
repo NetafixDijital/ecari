@@ -7,7 +7,9 @@ namespace ECari.Infrastructure.Services;
 
 public class OrdOrderService(
     TenantDbContextFactory tenantDbFactory,
-    ITenantConnectionResolver tenant)
+    ITenantConnectionResolver tenant,
+    DlnDeliveryNoteService dlnService,
+    InvInvoiceService invService)
 {
     private TenantDbContext Db => tenantDbFactory.Create(
         tenant.GetDatabaseName() ?? throw new InvalidOperationException("Şirket seçilmedi. Önce /api/auth/select-company çağırın."));
@@ -210,6 +212,135 @@ public class OrdOrderService(
         await tx.CommitAsync(ct);
 
         return (await GetByIdAsync(order.Id, ct))!;
+    }
+
+    public async Task<ConvertOrdToDlnResultDto> ConvertToDeliveryNoteAsync(long id, CancellationToken ct = default)
+    {
+        var db = Db;
+        var order = await db.OrdOrders.FirstOrDefaultAsync(o => o.Id == id && !o.IsDeleted, ct)
+            ?? throw new InvalidOperationException("Sipariş bulunamadı.");
+
+        if (order.Status == "CANCELLED")
+            throw new InvalidOperationException("İptal edilmiş sipariş irsaliyeye dönüştürülemez.");
+
+        var lines = await db.OrdOrderLines
+            .Where(l => l.OrderId == id && !l.IsDeleted)
+            .OrderBy(l => l.LineNo)
+            .ToListAsync(ct);
+
+        var shipLines = lines
+            .Where(l => l.Quantity > l.DeliveredQuantity)
+            .Select(l => new CreateDlnDeliveryNoteLineRequest(
+                l.ItemId,
+                l.Description,
+                l.Quantity - l.DeliveredQuantity,
+                l.UnitId))
+            .ToList();
+
+        if (shipLines.Count == 0)
+            throw new InvalidOperationException("Sevk edilecek kalem kalmadı.");
+
+        var dln = await dlnService.CreateAsync(new CreateDlnDeliveryNoteRequest(
+            order.OrderType,
+            order.AccountId,
+            DateOnly.FromDateTime(DateTime.UtcNow),
+            order.WarehouseId,
+            null,
+            order.Notes,
+            shipLines), ct);
+
+        var dlnLineEntities = await db.DlnDeliveryNoteLines
+            .Where(l => l.DeliveryNoteId == dln.Id && !l.IsDeleted)
+            .OrderBy(l => l.LineNo)
+            .ToListAsync(ct);
+
+        var ordLineIdx = 0;
+        foreach (var dlnLine in dlnLineEntities)
+        {
+            while (ordLineIdx < lines.Count && lines[ordLineIdx].Quantity <= lines[ordLineIdx].DeliveredQuantity)
+                ordLineIdx++;
+
+            if (ordLineIdx >= lines.Count) break;
+
+            var ordLine = lines[ordLineIdx];
+            dlnLine.SourceLineId = ordLine.Id;
+            ordLine.DeliveredQuantity += dlnLine.Quantity;
+            ordLineIdx++;
+        }
+
+        var allDelivered = lines.All(l => l.DeliveredQuantity >= l.Quantity);
+        order.Status = allDelivered ? "COMPLETED" : "PARTIAL";
+        order.UpdatedAt = DateTime.UtcNow;
+        await db.SaveChangesAsync(ct);
+
+        return new ConvertOrdToDlnResultDto(order.Id, dln.Id, dln.DocumentNo);
+    }
+
+    public async Task<ConvertOrdToInvResultDto> ConvertToInvoiceAsync(long id, CancellationToken ct = default)
+    {
+        var db = Db;
+        var order = await db.OrdOrders.FirstOrDefaultAsync(o => o.Id == id && !o.IsDeleted, ct)
+            ?? throw new InvalidOperationException("Sipariş bulunamadı.");
+
+        if (order.Status == "CANCELLED")
+            throw new InvalidOperationException("İptal edilmiş sipariş faturalandırılamaz.");
+
+        var lines = await db.OrdOrderLines
+            .Where(l => l.OrderId == id && !l.IsDeleted)
+            .OrderBy(l => l.LineNo)
+            .ToListAsync(ct);
+
+        var invLines = lines
+            .Where(l => l.Quantity > l.InvoicedQuantity)
+            .Select(l => new CreateInvInvoiceLineRequest(
+                l.ItemId,
+                l.Description,
+                l.Quantity - l.InvoicedQuantity,
+                l.UnitId,
+                l.UnitPrice,
+                l.TaxRateId))
+            .ToList();
+
+        if (invLines.Count == 0)
+            throw new InvalidOperationException("Faturalanacak kalem kalmadı.");
+
+        var invoiceType = order.OrderType == "PURCHASE" ? "PURCHASE" : "SALES";
+        var invoice = await invService.CreateAsync(new CreateInvInvoiceRequest(
+            invoiceType,
+            order.AccountId,
+            DateOnly.FromDateTime(DateTime.UtcNow),
+            order.DeliveryDate,
+            order.Notes,
+            invLines,
+            "BEKLIYOR"), ct);
+
+        foreach (var line in lines.Where(l => l.Quantity > l.InvoicedQuantity))
+            line.InvoicedQuantity = line.Quantity;
+
+        var allInvoiced = lines.All(l => l.InvoicedQuantity >= l.Quantity);
+        if (allInvoiced && order.Status != "CANCELLED")
+            order.Status = "COMPLETED";
+
+        order.UpdatedAt = DateTime.UtcNow;
+        await db.SaveChangesAsync(ct);
+
+        return new ConvertOrdToInvResultDto(order.Id, invoice.Id, invoice.DocumentNo);
+    }
+
+    public async Task<bool> DeleteAsync(long id, CancellationToken ct = default)
+    {
+        var db = Db;
+        var order = await db.OrdOrders.FirstOrDefaultAsync(o => o.Id == id && !o.IsDeleted, ct);
+        if (order is null) return false;
+
+        if (order.Status is "PARTIAL" or "COMPLETED")
+            throw new InvalidOperationException("Sevk veya fatura oluşmuş sipariş silinemez.");
+
+        order.IsDeleted = true;
+        order.Status = "CANCELLED";
+        order.DeletedAt = DateTime.UtcNow;
+        await db.SaveChangesAsync(ct);
+        return true;
     }
 
     private static async Task<string> GenerateDocumentNoAsync(

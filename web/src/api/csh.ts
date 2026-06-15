@@ -33,3 +33,25 @@ export async function recordPayment(body: CshPaymentRequest) {
   const { data } = await api.post<{ message: string }>('/api/csh/payments', body)
   return data
 }
+
+export type CshTransactionListItem = {
+  id: number
+  cashAccountId: number
+  cashAccountName: string
+  transactionDate: string
+  transactionType: string
+  transactionTypeLabel: string
+  amount: number
+  description: string | null
+  referenceNo: string | null
+}
+
+export async function fetchCshMovements(cashAccountId?: number, search?: string) {
+  const { data } = await api.get<CshTransactionListItem[]>('/api/csh/movements', {
+    params: {
+      cashAccountId: cashAccountId || undefined,
+      search: search || undefined,
+    },
+  })
+  return data
+}

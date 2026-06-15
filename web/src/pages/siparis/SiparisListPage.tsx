@@ -120,7 +120,9 @@ export default function SiparisListPage() {
                   const badge = orderStatusBadge(row.statusKey)
                   return (
                     <tr key={row.id}>
-                      <td className="fw-medium">{row.documentNo}</td>
+                      <td className="fw-medium">
+                        <Link to={`/siparis/${row.id}`}>{row.documentNo}</Link>
+                      </td>
                       <td>
                         <span className={`badge ${row.orderType === 'SALES' ? 'bg-label-primary' : 'bg-label-info'}`}>
                           {row.orderType === 'SALES' ? 'Satış' : 'Alış'}

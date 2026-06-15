@@ -25,7 +25,8 @@ public record CreateInvInvoiceRequest(
     DateOnly DocumentDate,
     DateOnly? DueDate,
     string? Notes,
-    IReadOnlyList<CreateInvInvoiceLineRequest> Lines);
+    IReadOnlyList<CreateInvInvoiceLineRequest> Lines,
+    string? PaymentStatus = null);
 
 public record InvInvoiceDetailDto(
     long Id,

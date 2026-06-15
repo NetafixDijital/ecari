@@ -31,3 +31,5 @@ public record CreateChqInstrumentRequest(
     DateOnly DueDate,
     decimal Amount,
     string? Notes);
+
+public record UpdateChqInstrumentStatusRequest(string Status);

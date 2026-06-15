@@ -1,0 +1,53 @@
+/* Tüm sayfalar — tam ekran layout */
+body.hs-fullscreen {
+  overflow: hidden;
+}
+
+body.hs-fullscreen .page-layout > .app-menubar-tabs,
+body.hs-fullscreen .page-layout > .app-header,
+body.hs-fullscreen .page-layout > .layout-overlay,
+body.hs-fullscreen .page-layout .app-content-footer {
+  display: none !important;
+}
+
+body.hs-fullscreen .page-layout .app-wrapper {
+  margin-left: 0 !important;
+  padding-top: 0 !important;
+  min-height: 100vh;
+}
+
+body.hs-fullscreen .page-layout .app-page-content {
+  padding: 1rem 1.25rem !important;
+}
+
+/* Hızlı Satış — yalnızca POS sayfasında ek düzen */
+body.hs-fullscreen.hs-fullscreen-pos .page-layout #hsPageHeader {
+  margin-bottom: 1rem !important;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--bs-border-color);
+}
+
+body.hs-fullscreen.hs-fullscreen-pos .hizli-satis-layout {
+  min-height: calc(100vh - 5.5rem);
+}
+
+body.hs-fullscreen.hs-fullscreen-pos .hs-product-grid {
+  max-height: calc(100vh - 12rem);
+  overflow-y: auto;
+}
+
+body.hs-fullscreen.hs-fullscreen-pos .hs-cart-panel {
+  max-height: calc(100vh - 6rem);
+}
+
+body.hs-fullscreen.hs-fullscreen-pos .hs-cart-items {
+  max-height: none;
+  flex: 1;
+  overflow-y: auto;
+}
+
+@media (max-width: 1199.98px) {
+  body.hs-fullscreen.hs-fullscreen-pos .hs-product-grid {
+    max-height: calc(100vh - 14rem);
+  }
+}

@@ -23,6 +23,18 @@ public class CshController(
         return Ok(await cshService.ListAsync(search, ct));
     }
 
+    [HttpGet("movements")]
+    public async Task<ActionResult<IReadOnlyList<CshTransactionListItemDto>>> Movements(
+        [FromQuery] long? cashAccountId,
+        [FromQuery] string? search,
+        CancellationToken ct)
+    {
+        if (!tenant.HasTenantContext())
+            return BadRequest(new { message = "Önce şirket seçin: POST /api/auth/select-company" });
+
+        return Ok(await cshService.ListMovementsAsync(cashAccountId, search, ct));
+    }
+
     [HttpPost("collections")]
     public async Task<IActionResult> Collection([FromBody] CshPaymentRequest request, CancellationToken ct)
     {

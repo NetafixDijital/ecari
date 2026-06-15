@@ -8,7 +8,10 @@ namespace ECari.Api.Controllers;
 
 [ApiController]
 [Route("api/auth")]
-public class AuthController(AuthService authService) : ControllerBase
+public class AuthController(
+    AuthService authService,
+    AuthUserService authUserService,
+    ITenantConnectionResolver tenant) : ControllerBase
 {
     [HttpPost("login")]
     [AllowAnonymous]
@@ -51,6 +54,36 @@ public class AuthController(AuthService authService) : ControllerBase
             return NotFound(new { message = "Şirket bulunamadı veya erişim yok." });
 
         return Ok(result);
+    }
+
+    [HttpGet("me")]
+    [Authorize]
+    public async Task<ActionResult<MeResponseDto>> GetMe(CancellationToken ct)
+    {
+        var userId = GetUserId();
+        var orgUserId = tenant.GetOrgUserId();
+        if (userId is null || orgUserId is null || !tenant.HasTenantContext())
+            return BadRequest(new { message = "Önce şirket seçin." });
+
+        var me = await authUserService.GetMeAsync(orgUserId.Value, userId.Value, ct);
+        if (me is null) return NotFound();
+        return Ok(me);
+    }
+
+    [HttpGet("permissions/tree")]
+    [Authorize]
+    public async Task<ActionResult<IReadOnlyList<AuthPermissionGroupDto>>> GetPermissionTree(CancellationToken ct)
+    {
+        if (!tenant.HasTenantContext()) return BadRequest(new { message = "Önce şirket seçin." });
+        return Ok(await authUserService.GetPermissionTreeAsync(ct));
+    }
+
+    [HttpGet("branches")]
+    [Authorize]
+    public async Task<ActionResult<IReadOnlyList<AuthBranchDto>>> GetBranches(CancellationToken ct)
+    {
+        if (!tenant.HasTenantContext()) return BadRequest(new { message = "Önce şirket seçin." });
+        return Ok(await authUserService.GetBranchesAsync(ct));
     }
 
     private long? GetUserId()

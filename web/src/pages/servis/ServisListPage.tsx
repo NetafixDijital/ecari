@@ -123,7 +123,9 @@ export default function ServisListPage() {
                   const badge = svcStatusBadge(row.statusKey)
                   return (
                     <tr key={row.id}>
-                      <td className="fw-medium">{row.ticketNo}</td>
+                      <td className="fw-medium">
+                        <Link to={`/servis/${row.id}`}>{row.ticketNo}</Link>
+                      </td>
                       <td>{formatDateTime(row.ticketDate)}</td>
                       <td>{row.accountTitle}</td>
                       <td>{row.deviceName || '—'}</td>

@@ -3,18 +3,27 @@ import 'package:provider/provider.dart';
 
 import '../../core/auth/auth_state.dart';
 import '../../core/config/app_menu.dart';
+import '../../core/config/bottom_nav_config.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_spacing.dart';
 import '../../core/widgets/app_bottom_nav.dart';
 import '../../core/widgets/app_header.dart';
+import '../../core/widgets/app_sub_nav.dart';
 import '../cari/cari_form_screen.dart';
 import '../cari/cari_list_screen.dart';
+import '../chq/chq_form_screen.dart';
 import '../dashboard/dashboard_screen.dart';
+import '../exp/exp_form_screen.dart';
+import '../ord/ord_form_screen.dart';
+import '../inv/inv_form_screen.dart';
+import '../stok/stk_form_screen.dart';
+import '../svc/svc_form_screen.dart';
+import '../tsk/tsk_form_screen.dart';
 import 'app_drawer.dart';
 import 'module_screen.dart';
 
 class HomeShell extends StatefulWidget {
-  const HomeShell({super.key, this.initialMenuId = 'home'});
+  const HomeShell({super.key, this.initialMenuId = 'cari'});
 
   final String initialMenuId;
 
@@ -24,32 +33,56 @@ class HomeShell extends StatefulWidget {
 
 class _HomeShellState extends State<HomeShell> {
   late String _menuId;
+  late int _navIndex;
   int _cariRefreshKey = 0;
-  int _navIndex = 0;
+  int _moduleRefreshKey = 0;
   final _scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
   void initState() {
     super.initState();
-    _menuId = widget.initialMenuId;
-    _navIndex = _menuId == 'cari' ? 1 : 0;
+    final groupIndex = BottomNavConfig.groupIndexForMenuId(widget.initialMenuId);
+    if (groupIndex != null) {
+      _menuId = widget.initialMenuId;
+      _navIndex = groupIndex;
+    } else {
+      _menuId = widget.initialMenuId;
+      _navIndex = 0;
+    }
   }
+
+  int? get _bottomNavGroupIndex => BottomNavConfig.groupIndexForMenuId(_menuId);
+
+  BottomNavGroup? get _activeBottomGroup {
+    final idx = _bottomNavGroupIndex;
+    if (idx == null) return null;
+    return BottomNavConfig.groups[idx];
+  }
+
+  bool get _showBottomSubNav => _bottomNavGroupIndex != null;
 
   void _openDrawer() => _scaffoldKey.currentState?.openDrawer();
 
   void _selectMenu(String id) {
+    final groupIndex = BottomNavConfig.groupIndexForMenuId(id);
     setState(() {
       _menuId = id;
-      if (id == 'home') {
-        _navIndex = 0;
-      } else if (id == 'cari') {
-        _navIndex = 1;
-      }
+      if (groupIndex != null) _navIndex = groupIndex;
     });
     if (_scaffoldKey.currentState?.isDrawerOpen ?? false) {
       Navigator.of(context).pop();
     }
   }
+
+  void _selectBottomNav(int index) {
+    final group = BottomNavConfig.groups[index];
+    setState(() {
+      _navIndex = index;
+      _menuId = group.defaultMenuId;
+    });
+  }
+
+  void _selectSubNav(String menuId) => setState(() => _menuId = menuId);
 
   void _goCari() => _selectMenu('cari');
 
@@ -57,16 +90,7 @@ class _HomeShellState extends State<HomeShell> {
 
   void _refreshCari() => setState(() => _cariRefreshKey++);
 
-  void _onNavTap(int index) {
-    if (index == 2) {
-      _openDrawer();
-      return;
-    }
-    setState(() {
-      _navIndex = index;
-      _menuId = index == 0 ? 'home' : 'cari';
-    });
-  }
+  void _refreshModule() => setState(() => _moduleRefreshKey++);
 
   Future<void> _logout() async {
     await context.read<AuthState>().logout();
@@ -81,10 +105,44 @@ class _HomeShellState extends State<HomeShell> {
     if (created == true && mounted) {
       setState(() {
         _menuId = 'cari';
-        _navIndex = 1;
+        _navIndex = 0;
         _cariRefreshKey++;
       });
     }
+  }
+
+  Future<void> _openCreateForMenu() async {
+    final Widget screen = switch (_menuId) {
+      'stok' => const StkFormScreen(),
+      'fatura-satis' => const InvFormScreen(),
+      'fatura-alis' => const InvFormScreen(invoiceType: 'PURCHASE'),
+      'gorev' => const TskFormScreen(),
+      'servis' => const SvcFormScreen(),
+      'masraf' => const ExpFormScreen(),
+      'siparis' => const OrdFormScreen(),
+      'cek' => const ChqFormScreen(),
+      _ => const SizedBox.shrink(),
+    };
+    if (screen is SizedBox) return;
+    final created = await Navigator.of(context).push<bool>(
+      MaterialPageRoute(builder: (_) => screen),
+    );
+    if (created == true && mounted) _refreshModule();
+  }
+
+  ({String label, VoidCallback action})? _fabAction() {
+    return switch (_menuId) {
+      'cari' => (label: 'Yeni Cari Kart', action: _openNewCari),
+      'stok' => (label: 'Yeni Stok Tanımı', action: _openCreateForMenu),
+      'fatura-satis' => (label: 'Yeni Satış Faturası', action: _openCreateForMenu),
+      'fatura-alis' => (label: 'Yeni Alış Faturası', action: _openCreateForMenu),
+      'gorev' => (label: 'Yeni Görev', action: _openCreateForMenu),
+      'servis' => (label: 'Yeni Servis', action: _openCreateForMenu),
+      'masraf' => (label: 'Yeni Masraf', action: _openCreateForMenu),
+      'siparis' => (label: 'Yeni Sipariş', action: _openCreateForMenu),
+      'cek' => (label: 'Yeni Çek', action: _openCreateForMenu),
+      _ => null,
+    };
   }
 
   String _initials(String name) {
@@ -99,15 +157,21 @@ class _HomeShellState extends State<HomeShell> {
       final first = auth.user?.fullName.trim().split(RegExp(r'\s+')).firstOrNull;
       return first != null && first.isNotEmpty ? 'Merhaba, $first' : 'Ana Panel';
     }
+    final bottomTitle = BottomNavConfig.titleForMenuId(_menuId);
+    if (bottomTitle != _menuId) return bottomTitle;
     return AppMenu.titleFor(_menuId);
   }
 
   String? _headerSubtitle(AuthState auth) {
     if (_menuId == 'home') return dashboardDateSubtitle();
+    final group = _activeBottomGroup;
+    if (group != null && BottomNavConfig.groupIndexForMenuId(_menuId) != null) {
+      return group.label;
+    }
     return auth.companyName;
   }
 
-  Widget _body() {
+  Widget _moduleContent() {
     return switch (_menuId) {
       'home' => DashboardScreen(
           onOpenCari: _goCari,
@@ -118,13 +182,34 @@ class _HomeShellState extends State<HomeShell> {
           onNewCari: _openNewCari,
           onFinanceDone: _refreshCari,
         ),
-      _ => moduleScreenFor(_menuId, onSuccess: _refreshCari),
+      _ => KeyedSubtree(
+          key: ValueKey('module-$_menuId-$_moduleRefreshKey'),
+          child: moduleScreenFor(_menuId, onSuccess: _refreshCari),
+        ),
     };
+  }
+
+  Widget _body() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        if (_showBottomSubNav && _activeBottomGroup != null)
+          AppSubNav(
+            group: _activeBottomGroup!,
+            selectedMenuId: _menuId,
+            onSelect: _selectSubNav,
+            actionLabel: _fabAction()?.label,
+            onAction: _fabAction()?.action,
+          ),
+        Expanded(child: _moduleContent()),
+      ],
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     final auth = context.watch<AuthState>();
+    final fab = _fabAction();
 
     return Scaffold(
       key: _scaffoldKey,
@@ -143,19 +228,19 @@ class _HomeShellState extends State<HomeShell> {
       body: _body(),
       bottomNavigationBar: AppBottomNav(
         selectedIndex: _navIndex,
-        onTap: _onNavTap,
+        onTap: _selectBottomNav,
       ),
-      floatingActionButton: _menuId == 'cari'
-          ? Padding(
+      floatingActionButton: fab == null
+          ? null
+          : Padding(
               padding: const EdgeInsets.only(bottom: AppSpacing.sm),
               child: FloatingActionButton.extended(
-                onPressed: _openNewCari,
+                onPressed: fab.action,
                 elevation: 4,
                 icon: const Icon(Icons.add_rounded),
-                label: const Text('Yeni Cari'),
+                label: Text(fab.label),
               ),
-            )
-          : null,
+            ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
     );
   }

@@ -25,12 +25,18 @@ public class TenantDbContext : DbContext
     public DbSet<DlnDeliveryNoteLine> DlnDeliveryNoteLines => Set<DlnDeliveryNoteLine>();
     public DbSet<OrdOrder> OrdOrders => Set<OrdOrder>();
     public DbSet<OrdOrderLine> OrdOrderLines => Set<OrdOrderLine>();
+    public DbSet<QotQuotation> QotQuotations => Set<QotQuotation>();
+    public DbSet<QotQuotationLine> QotQuotationLines => Set<QotQuotationLine>();
     public DbSet<BnkBank> BnkBanks => Set<BnkBank>();
     public DbSet<BnkAccount> BnkAccounts => Set<BnkAccount>();
     public DbSet<BnkTransaction> BnkTransactions => Set<BnkTransaction>();
     public DbSet<StkStockMovement> StkStockMovements => Set<StkStockMovement>();
     public DbSet<ExpExpense> ExpExpenses => Set<ExpExpense>();
+    public DbSet<ExpExpenseLine> ExpExpenseLines => Set<ExpExpenseLine>();
+    public DbSet<ExpServiceDefinition> ExpServiceDefinitions => Set<ExpServiceDefinition>();
     public DbSet<SvcTicket> SvcTickets => Set<SvcTicket>();
+    public DbSet<SvcTicketLine> SvcTicketLines => Set<SvcTicketLine>();
+    public DbSet<SvcServiceDefinition> SvcServiceDefinitions => Set<SvcServiceDefinition>();
     public DbSet<TskTask> TskTasks => Set<TskTask>();
     public DbSet<CfgModuleSetting> CfgModuleSettings => Set<CfgModuleSetting>();
     public DbSet<CshAccount> CshAccounts => Set<CshAccount>();
@@ -38,6 +44,14 @@ public class TenantDbContext : DbContext
     public DbSet<CariMovement> CariMovements => Set<CariMovement>();
     public DbSet<ChqPortfolio> ChqPortfolios => Set<ChqPortfolio>();
     public DbSet<ChqInstrument> ChqInstruments => Set<ChqInstrument>();
+    public DbSet<OrgUser> OrgUsers => Set<OrgUser>();
+    public DbSet<OrgBranch> OrgBranches => Set<OrgBranch>();
+    public DbSet<AuthPermissionGroup> AuthPermissionGroups => Set<AuthPermissionGroup>();
+    public DbSet<AuthPermission> AuthPermissions => Set<AuthPermission>();
+    public DbSet<AuthUserPermission> AuthUserPermissions => Set<AuthUserPermission>();
+    public DbSet<AuthUserBranchAccess> AuthUserBranchAccess => Set<AuthUserBranchAccess>();
+    public DbSet<AuthUserSettings> AuthUserSettings => Set<AuthUserSettings>();
+    public DbSet<AuthUserListView> AuthUserList => Set<AuthUserListView>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -384,6 +398,62 @@ public class TenantDbContext : DbContext
             e.HasOne(x => x.Order).WithMany().HasForeignKey(x => x.OrderId);
         });
 
+        modelBuilder.Entity<QotQuotation>(e =>
+        {
+            e.ToTable("qot_quotations");
+            e.HasKey(x => x.Id);
+            e.Property(x => x.DocumentNo).HasColumnName("document_no").HasMaxLength(50);
+            e.Property(x => x.DocumentDate).HasColumnName("document_date");
+            e.Property(x => x.ValidUntil).HasColumnName("valid_until");
+            e.Property(x => x.DocumentType).HasColumnName("document_type").HasMaxLength(20);
+            e.Property(x => x.Status).HasColumnName("status").HasMaxLength(20);
+            e.Property(x => x.AccountId).HasColumnName("account_id");
+            e.Property(x => x.BranchId).HasColumnName("branch_id");
+            e.Property(x => x.WarehouseId).HasColumnName("warehouse_id");
+            e.Property(x => x.CurrencyId).HasColumnName("currency_id");
+            e.Property(x => x.ExchangeRate).HasColumnName("exchange_rate");
+            e.Property(x => x.Subtotal).HasColumnName("subtotal");
+            e.Property(x => x.DiscountTotal).HasColumnName("discount_total");
+            e.Property(x => x.TaxTotal).HasColumnName("tax_total");
+            e.Property(x => x.GrandTotal).HasColumnName("grand_total");
+            e.Property(x => x.RevisionNo).HasColumnName("revision_no");
+            e.Property(x => x.ParentQuotationId).HasColumnName("parent_quotation_id");
+            e.Property(x => x.Probability).HasColumnName("probability");
+            e.Property(x => x.ConvertedOrderId).HasColumnName("converted_order_id");
+            e.Property(x => x.ConvertedAt).HasColumnName("converted_at");
+            e.Property(x => x.Notes).HasColumnName("notes");
+            e.Property(x => x.CreatedAt).HasColumnName("created_at");
+            e.Property(x => x.CreatedBy).HasColumnName("created_by");
+            e.Property(x => x.UpdatedAt).HasColumnName("updated_at");
+            e.Property(x => x.UpdatedBy).HasColumnName("updated_by");
+            e.Property(x => x.IsDeleted).HasColumnName("is_deleted");
+            e.Property(x => x.DeletedAt).HasColumnName("deleted_at");
+            e.Property(x => x.DeletedBy).HasColumnName("deleted_by");
+            e.Property(x => x.RowVersion).HasColumnName("row_version").IsRowVersion();
+            e.HasOne(x => x.Account).WithMany().HasForeignKey(x => x.AccountId);
+        });
+
+        modelBuilder.Entity<QotQuotationLine>(e =>
+        {
+            e.ToTable("qot_quotation_lines");
+            e.HasKey(x => x.Id);
+            e.Property(x => x.QuotationId).HasColumnName("quotation_id");
+            e.Property(x => x.LineNo).HasColumnName("line_no");
+            e.Property(x => x.ItemId).HasColumnName("item_id");
+            e.Property(x => x.Description).HasColumnName("description").HasMaxLength(500);
+            e.Property(x => x.Quantity).HasColumnName("quantity");
+            e.Property(x => x.UnitId).HasColumnName("unit_id");
+            e.Property(x => x.UnitPrice).HasColumnName("unit_price");
+            e.Property(x => x.DiscountRate).HasColumnName("discount_rate");
+            e.Property(x => x.TaxRateId).HasColumnName("tax_rate_id");
+            e.Property(x => x.TaxAmount).HasColumnName("tax_amount");
+            e.Property(x => x.LineTotal).HasColumnName("line_total");
+            e.Property(x => x.WarehouseId).HasColumnName("warehouse_id");
+            e.Property(x => x.CreatedAt).HasColumnName("created_at");
+            e.Property(x => x.IsDeleted).HasColumnName("is_deleted");
+            e.HasOne(x => x.Quotation).WithMany().HasForeignKey(x => x.QuotationId);
+        });
+
         modelBuilder.Entity<BnkBank>(e =>
         {
             e.ToTable("bnk_banks");
@@ -476,11 +546,54 @@ public class TenantDbContext : DbContext
             e.Property(x => x.Category).HasColumnName("category").HasMaxLength(50);
             e.Property(x => x.Description).HasColumnName("description").HasMaxLength(500);
             e.Property(x => x.Amount).HasColumnName("amount");
+            e.Property(x => x.AccountId).HasColumnName("account_id");
+            e.Property(x => x.Subtotal).HasColumnName("subtotal");
+            e.Property(x => x.TaxTotal).HasColumnName("tax_total");
+            e.Property(x => x.GrandTotal).HasColumnName("grand_total");
+            e.Property(x => x.PurchaseInvoiceId).HasColumnName("purchase_invoice_id");
             e.Property(x => x.CurrencyId).HasColumnName("currency_id");
             e.Property(x => x.RequesterName).HasColumnName("requester_name").HasMaxLength(100);
             e.Property(x => x.ApprovalStatus).HasColumnName("approval_status").HasMaxLength(20);
+            e.Property(x => x.PaymentStatus).HasColumnName("payment_status").HasMaxLength(20);
             e.Property(x => x.PaymentMethod).HasColumnName("payment_method").HasMaxLength(30);
             e.Property(x => x.Notes).HasColumnName("notes");
+            e.Property(x => x.CreatedAt).HasColumnName("created_at");
+            e.Property(x => x.IsDeleted).HasColumnName("is_deleted");
+            e.HasOne(x => x.Account).WithMany().HasForeignKey(x => x.AccountId);
+        });
+
+        modelBuilder.Entity<ExpExpenseLine>(e =>
+        {
+            e.ToTable("exp_expense_lines");
+            e.HasKey(x => x.Id);
+            e.Property(x => x.ExpenseId).HasColumnName("expense_id");
+            e.Property(x => x.LineNo).HasColumnName("line_no");
+            e.Property(x => x.LineType).HasColumnName("line_type").HasMaxLength(20);
+            e.Property(x => x.ServiceDefinitionId).HasColumnName("service_definition_id");
+            e.Property(x => x.ItemId).HasColumnName("item_id");
+            e.Property(x => x.Description).HasColumnName("description").HasMaxLength(500);
+            e.Property(x => x.Quantity).HasColumnName("quantity");
+            e.Property(x => x.UnitId).HasColumnName("unit_id");
+            e.Property(x => x.UnitPrice).HasColumnName("unit_price");
+            e.Property(x => x.TaxRateId).HasColumnName("tax_rate_id");
+            e.Property(x => x.TaxAmount).HasColumnName("tax_amount");
+            e.Property(x => x.LineTotal).HasColumnName("line_total");
+            e.Property(x => x.CreatedAt).HasColumnName("created_at");
+            e.Property(x => x.IsDeleted).HasColumnName("is_deleted");
+            e.HasOne(x => x.Expense).WithMany().HasForeignKey(x => x.ExpenseId);
+            e.HasOne(x => x.ServiceDefinition).WithMany().HasForeignKey(x => x.ServiceDefinitionId);
+        });
+
+        modelBuilder.Entity<ExpServiceDefinition>(e =>
+        {
+            e.ToTable("exp_service_definitions");
+            e.HasKey(x => x.Id);
+            e.Property(x => x.Code).HasColumnName("code").HasMaxLength(30);
+            e.Property(x => x.Name).HasColumnName("name").HasMaxLength(100);
+            e.Property(x => x.CategoryGroup).HasColumnName("category_group").HasMaxLength(50);
+            e.Property(x => x.DefaultTaxRateId).HasColumnName("default_tax_rate_id");
+            e.Property(x => x.IsActive).HasColumnName("is_active");
+            e.Property(x => x.SortOrder).HasColumnName("sort_order");
             e.Property(x => x.CreatedAt).HasColumnName("created_at");
             e.Property(x => x.IsDeleted).HasColumnName("is_deleted");
         });
@@ -499,9 +612,47 @@ public class TenantDbContext : DbContext
             e.Property(x => x.Priority).HasColumnName("priority").HasMaxLength(20);
             e.Property(x => x.Resolution).HasColumnName("resolution");
             e.Property(x => x.ClosedAt).HasColumnName("closed_at");
+            e.Property(x => x.InvoiceId).HasColumnName("invoice_id");
             e.Property(x => x.CreatedAt).HasColumnName("created_at");
             e.Property(x => x.IsDeleted).HasColumnName("is_deleted");
             e.HasOne(x => x.Account).WithMany().HasForeignKey(x => x.AccountId);
+        });
+
+        modelBuilder.Entity<SvcServiceDefinition>(e =>
+        {
+            e.ToTable("svc_service_definitions");
+            e.HasKey(x => x.Id);
+            e.Property(x => x.Code).HasColumnName("code").HasMaxLength(30);
+            e.Property(x => x.Name).HasColumnName("name").HasMaxLength(100);
+            e.Property(x => x.DefaultTaxRateId).HasColumnName("default_tax_rate_id");
+            e.Property(x => x.IsActive).HasColumnName("is_active");
+            e.Property(x => x.SortOrder).HasColumnName("sort_order");
+            e.Property(x => x.IsDeleted).HasColumnName("is_deleted");
+        });
+
+        modelBuilder.Entity<SvcTicketLine>(e =>
+        {
+            e.ToTable("svc_ticket_lines");
+            e.HasKey(x => x.Id);
+            e.Property(x => x.TicketId).HasColumnName("ticket_id");
+            e.Property(x => x.LineNo).HasColumnName("line_no");
+            e.Property(x => x.LineType).HasColumnName("line_type").HasMaxLength(20);
+            e.Property(x => x.ServiceDefinitionId).HasColumnName("service_definition_id");
+            e.Property(x => x.ItemId).HasColumnName("item_id");
+            e.Property(x => x.Description).HasColumnName("description").HasMaxLength(500);
+            e.Property(x => x.Quantity).HasColumnName("quantity");
+            e.Property(x => x.UnitId).HasColumnName("unit_id");
+            e.Property(x => x.UnitPrice).HasColumnName("unit_price");
+            e.Property(x => x.TaxRateId).HasColumnName("tax_rate_id");
+            e.Property(x => x.TaxAmount).HasColumnName("tax_amount");
+            e.Property(x => x.LineTotal).HasColumnName("line_total");
+            e.Property(x => x.CreatedAt).HasColumnName("created_at");
+            e.Property(x => x.IsDeleted).HasColumnName("is_deleted");
+            e.HasOne(x => x.Ticket).WithMany(t => t.Lines).HasForeignKey(x => x.TicketId);
+            e.HasOne(x => x.ServiceDefinition).WithMany().HasForeignKey(x => x.ServiceDefinitionId);
+            e.HasOne(x => x.Item).WithMany().HasForeignKey(x => x.ItemId);
+            e.HasOne(x => x.Unit).WithMany().HasForeignKey(x => x.UnitId);
+            e.HasOne(x => x.TaxRate).WithMany().HasForeignKey(x => x.TaxRateId);
         });
 
         modelBuilder.Entity<TskTask>(e =>
@@ -629,6 +780,112 @@ public class TenantDbContext : DbContext
             e.Property(x => x.CreatedAt).HasColumnName("created_at");
             e.Property(x => x.CreatedBy).HasColumnName("created_by");
             e.Property(x => x.IsDeleted).HasColumnName("is_deleted");
+        });
+
+        modelBuilder.Entity<OrgUser>(e =>
+        {
+            e.ToTable("org_users");
+            e.HasKey(x => x.Id);
+            e.Property(x => x.SystemUserId).HasColumnName("system_user_id");
+            e.Property(x => x.Username).HasColumnName("username").HasMaxLength(100);
+            e.Property(x => x.FullName).HasColumnName("full_name").HasMaxLength(200);
+            e.Property(x => x.Email).HasColumnName("email").HasMaxLength(254);
+            e.Property(x => x.Phone).HasColumnName("phone").HasMaxLength(30);
+            e.Property(x => x.DepartmentId).HasColumnName("department_id");
+            e.Property(x => x.DefaultBranchId).HasColumnName("default_branch_id");
+            e.Property(x => x.IsActive).HasColumnName("is_active");
+            e.Property(x => x.InvitedAt).HasColumnName("invited_at");
+            e.Property(x => x.JoinedAt).HasColumnName("joined_at");
+            e.Property(x => x.CreatedAt).HasColumnName("created_at");
+            e.Property(x => x.CreatedBy).HasColumnName("created_by");
+            e.Property(x => x.UpdatedAt).HasColumnName("updated_at");
+            e.Property(x => x.UpdatedBy).HasColumnName("updated_by");
+            e.Property(x => x.IsDeleted).HasColumnName("is_deleted");
+            e.Property(x => x.DeletedAt).HasColumnName("deleted_at");
+            e.Property(x => x.DeletedBy).HasColumnName("deleted_by");
+        });
+
+        modelBuilder.Entity<OrgBranch>(e =>
+        {
+            e.ToTable("org_branches");
+            e.HasKey(x => x.Id);
+            e.Property(x => x.Code).HasColumnName("code").HasMaxLength(20);
+            e.Property(x => x.Name).HasColumnName("name").HasMaxLength(200);
+            e.Property(x => x.IsHeadquarters).HasColumnName("is_headquarters");
+            e.Property(x => x.IsActive).HasColumnName("is_active");
+            e.Property(x => x.IsDeleted).HasColumnName("is_deleted");
+        });
+
+        modelBuilder.Entity<AuthPermissionGroup>(e =>
+        {
+            e.ToTable("auth_permission_groups");
+            e.HasKey(x => x.Id);
+            e.Property(x => x.Code).HasColumnName("code").HasMaxLength(50);
+            e.Property(x => x.Name).HasColumnName("name").HasMaxLength(100);
+            e.Property(x => x.ParentId).HasColumnName("parent_id");
+            e.Property(x => x.SortOrder).HasColumnName("sort_order");
+            e.Property(x => x.IsActive).HasColumnName("is_active");
+        });
+
+        modelBuilder.Entity<AuthPermission>(e =>
+        {
+            e.ToTable("auth_permissions");
+            e.HasKey(x => x.Id);
+            e.Property(x => x.GroupId).HasColumnName("group_id");
+            e.Property(x => x.Code).HasColumnName("code").HasMaxLength(100);
+            e.Property(x => x.Name).HasColumnName("name").HasMaxLength(200);
+            e.Property(x => x.ModuleCode).HasColumnName("module_code").HasMaxLength(30);
+            e.Property(x => x.ActionCode).HasColumnName("action_code").HasMaxLength(30);
+            e.Property(x => x.SortOrder).HasColumnName("sort_order");
+            e.Property(x => x.IsActive).HasColumnName("is_active");
+            e.HasOne(x => x.Group).WithMany(g => g.Permissions).HasForeignKey(x => x.GroupId);
+        });
+
+        modelBuilder.Entity<AuthUserPermission>(e =>
+        {
+            e.ToTable("auth_user_permissions");
+            e.HasKey(x => x.Id);
+            e.Property(x => x.OrgUserId).HasColumnName("org_user_id");
+            e.Property(x => x.PermissionId).HasColumnName("permission_id");
+            e.Property(x => x.IsGranted).HasColumnName("is_granted");
+            e.Property(x => x.CreatedAt).HasColumnName("created_at");
+            e.HasOne(x => x.Permission).WithMany().HasForeignKey(x => x.PermissionId);
+        });
+
+        modelBuilder.Entity<AuthUserBranchAccess>(e =>
+        {
+            e.ToTable("auth_user_branch_access");
+            e.HasKey(x => x.Id);
+            e.Property(x => x.OrgUserId).HasColumnName("org_user_id");
+            e.Property(x => x.BranchId).HasColumnName("branch_id");
+            e.Property(x => x.AccessRule).HasColumnName("access_rule").HasMaxLength(20);
+            e.Property(x => x.CreatedAt).HasColumnName("created_at");
+            e.HasOne(x => x.Branch).WithMany().HasForeignKey(x => x.BranchId);
+        });
+
+        modelBuilder.Entity<AuthUserSettings>(e =>
+        {
+            e.ToTable("auth_user_settings");
+            e.HasKey(x => x.Id);
+            e.Property(x => x.OrgUserId).HasColumnName("org_user_id");
+            e.Property(x => x.IsBranchRestrictionEnabled).HasColumnName("is_branch_restriction_enabled");
+            e.Property(x => x.MaxBranchAccess).HasColumnName("max_branch_access");
+            e.Property(x => x.PermissionSummaryCache).HasColumnName("permission_summary_cache").HasMaxLength(500);
+            e.Property(x => x.CreatedAt).HasColumnName("created_at");
+            e.Property(x => x.UpdatedAt).HasColumnName("updated_at");
+        });
+
+        modelBuilder.Entity<AuthUserListView>(e =>
+        {
+            e.HasNoKey();
+            e.ToView("v_auth_user_list");
+            e.Property(x => x.Id).HasColumnName("id");
+            e.Property(x => x.FullName).HasColumnName("full_name");
+            e.Property(x => x.Email).HasColumnName("email");
+            e.Property(x => x.Phone).HasColumnName("phone");
+            e.Property(x => x.IsActive).HasColumnName("is_active");
+            e.Property(x => x.CreatedAt).HasColumnName("created_at");
+            e.Property(x => x.PermissionSummary).HasColumnName("permission_summary");
         });
     }
 }

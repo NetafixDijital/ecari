@@ -117,7 +117,9 @@ class AppDrawer extends StatelessWidget {
                     ),
                   ),
                   const _SectionLabel('Ayarlar'),
-                  ...AppMenu.settings.map(
+                  ...AppMenu.settings
+                      .where((item) => item.id != 'ayarlar-kullanicilar' || auth.hasPermission('AUTH.USER.VIEW'))
+                      .map(
                     (item) => _MenuTile(
                       item: item,
                       selected: selectedId == item.id,

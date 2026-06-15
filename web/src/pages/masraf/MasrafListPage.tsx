@@ -1,38 +1,12 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { createExpense, fetchExpenses, type ExpExpenseListItem } from '../../api/exp'
+import { fetchExpenses, payExpense, updateExpenseStatus, type ExpExpenseListItem } from '../../api/exp'
+import IconActionButton from '../../components/ui/IconActionButton'
 import TableSearchToolbar from '../../components/ui/TableSearchToolbar'
-import {
-  expenseCategoryLabel,
-  expenseStatusBadge,
-  formatDate,
-  formatTry,
-} from '../../utils/format'
+import { apiErrorMessage } from '../../utils/apiError'
+import { expenseStatusBadge, formatDate, formatTry } from '../../utils/format'
 
 type StatusFilter = 'all' | 'PENDING' | 'APPROVED' | 'PAID' | 'REJECTED'
-
-const CATEGORIES = [
-  { value: 'yakit', label: 'Yakıt' },
-  { value: 'kirtasiye', label: 'Kırtasiye' },
-  { value: 'yemek', label: 'Yemek' },
-  { value: 'konaklama', label: 'Konaklama' },
-  { value: 'diger', label: 'Diğer' },
-]
-
-const PAYMENT_METHODS = [
-  { value: 'CASH', label: 'Nakit' },
-  { value: 'CARD', label: 'Kredi Kartı' },
-  { value: 'TRANSFER', label: 'Havale/EFT' },
-]
-
-function todayIso() {
-  return new Date().toISOString().slice(0, 10)
-}
-
-function closeModal(id: string) {
-  const el = document.getElementById(id)
-  if (el && window.bootstrap) window.bootstrap.Modal.getOrCreateInstance(el).hide()
-}
 
 export default function MasrafListPage() {
   const [items, setItems] = useState<ExpExpenseListItem[]>([])
@@ -40,15 +14,7 @@ export default function MasrafListPage() {
   const [tableSearch, setTableSearch] = useState('')
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
-
-  const [expenseDate, setExpenseDate] = useState(todayIso())
-  const [category, setCategory] = useState('yakit')
-  const [description, setDescription] = useState('')
-  const [amount, setAmount] = useState('')
-  const [requester, setRequester] = useState('')
-  const [paymentMethod, setPaymentMethod] = useState('CASH')
-  const [creating, setCreating] = useState(false)
-  const [createError, setCreateError] = useState('')
+  const [actingId, setActingId] = useState<number | null>(null)
 
   const loadItems = useCallback(() => {
     setLoading(true)
@@ -67,57 +33,49 @@ export default function MasrafListPage() {
     const q = tableSearch.trim().toLowerCase()
     if (!q) return items
     return items.filter((row) => {
-      const haystack = [
-        row.documentNo,
-        row.description,
-        row.requesterName,
-        row.category,
-        expenseCategoryLabel(row.category),
-      ]
-        .filter(Boolean)
-        .join(' ')
-        .toLowerCase()
+      const haystack = [row.documentNo, row.accountTitle, row.summary, row.paymentMethodLabel].join(' ').toLowerCase()
       return haystack.includes(q)
     })
   }, [items, tableSearch])
 
-  function resetForm() {
-    setExpenseDate(todayIso())
-    setCategory('yakit')
-    setDescription('')
-    setAmount('')
-    setRequester('')
-    setPaymentMethod('CASH')
-    setCreateError('')
-  }
-
-  async function handleCreate() {
-    const parsedAmount = Number(amount)
-    if (!description.trim() || !parsedAmount || parsedAmount <= 0) {
-      setCreateError('Açıklama ve geçerli bir tutar girin.')
-      return
-    }
-    setCreating(true)
-    setCreateError('')
+  async function handleApprove(row: ExpExpenseListItem) {
+    setActingId(row.id)
+    setError('')
     try {
-      await createExpense({
-        expenseDate,
-        category,
-        description: description.trim(),
-        amount: parsedAmount,
-        requesterName: requester.trim() || null,
-        paymentMethod,
-      })
-      closeModal('modalYeniMasraf')
-      resetForm()
+      await updateExpenseStatus(row.id, 'approve')
       loadItems()
     } catch (err: unknown) {
-      const message =
-        (err as { response?: { data?: { message?: string } } })?.response?.data?.message ||
-        'Masraf kaydı oluşturulamadı.'
-      setCreateError(message)
+      setError(apiErrorMessage(err, 'Masraf onaylanamadı.'))
     } finally {
-      setCreating(false)
+      setActingId(null)
+    }
+  }
+
+  async function handleReject(row: ExpExpenseListItem) {
+    if (!window.confirm(`${row.documentNo} reddedilsin mi?`)) return
+    setActingId(row.id)
+    setError('')
+    try {
+      await updateExpenseStatus(row.id, 'reject')
+      loadItems()
+    } catch (err: unknown) {
+      setError(apiErrorMessage(err, 'Masraf reddedilemedi.'))
+    } finally {
+      setActingId(null)
+    }
+  }
+
+  async function handlePay(row: ExpExpenseListItem) {
+    if (!window.confirm(`${row.documentNo} ödemesi yapılsın mı?`)) return
+    setActingId(row.id)
+    setError('')
+    try {
+      await payExpense(row.id)
+      loadItems()
+    } catch (err: unknown) {
+      setError(apiErrorMessage(err, 'Masraf ödenemedi.'))
+    } finally {
+      setActingId(null)
     }
   }
 
@@ -128,34 +86,21 @@ export default function MasrafListPage() {
           <h4 className="mb-1">Masraf Listesi</h4>
           <nav aria-label="breadcrumb">
             <ol className="breadcrumb">
-              <li className="breadcrumb-item">
-                <Link to="/">Ana Sayfa</Link>
-              </li>
+              <li className="breadcrumb-item"><Link to="/">Ana Sayfa</Link></li>
               <li className="breadcrumb-item active">Masraf</li>
             </ol>
           </nav>
         </div>
-        <div className="d-flex gap-2">
-          <Link to="/masraf/yonetim" className="btn btn-label-secondary">
-            <i className="ti ti-chart-pie me-1" /> Yönetim
-          </Link>
-          <button
-            type="button"
-            className="btn btn-primary"
-            data-bs-toggle="modal"
-            data-bs-target="#modalYeniMasraf"
-            onClick={resetForm}
-          >
-            <i className="ti ti-plus me-1" /> Yeni Masraf
-          </button>
-        </div>
+        <Link to="/masraf/yeni" className="btn btn-primary">
+          <i className="ti ti-plus me-1" /> Yeni Masraf
+        </Link>
       </div>
 
       {error && <div className="alert alert-danger py-2">{error}</div>}
 
       <div className="card datatables-toolbar-hidden">
         <div className="card-header d-flex flex-wrap justify-content-between align-items-center gap-2">
-          <span>Masraflar</span>
+          <span>Masraf Kayıtları (Kapalı Fatura)</span>
           <div className="btn-group btn-group-sm flex-wrap">
             {(
               [
@@ -184,137 +129,70 @@ export default function MasrafListPage() {
               <tr>
                 <th>Belge No</th>
                 <th>Tarih</th>
-                <th>Kategori</th>
-                <th>Açıklama</th>
-                <th>Talep Eden</th>
+                <th>Cari</th>
+                <th>Özet</th>
+                <th>Ödeme</th>
                 <th>Tutar</th>
                 <th>Durum</th>
+                <th className="text-center">İşlemler</th>
               </tr>
             </thead>
             <tbody>
               {loading && (
-                <tr>
-                  <td colSpan={7} className="text-center text-body-secondary py-4">
-                    Yükleniyor...
-                  </td>
-                </tr>
+                <tr><td colSpan={8} className="text-center text-body-secondary py-4">Yükleniyor...</td></tr>
               )}
               {!loading && filteredItems.length === 0 && (
-                <tr>
-                  <td colSpan={7} className="text-center text-body-secondary py-4">
-                    Kayıt bulunamadı.
-                  </td>
-                </tr>
+                <tr><td colSpan={8} className="text-center text-body-secondary py-4">Kayıt bulunamadı.</td></tr>
               )}
-              {!loading &&
-                filteredItems.map((row) => {
-                  const badge = expenseStatusBadge(row.statusKey)
-                  return (
-                    <tr key={row.id}>
-                      <td className="fw-medium">{row.documentNo}</td>
-                      <td>{formatDate(row.expenseDate)}</td>
-                      <td>{expenseCategoryLabel(row.category)}</td>
-                      <td>{row.description}</td>
-                      <td>{row.requesterName || '—'}</td>
-                      <td>{formatTry(row.amount)}</td>
-                      <td>
-                        <span className={`badge ${badge.className}`}>{badge.label}</span>
-                      </td>
-                    </tr>
-                  )
-                })}
+              {!loading && filteredItems.map((row) => {
+                const badge = expenseStatusBadge(row.statusKey)
+                return (
+                  <tr key={row.id}>
+                    <td className="fw-medium">
+                      <Link to={`/masraf/${row.id}`}>{row.documentNo}</Link>
+                    </td>
+                    <td>{formatDate(row.expenseDate)}</td>
+                    <td>{row.accountTitle}</td>
+                    <td className="text-truncate" style={{ maxWidth: '16rem' }}>{row.summary}</td>
+                    <td>{row.paymentMethodLabel}</td>
+                    <td>{formatTry(row.grandTotal)}</td>
+                    <td><span className={`badge ${badge.className}`}>{badge.label}</span></td>
+                    <td className="text-center">
+                      <div className="d-inline-flex gap-1">
+                        {row.statusKey === 'onay_bekliyor' && (
+                          <>
+                            <IconActionButton
+                              icon="ti-check"
+                              color="success"
+                              title="Onayla"
+                              disabled={actingId === row.id}
+                              onClick={() => handleApprove(row)}
+                            />
+                            <IconActionButton
+                              icon="ti-x"
+                              color="danger"
+                              title="Reddet"
+                              disabled={actingId === row.id}
+                              onClick={() => handleReject(row)}
+                            />
+                          </>
+                        )}
+                        {(row.statusKey === 'onaylandi' || row.statusKey === 'onay_bekliyor') && !row.purchaseInvoiceId && (
+                          <IconActionButton
+                            icon="ti-cash"
+                            color="primary"
+                            title="Öde"
+                            disabled={actingId === row.id}
+                            onClick={() => handlePay(row)}
+                          />
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                )
+              })}
             </tbody>
           </table>
-        </div>
-      </div>
-
-      <div className="modal fade" id="modalYeniMasraf" tabIndex={-1} aria-hidden="true">
-        <div className="modal-dialog modal-dialog-centered">
-          <div className="modal-content">
-            <div className="modal-header">
-              <h5 className="modal-title">
-                <i className="ti ti-receipt-2 me-2 text-primary" />
-                Yeni Masraf
-              </h5>
-              <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Kapat" />
-            </div>
-            <div className="modal-body">
-              {createError && <div className="alert alert-danger py-2">{createError}</div>}
-              <div className="mb-3">
-                <label className="form-label">Tarih</label>
-                <input
-                  type="date"
-                  className="form-control"
-                  value={expenseDate}
-                  onChange={(e) => setExpenseDate(e.target.value)}
-                />
-              </div>
-              <div className="mb-3">
-                <label className="form-label">Kategori</label>
-                <select className="form-select" value={category} onChange={(e) => setCategory(e.target.value)}>
-                  {CATEGORIES.map((c) => (
-                    <option key={c.value} value={c.value}>
-                      {c.label}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div className="mb-3">
-                <label className="form-label">Açıklama</label>
-                <textarea
-                  className="form-control"
-                  rows={2}
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                  placeholder="Masraf açıklaması"
-                />
-              </div>
-              <div className="mb-3">
-                <label className="form-label">Tutar (₺)</label>
-                <input
-                  type="number"
-                  className="form-control"
-                  step="0.01"
-                  min={0}
-                  value={amount}
-                  onChange={(e) => setAmount(e.target.value)}
-                  placeholder="0,00"
-                />
-              </div>
-              <div className="mb-3">
-                <label className="form-label">Talep Eden</label>
-                <input
-                  type="text"
-                  className="form-control"
-                  value={requester}
-                  onChange={(e) => setRequester(e.target.value)}
-                  placeholder="Ad Soyad"
-                />
-              </div>
-              <div className="mb-0">
-                <label className="form-label">Ödeme Yöntemi</label>
-                <select
-                  className="form-select"
-                  value={paymentMethod}
-                  onChange={(e) => setPaymentMethod(e.target.value)}
-                >
-                  {PAYMENT_METHODS.map((m) => (
-                    <option key={m.value} value={m.value}>
-                      {m.label}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            </div>
-            <div className="modal-footer">
-              <button type="button" className="btn btn-label-secondary" data-bs-dismiss="modal">
-                İptal
-              </button>
-              <button type="button" className="btn btn-primary" disabled={creating} onClick={handleCreate}>
-                {creating ? 'Kaydediliyor...' : 'Kaydet'}
-              </button>
-            </div>
-          </div>
         </div>
       </div>
     </div>

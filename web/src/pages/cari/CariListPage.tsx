@@ -18,6 +18,8 @@ import { fetchBnkAccounts } from '../../api/bnk'
 import IconActionButton from '../../components/ui/IconActionButton'
 import TableSearchToolbar from '../../components/ui/TableSearchToolbar'
 import { displayTaxId, formatCariBalance, personTypeBadge } from '../../utils/format'
+import { useToast } from '../../context/ToastContext'
+import { apiErrorMessage } from '../../utils/apiError'
 import CariListModals, {
   type PaymentModalState,
   type TahsilatPaymentMethod,
@@ -42,6 +44,7 @@ function todayIso() {
 }
 
 export default function CariListPage() {
+  const toast = useToast()
   const [items, setItems] = useState<CariAccountListItem[]>([])
   const [cities, setCities] = useState<City[]>([])
   const [paymentTerms, setPaymentTerms] = useState<PaymentTerm[]>([])
@@ -121,12 +124,12 @@ export default function CariListPage() {
     setCreateError('')
     try {
       await createCariAccount(body)
+      toast.success('Kayıt oluşturuldu', 'Cari hesap eklendi.')
       loadItems()
     } catch (err: unknown) {
-      const message =
-        (err as { response?: { data?: { message?: string } } })?.response?.data?.message ||
-        'Cari kaydı oluşturulamadı.'
+      const message = apiErrorMessage(err, 'Cari kaydı oluşturulamadı.')
       setCreateError(message)
+      toast.error('Kayıt başarısız', message)
       throw err
     } finally {
       setCreating(false)
@@ -138,12 +141,12 @@ export default function CariListPage() {
     setSaveError('')
     try {
       await updateCariAccount(id, body)
+      toast.success('Güncellendi', 'Cari bilgileri kaydedildi.')
       loadItems()
     } catch (err: unknown) {
-      const message =
-        (err as { response?: { data?: { message?: string } } })?.response?.data?.message ||
-        'Cari güncellenemedi.'
+      const message = apiErrorMessage(err, 'Cari güncellenemedi.')
       setSaveError(message)
+      toast.error('Kayıt başarısız', message)
       throw err
     } finally {
       setSaving(false)
@@ -155,9 +158,10 @@ export default function CariListPage() {
     setDeletingId(row.id)
     try {
       await deleteCariAccount(row.id)
+      toast.success('Silindi', `"${row.title}" cari kaydı kaldırıldı.`)
       loadItems()
     } catch {
-      window.alert('Cari silinemedi.')
+      toast.error('Silme başarısız', 'Cari silinemedi.')
     } finally {
       setDeletingId(null)
     }
@@ -232,12 +236,12 @@ export default function CariListPage() {
       })
       closeModal('modalVirman')
       setVirmanModal(null)
+      toast.success('Virman kaydedildi', 'Cari hesaplar arası transfer tamamlandı.')
       loadItems()
     } catch (err: unknown) {
-      const message =
-        (err as { response?: { data?: { message?: string } } })?.response?.data?.message ||
-        'Virman kaydedilemedi.'
+      const message = apiErrorMessage(err, 'Virman kaydedilemedi.')
       setVirmanError(message)
+      toast.error('Kayıt başarısız', message)
     } finally {
       setVirmanSaving(false)
     }
@@ -303,12 +307,15 @@ export default function CariListPage() {
         closeModal('modalTediye')
       }
       setPaymentModal(null)
+      toast.success(
+        paymentModal.type === 'tahsilat' ? 'Tahsilat kaydedildi' : 'Tediye kaydedildi',
+        `${paymentModal.cari.title} — işlem tamamlandı.`,
+      )
       loadItems()
     } catch (err: unknown) {
-      const message =
-        (err as { response?: { data?: { message?: string } } })?.response?.data?.message ||
-        'İşlem kaydedilemedi.'
+      const message = apiErrorMessage(err, 'Ödeme kaydedilemedi.')
       setPaymentError(message)
+      toast.error('Kayıt başarısız', message)
     } finally {
       setPaymentSaving(false)
     }

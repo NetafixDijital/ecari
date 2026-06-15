@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { useAuth } from '../../context/AuthContext'
+import { useToast } from '../../context/ToastContext'
 import {
   fetchCompanyProfile,
   updateCompanyProfile,
@@ -8,12 +10,13 @@ import {
 } from '../../api/cfg'
 
 export default function AyarlarGenelPage() {
+  const { hasPermission } = useAuth()
+  const toast = useToast()
   const [profile, setProfile] = useState<CompanyProfile | null>(null)
   const [form, setForm] = useState<UpdateCompanyProfileRequest | null>(null)
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
-  const [success, setSuccess] = useState('')
 
   useEffect(() => {
     fetchCompanyProfile()
@@ -31,15 +34,16 @@ export default function AyarlarGenelPage() {
     if (!form) return
     setSaving(true)
     setError('')
-    setSuccess('')
     try {
       const updated = await updateCompanyProfile(form)
       setProfile(updated)
       const { id: _id, ...rest } = updated
       setForm(rest)
-      setSuccess('Firma bilgileri kaydedildi.')
+      toast.success('Kaydedildi', 'Firma bilgileri güncellendi.')
     } catch {
-      setError('Kayıt sırasında hata oluştu.')
+      const msg = 'Kayıt sırasında hata oluştu.'
+      setError(msg)
+      toast.error('Kayıt başarısız', msg)
     } finally {
       setSaving(false)
     }
@@ -65,7 +69,6 @@ export default function AyarlarGenelPage() {
       <h4 className="mb-4">Genel Ayarlar</h4>
 
       {error && <div className="alert alert-danger py-2">{error}</div>}
-      {success && <div className="alert alert-success py-2">{success}</div>}
 
       <form onSubmit={handleSave}>
         <div className="row g-4">
@@ -205,6 +208,22 @@ export default function AyarlarGenelPage() {
                 </Link>
               </div>
             </div>
+            {hasPermission('AUTH.USER.VIEW') && (
+              <div className="card mt-4">
+                <div className="card-header">Kullanıcı &amp; Yetki</div>
+                <div className="card-body d-flex flex-wrap align-items-center justify-content-between gap-3">
+                  <div>
+                    <p className="mb-1 fw-medium">Kullanıcı hesapları ve izin yönetimi</p>
+                    <p className="text-body-secondary small mb-0">
+                      Yeni kullanıcı ekleyin, izin ağacından yetki atayın, şube erişim kısıtları tanımlayın.
+                    </p>
+                  </div>
+                  <Link to="/ayarlar/kullanicilar" className="btn btn-primary">
+                    <i className="ti ti-users me-1" /> Kullanıcıları Yönet
+                  </Link>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </form>

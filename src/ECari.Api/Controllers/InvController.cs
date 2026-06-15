@@ -72,4 +72,17 @@ public class InvController(
             return BadRequest(new { message = ex.Message });
         }
     }
+
+    [HttpDelete("invoices/{id:long}")]
+    public async Task<IActionResult> Delete(long id, CancellationToken ct)
+    {
+        if (!tenant.HasTenantContext())
+            return BadRequest(new { message = "Önce şirket seçin: POST /api/auth/select-company" });
+        try
+        {
+            if (!await invService.DeleteAsync(id, ct)) return NotFound();
+            return NoContent();
+        }
+        catch (InvalidOperationException ex) { return BadRequest(new { message = ex.Message }); }
+    }
 }

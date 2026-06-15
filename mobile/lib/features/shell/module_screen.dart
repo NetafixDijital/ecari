@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../finance/tahsilat_screen.dart';
-import '../finance/tediye_screen.dart';
+import '../hizli_satis/hizli_satis_screen.dart';
+import '../finance/tahsilat_screen.dart';import '../finance/tediye_screen.dart';
 import '../finance/virman_screen.dart';
 import '../bnk/bnk_list_screen.dart';
 import '../cari/cari_models.dart';
@@ -11,10 +11,13 @@ import '../csh/csh_list_screen.dart';
 import '../depo/depo_list_screen.dart';
 import '../dln/dln_list_screen.dart';
 import '../exp/exp_list_screen.dart';
+import '../exp/exp_management_screen.dart';
 import '../inv/inv_list_screen.dart';
 import '../ord/ord_list_screen.dart';
+import '../qot/qot_list_screen.dart';
 import '../reports/gun_sonu_screen.dart';
 import '../reports/report_screens.dart';
+import '../auth_users/auth_user_list_screen.dart';
 import '../settings/settings_screen.dart';
 import '../stok/stk_list_screen.dart';
 import '../stok/stk_movements_screen.dart';
@@ -33,9 +36,12 @@ Widget moduleScreenFor(String menuId, {CariAccount? initialCari, VoidCallback? o
     'irsaliye-satis' => const DlnListScreen(fixedType: 'SALES'),
     'irsaliye-alis' => const DlnListScreen(fixedType: 'PURCHASE'),
     'siparis' => const OrdListScreen(),
+    'teklif' => const QotListScreen(),
+    'hizli-satis' => const HizliSatisScreen(),
     'servis' => const SvcListScreen(),
     'gorev' => const TskListScreen(),
     'masraf' => const ExpListScreen(),
+    'masraf-yonetim' => const ExpManagementScreen(),
     'tahsilat' => TahsilatScreen(initialCari: initialCari, onSuccess: onSuccess),
     'tediye' => TediyeScreen(initialCari: initialCari, onSuccess: onSuccess),
     'virman' => VirmanScreen(initialSource: initialCari, onSuccess: onSuccess),
@@ -50,6 +56,7 @@ Widget moduleScreenFor(String menuId, {CariAccount? initialCari, VoidCallback? o
     'rapor-is' => const DlnListScreen(fixedType: 'SALES', reportMode: true),
     'rapor-ia' => const DlnListScreen(fixedType: 'PURCHASE', reportMode: true),
     'ayarlar' => const SettingsScreen(),
+    'ayarlar-kullanicilar' => const AuthUserListScreen(),
     _ => Center(child: Text('Modül: $menuId')),
   };
 }
