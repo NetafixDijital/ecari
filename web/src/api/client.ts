@@ -1,6 +1,10 @@
 import axios from 'axios'
 
-const baseURL = import.meta.env.VITE_API_BASE_URL ?? ''
+const productionApiBase = 'https://ecariapi.netafix.com'
+
+const baseURL =
+  import.meta.env.VITE_API_BASE_URL?.trim() ||
+  (import.meta.env.PROD ? productionApiBase : 'http://localhost:5050')
 
 export const api = axios.create({
   baseURL,

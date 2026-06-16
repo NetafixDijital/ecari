@@ -8,6 +8,8 @@ obj/
 [Dd]ebug/
 [Rr]elease/
 publish/
+plesk-yukle/
+plesk-yukle.zip
 *.nupkg
 *.snupkg
 project.lock.json

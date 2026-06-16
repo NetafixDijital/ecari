@@ -1,0 +1,14 @@
+mobile/
+publish/
+plesk-yukle/
+plesk-yukle.zip
+src/
+database/
+docs/
+proje-rehberi/
+design/html/**/*.html
+**/*.apk
+**/.git/
+**/bin/
+**/obj/
+**/node_modules/
