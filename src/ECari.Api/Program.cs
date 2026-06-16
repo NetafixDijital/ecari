@@ -82,17 +82,21 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
-if (app.Environment.IsDevelopment())
+var corsPolicy = app.Environment.IsDevelopment() ? "DevCors" : "ProductionCors";
+app.UseCors(corsPolicy);
+
+app.UseExceptionHandler(errorApp =>
 {
-   
-    app.UseCors("DevCors");
-}
-else
-{
-    app.UseCors("ProductionCors");
-}
- app.UseSwagger();
-    app.UseSwaggerUI();
+    errorApp.Run(async context =>
+    {
+        context.Response.StatusCode = StatusCodes.Status500InternalServerError;
+        context.Response.ContentType = "application/json; charset=utf-8";
+        await context.Response.WriteAsJsonAsync(new { message = "Sunucu hatası. Lütfen daha sonra tekrar deneyin." });
+    });
+});
+
+app.UseSwagger();
+app.UseSwaggerUI();
 
 app.UseHttpsRedirection();
 app.UseAuthentication();

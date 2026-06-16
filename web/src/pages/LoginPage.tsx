@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { getRememberedEmail, useAuth } from '../context/AuthContext'
+import { apiErrorMessage } from '../utils/apiError'
 
 function AuthIllustration() {
   return (
@@ -44,11 +45,7 @@ export default function LoginPage() {
       const next = await login(email.trim(), password, rememberMe)
       navigate(next === 'select-company' ? '/select-company' : '/', { replace: true })
     } catch (err: unknown) {
-      const message =
-        (err as { response?: { data?: { message?: string } } })?.response?.data?.message ||
-        (err as Error)?.message ||
-        'Giriş başarısız. Lütfen bilgilerinizi kontrol edin.'
-      setError(message)
+      setError(apiErrorMessage(err, 'Giriş başarısız. Lütfen bilgilerinizi kontrol edin.'))
     }
   }
 
