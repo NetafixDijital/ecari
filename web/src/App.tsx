@@ -9,6 +9,7 @@ import StokListPage from './pages/stok/StokListPage'
 import CompanySelectPage from './pages/CompanySelectPage'
 import HomePage from './pages/HomePage'
 import LoginPage from './pages/LoginPage'
+import ApiTestPage from './pages/ApiTestPage'
 import AyarlarGenelPage from './pages/ayarlar/AyarlarGenelPage'
 import AyarlarMenuPage from './pages/ayarlar/AyarlarMenuPage'
 import AyarlarOzelPage from './pages/ayarlar/AyarlarOzelPage'
@@ -65,6 +66,7 @@ export default function App() {
         }
       />
       <Route path="/select-company" element={<CompanySelectPage />} />
+      <Route path="/api-test" element={<ApiTestPage />} />
       <Route element={<ProtectedRoute />}>
         <Route element={<AppLayout />}>
           <Route path="/" element={<HomePage />} />
