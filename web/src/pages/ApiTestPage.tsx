@@ -62,6 +62,13 @@ export default function ApiTestPage() {
     const steps: StepResult[] = []
 
     steps.push(
+      await timedFetch('Health GET', `${baseUrl}/api/health`, {
+        method: 'GET',
+        mode: 'cors',
+      }),
+    )
+
+    steps.push(
       await timedFetch('Swagger UI', `${baseUrl}/swagger/index.html`, {
         method: 'GET',
         mode: 'cors',
@@ -210,8 +217,8 @@ export default function ApiTestPage() {
       </div>
 
       <p className="text-muted small mt-4 mb-0">
-        Login POST 500 + CORS başlığı yoksa tarayıcı &quot;Network Error&quot; gösterir. Çözüm: Plesk&apos;te{' '}
-        <code>appsettings.Production.json</code> SQL şifresi ve veritabanı kurulumu.
+        Login POST 500 veya OPTIONS 405 ise Plesk&apos;te yeni <code>web.config</code> yükleyin
+        (OPTIONSVerbHandler kaldırıldı) ve <code>appsettings.Production.json</code> SQL şifresini kontrol edin.
       </p>
     </div>
   )

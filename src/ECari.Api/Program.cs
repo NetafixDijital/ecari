@@ -83,6 +83,8 @@ builder.Services.AddCors(options =>
 var app = builder.Build();
 
 var corsPolicy = app.Environment.IsDevelopment() ? "DevCors" : "ProductionCors";
+
+app.UseRouting();
 app.UseCors(corsPolicy);
 
 app.UseExceptionHandler(errorApp =>
@@ -101,6 +103,11 @@ app.UseSwaggerUI();
 app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.MapGet("/api/health", () => Results.Ok(new { status = "ok", utc = DateTime.UtcNow }))
+    .AllowAnonymous()
+    .RequireCors(corsPolicy);
+
 app.MapControllers();
 
 app.Run();
