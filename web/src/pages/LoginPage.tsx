@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { getRememberedEmail, useAuth } from '../context/AuthContext'
+import { APP_VERSION_LABEL } from '../config/appVersion'
 import { apiErrorMessage } from '../utils/apiError'
 
 function AuthIllustration() {
@@ -157,13 +158,16 @@ export default function LoginPage() {
                     {isLoading ? 'Giriş yapılıyor…' : 'Giriş Yap'}
                   </button>
                 </div>
-                <p className="mb-5 text-center text-body-secondary">
+                <p className="mb-3 text-center text-body-secondary">
                   Hesabınız yok mu?{' '}
                   <a href="#kayit" onClick={(e) => e.preventDefault()}>
                     Kayıt olun
                   </a>
                 </p>
               </form>
+              <p className="text-center text-body-secondary mb-0 small opacity-75" aria-label="Uygulama sürümü">
+                {APP_VERSION_LABEL}
+              </p>
             </div>
           </div>
         </div>
