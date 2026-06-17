@@ -64,6 +64,21 @@ public class DlnController(
         }
     }
 
+    [HttpPatch("delivery-notes/{id:long}/dates")]
+    public async Task<ActionResult<DlnDeliveryNoteDetailDto>> UpdateDates(
+        long id,
+        [FromBody] UpdateDlnDeliveryNoteDatesRequest request,
+        CancellationToken ct)
+    {
+        if (!tenant.HasTenantContext())
+            return BadRequest(new { message = "Önce şirket seçin: POST /api/auth/select-company" });
+
+        var updated = await dlnService.UpdateDatesAsync(id, request, ct);
+        if (updated is null) return NotFound();
+
+        return Ok(updated);
+    }
+
     [HttpPost("delivery-notes/{id:long}/convert-to-invoice")]
     public async Task<ActionResult<ConvertDlnToInvResultDto>> ConvertToInvoice(long id, CancellationToken ct)
     {

@@ -104,10 +104,6 @@ app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.MapGet("/api/health", () => Results.Ok(new { status = "ok", utc = DateTime.UtcNow }))
-    .AllowAnonymous()
-    .RequireCors(corsPolicy);
-
 app.MapControllers();
 
 app.Run();

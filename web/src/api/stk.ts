@@ -23,6 +23,7 @@ export interface CreateStkItemRequest {
   purchasePrice?: number
   salesPrice?: number
   baseUnitId?: number
+  taxRateId?: number
 }
 
 export async function fetchStkItems(search?: string) {
@@ -53,6 +54,7 @@ export interface UpdateStkItemRequest {
   brandName?: string
   purchasePrice?: number
   salesPrice?: number
+  taxRateId?: number
   shelfNo?: string
   isWeighable?: boolean
   description?: string
@@ -95,12 +97,18 @@ export async function fetchStkMovements(params?: {
   warehouseId?: number
   itemId?: number
   search?: string
+  dateFrom?: string
+  dateTo?: string
+  movementType?: string
 }) {
   const { data } = await api.get<StkStockMovementListItem[]>('/api/stk/movements', {
     params: {
       warehouseId: params?.warehouseId || undefined,
       itemId: params?.itemId || undefined,
       search: params?.search || undefined,
+      dateFrom: params?.dateFrom || undefined,
+      dateTo: params?.dateTo || undefined,
+      movementType: params?.movementType || undefined,
     },
   })
   return data

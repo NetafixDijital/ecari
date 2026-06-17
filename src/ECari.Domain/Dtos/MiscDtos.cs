@@ -20,6 +20,7 @@ public record SvcTicketDetailDto(
     string? DeviceName,
     string ProblemDescription,
     string? TechnicianName,
+    long? TechnicianId,
     string PriorityKey,
     string PriorityLabel,
     string StatusKey,
@@ -51,7 +52,31 @@ public record SvcServiceDefinitionDto(
     long Id,
     string Code,
     string Name,
-    long? DefaultTaxRateId);
+    long? DefaultTaxRateId,
+    bool IsActive = true,
+    int SortOrder = 0);
+
+public record SvcTechnicianDto(
+    long Id,
+    string Code,
+    string Name,
+    string? Phone,
+    bool IsActive,
+    int SortOrder);
+
+public record UpsertSvcTechnicianRequest(
+    string Code,
+    string Name,
+    string? Phone,
+    bool IsActive = true,
+    int SortOrder = 0);
+
+public record UpsertSvcServiceDefinitionRequest(
+    string Code,
+    string Name,
+    long? DefaultTaxRateId,
+    bool IsActive = true,
+    int SortOrder = 0);
 
 public record SaveSvcTicketLineRequest(
     long? ServiceDefinitionId,
@@ -87,12 +112,14 @@ public record CreateSvcTicketRequest(
     string? DeviceName,
     string ProblemDescription,
     string? TechnicianName,
+    long? TechnicianId,
     string Priority);
 
 public record UpdateSvcTicketRequest(
     string? DeviceName,
     string ProblemDescription,
     string? TechnicianName,
+    long? TechnicianId,
     string Priority,
     string? Resolution);
 

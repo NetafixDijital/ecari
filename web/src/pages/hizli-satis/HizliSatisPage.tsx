@@ -218,12 +218,13 @@ export default function HizliSatisPage() {
       {error && <div className="alert alert-danger py-2">{error}</div>}
 
       <div className="hs-pos" id="hsPos">
-      <div className="row g-4 hizli-satis-layout">
-        <div className="col-lg-8">
-          <div className="card hs-products-panel">
-            <div className="card-header d-flex flex-wrap justify-content-between align-items-center gap-2">
-              <span>Ürünler</span>
-              <div className="nl-field-icon" style={{ maxWidth: '20rem' }}>
+        <div className="hizli-satis-layout">
+          <div className="hs-products-panel card">
+            <div className="card-header border-0 pb-0 d-flex flex-wrap justify-content-between align-items-center gap-2">
+              <h6 className="mb-0">
+                <i className="ti ti-packages me-1" /> Ürünler
+              </h6>
+              <div className="nl-field-icon" style={{ maxWidth: '20rem', minWidth: '12rem' }}>
                 <span className="nl-field-icon__icon">
                   <i className="ti ti-search" />
                 </span>
@@ -236,45 +237,48 @@ export default function HizliSatisPage() {
                 />
               </div>
             </div>
-            <div className="card-body">
+            <div className="card-body pt-3">
               {loading && <p className="text-body-secondary mb-0">Yükleniyor...</p>}
               {!loading && filteredProducts.length === 0 && (
-                <p className="text-body-secondary mb-0">Ürün bulunamadı.</p>
+                <div className="hs-empty-cart">
+                  <i className="ti ti-package-off d-block" />
+                  <p className="mb-0 small">Ürün bulunamadı.</p>
+                </div>
               )}
-              {!loading && (
-                <div className="row g-3 hs-product-grid">
+              {!loading && filteredProducts.length > 0 && (
+                <div className="hs-product-grid">
                   {filteredProducts.map((item) => (
-                    <div key={item.id} className="col-md-4 col-sm-6">
-                      <button
-                        type="button"
-                        className="card h-100 w-100 text-start border shadow-none"
-                        onClick={() => addToCart(item)}
-                      >
-                        <div className="card-body p-3">
-                          <p className="fw-medium mb-1 text-truncate">{item.name}</p>
-                          <p className="text-body-secondary small mb-2">{item.code}</p>
-                          <div className="d-flex justify-content-between align-items-center">
-                            <span className="text-primary fw-semibold">
-                              {formatTry(item.salesPrice ?? 0)}
-                            </span>
-                            <span className="badge bg-label-secondary">{item.baseUnitName}</span>
-                          </div>
-                        </div>
-                      </button>
-                    </div>
+                    <button
+                      key={item.id}
+                      type="button"
+                      className="hs-product-card"
+                      onClick={() => addToCart(item)}
+                    >
+                      <div className="hs-product-icon">
+                        <i className="ti ti-package" />
+                      </div>
+                      <div className="hs-product-name">{item.name}</div>
+                      <div className="hs-product-price">{formatTry(item.salesPrice ?? 0)}</div>
+                      <div className="hs-product-stock">
+                        {item.code} · {item.baseUnitName}
+                      </div>
+                    </button>
                   ))}
                 </div>
               )}
             </div>
           </div>
-        </div>
 
-        <div className="col-lg-4">
-          <div className="card sticky-top hs-cart-panel" style={{ top: isFullscreen ? '1rem' : '5rem' }}>
-            <div className="card-header">Sepet</div>
-            <div className="card-body hs-cart-items">
-              <div className="mb-3">
-                <label className="form-label small">Müşteri (isteğe bağlı)</label>
+          <div className="hs-cart-panel card">
+            <div className="card-header py-3 d-flex justify-content-between align-items-center border-0">
+              <h6 className="mb-0">
+                <i className="ti ti-shopping-cart me-1" /> Sepet
+              </h6>
+              {cart.length > 0 && <span className="badge bg-primary rounded-pill">{cart.length}</span>}
+            </div>
+            <div className="card-body">
+              <div className="px-3 pb-3 border-bottom">
+                <label className="form-label small mb-1">Müşteri (isteğe bağlı)</label>
                 <div className="d-flex gap-2">
                   <input
                     type="text"
@@ -284,7 +288,7 @@ export default function HizliSatisPage() {
                   />
                   <button
                     type="button"
-                    className="btn btn-sm btn-label-primary"
+                    className="btn btn-sm btn-label-primary flex-shrink-0"
                     data-bs-toggle="modal"
                     data-bs-target="#modalCariSecHizliSatis"
                   >
@@ -302,77 +306,81 @@ export default function HizliSatisPage() {
                 )}
               </div>
 
-              {cart.length === 0 && (
-                <p className="text-body-secondary small mb-0">Sepetiniz boş. Ürünlere tıklayarak ekleyin.</p>
-              )}
-              {cart.map((line) => (
-                <div key={line.key} className="d-flex align-items-start gap-2 mb-3 pb-3 border-bottom">
-                  <div className="flex-grow-1">
-                    <p className="mb-1 fw-medium small">{line.item.name}</p>
-                    <p className="text-body-secondary small mb-2">{formatTry(line.unitPrice)}</p>
-                    <div className="d-flex align-items-center gap-2">
-                      <button
-                        type="button"
-                        className="btn btn-sm btn-label-secondary"
-                        onClick={() => updateQuantity(line.key, line.quantity - 1)}
-                      >
-                        −
-                      </button>
-                      <input
-                        type="number"
-                        className="form-control form-control-sm text-center"
-                        style={{ width: '3.5rem' }}
-                        min={1}
-                        value={line.quantity}
-                        onChange={(e) => updateQuantity(line.key, Number(e.target.value) || 1)}
-                      />
-                      <button
-                        type="button"
-                        className="btn btn-sm btn-label-secondary"
-                        onClick={() => updateQuantity(line.key, line.quantity + 1)}
-                      >
-                        +
-                      </button>
-                      <button
-                        type="button"
-                        className="btn btn-sm btn-label-danger ms-auto"
-                        onClick={() => removeLine(line.key)}
-                      >
-                        <i className="ti ti-trash" />
-                      </button>
-                    </div>
+              <div className="hs-cart-items">
+                {cart.length === 0 && (
+                  <div className="hs-empty-cart">
+                    <i className="ti ti-shopping-cart-off d-block" />
+                    <p className="mb-0 small">Sepetiniz boş. Ürünlere tıklayarak ekleyin.</p>
                   </div>
-                  <span className="fw-medium small">{formatTry(calcLineTotal(line, taxRates))}</span>
-                </div>
-              ))}
-            </div>
-            {cart.length > 0 && (
-              <div className="card-footer">
-                <div className="d-flex justify-content-between mb-2">
-                  <span className="text-body-secondary">Ara Toplam</span>
-                  <span>{formatTry(cartTotals.subtotal)}</span>
-                </div>
-                <div className="d-flex justify-content-between mb-2">
-                  <span className="text-body-secondary">KDV</span>
-                  <span>{formatTry(cartTotals.taxTotal)}</span>
-                </div>
-                <div className="d-flex justify-content-between fw-bold mb-3">
-                  <span>Genel Toplam</span>
-                  <span>{formatTry(cartTotals.grandTotal)}</span>
-                </div>
-                <button
-                  type="button"
-                  className="btn btn-primary w-100"
-                  disabled={checkoutSaving}
-                  onClick={handleCheckout}
-                >
-                  {checkoutSaving ? 'İşleniyor...' : 'Satışı Tamamla'}
-                </button>
+                )}
+                {cart.map((line) => (
+                  <div key={line.key} className="hs-cart-item">
+                    <div className="hs-cart-item-info">
+                      <div className="name">{line.item.name}</div>
+                      <div className="text-body-secondary small">{formatTry(line.unitPrice)}</div>
+                      <div className="hs-cart-item-qty">
+                        <button
+                          type="button"
+                          className="btn btn-sm btn-label-secondary"
+                          onClick={() => updateQuantity(line.key, line.quantity - 1)}
+                        >
+                          −
+                        </button>
+                        <input
+                          type="number"
+                          className="form-control form-control-sm"
+                          min={1}
+                          value={line.quantity}
+                          onChange={(e) => updateQuantity(line.key, Number(e.target.value) || 1)}
+                        />
+                        <button
+                          type="button"
+                          className="btn btn-sm btn-label-secondary"
+                          onClick={() => updateQuantity(line.key, line.quantity + 1)}
+                        >
+                          +
+                        </button>
+                        <button
+                          type="button"
+                          className="btn btn-sm btn-label-danger ms-auto"
+                          onClick={() => removeLine(line.key)}
+                        >
+                          <i className="ti ti-trash" />
+                        </button>
+                      </div>
+                    </div>
+                    <span className="fw-medium small text-nowrap">{formatTry(calcLineTotal(line, taxRates))}</span>
+                  </div>
+                ))}
               </div>
-            )}
+
+              {cart.length > 0 && (
+                <div className="hs-cart-summary">
+                  <div className="row-line">
+                    <span>Ara Toplam</span>
+                    <span>{formatTry(cartTotals.subtotal)}</span>
+                  </div>
+                  <div className="row-line">
+                    <span>KDV</span>
+                    <span>{formatTry(cartTotals.taxTotal)}</span>
+                  </div>
+                  <div className="row-line total-line d-flex justify-content-between">
+                    <span>Genel Toplam</span>
+                    <span>{formatTry(cartTotals.grandTotal)}</span>
+                  </div>
+                  <button
+                    type="button"
+                    className="btn btn-primary w-100 mt-3"
+                    disabled={checkoutSaving}
+                    onClick={handleCheckout}
+                  >
+                    {checkoutSaving ? 'İşleniyor...' : 'Satışı Tamamla'}
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
         </div>
-      </div>
       </div>
 
       <CariSecModal

@@ -44,3 +44,5 @@ public record CreateDlnDeliveryNoteRequest(
     string? ShippingAddress,
     string? Notes,
     IReadOnlyList<CreateDlnDeliveryNoteLineRequest> Lines);
+
+public record UpdateDlnDeliveryNoteDatesRequest(DateOnly DocumentDate);

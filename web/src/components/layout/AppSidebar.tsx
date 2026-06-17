@@ -61,6 +61,16 @@ export default function AppSidebar({ panelOpen }: { panelOpen: boolean }) {
   const visibleDashboardLinks = useMemo(() => getVisibleDashboardLinks(shortcuts), [shortcuts])
   const activeTab = detectActiveTab(pathname)
   const [openTab, setOpenTab] = useState<SidebarTab>(activeTab)
+  const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>({})
+
+  const isGroupActive = (group: (typeof orderedModuleGroups)[number]) => {
+    if (group.to && pathname.startsWith(group.to)) return true
+    return group.children?.some((child) => pathname.startsWith(child.to)) ?? false
+  }
+
+  function toggleGroup(groupId: string) {
+    setExpandedGroups((prev) => ({ ...prev, [groupId]: !prev[groupId] }))
+  }
 
   useEffect(() => {
     const refreshMenu = () => {
@@ -156,14 +166,26 @@ export default function AppSidebar({ panelOpen }: { panelOpen: boolean }) {
               <MenuHeading label="Modüller" />
               {orderedModuleGroups.map((group, idx) => {
                 const tone = MODULE_TONES[idx % MODULE_TONES.length]
+                const expanded = expandedGroups[group.id] ?? isGroupActive(group)
                 return (
                   <li key={group.id}>
                     {group.children ? (
                       <>
-                        <MenuHeading label={group.label} />
-                        {group.children.map((child) => (
-                          <MenuLinkItem key={child.id} item={{ ...child, icon: group.icon, tone }} />
-                        ))}
+                        <li className="menu-item">
+                          <button
+                            type="button"
+                            className="menu-link border-0 bg-transparent w-100 text-start d-flex align-items-center gap-2"
+                            onClick={() => toggleGroup(group.id)}
+                          >
+                            <i className={`ti ${group.icon}`} />
+                            <span className="flex-grow-1">{group.label}</span>
+                            <i className={`ti ${expanded ? 'ti-chevron-down' : 'ti-chevron-right'} small`} />
+                          </button>
+                        </li>
+                        {expanded &&
+                          group.children.map((child) => (
+                            <MenuLinkItem key={child.id} item={{ ...child, icon: group.icon, tone }} />
+                          ))}
                         <li>
                           <div className="menu-divider" />
                         </li>
@@ -196,16 +218,8 @@ export default function AppSidebar({ panelOpen }: { panelOpen: boolean }) {
             </TabPane>
 
             <TabPane id="reportsTab" activeTab={openTab} tabKey="reportsTab">
-              <MenuHeading label="Fatura" />
-              {reportsLinks.slice(0, 2).map((item) => (
-                <MenuLinkItem key={item.id} item={item} />
-              ))}
-              <MenuHeading label="İrsaliye" />
-              {reportsLinks.slice(2, 4).map((item) => (
-                <MenuLinkItem key={item.id} item={item} />
-              ))}
-              <MenuHeading label="Mali" />
-              {reportsLinks.slice(4).map((item) => (
+              <MenuHeading label="Raporlar" />
+              {reportsLinks.map((item) => (
                 <MenuLinkItem key={item.id} item={item} />
               ))}
             </TabPane>

@@ -4,10 +4,11 @@ import {
   convertDeliveryNoteToInvoice,
   deleteDeliveryNote,
   fetchDeliveryNote,
+  updateDeliveryNoteDates,
   type DlnDeliveryNoteDetail,
 } from '../../api/dln'
 import { apiErrorMessage } from '../../utils/apiError'
-import { deliveryStatusBadge, formatDate, formatQuantity } from '../../utils/format'
+import { deliveryStatusBadge, formatQuantity } from '../../utils/format'
 
 export default function IrsaliyeDetayPage() {
   const { id } = useParams()
@@ -17,13 +18,18 @@ export default function IrsaliyeDetayPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [acting, setActing] = useState(false)
+  const [documentDate, setDocumentDate] = useState('')
+  const [dateMessage, setDateMessage] = useState('')
 
   const loadItem = useCallback(() => {
     if (!noteId) return
     setLoading(true)
     setError('')
     fetchDeliveryNote(noteId)
-      .then(setItem)
+      .then((data) => {
+        setItem(data)
+        setDocumentDate(data.documentDate)
+      })
       .catch(() => setError('İrsaliye detayı yüklenemedi.'))
       .finally(() => setLoading(false))
   }, [noteId])
@@ -31,6 +37,23 @@ export default function IrsaliyeDetayPage() {
   useEffect(() => {
     loadItem()
   }, [loadItem])
+
+  async function handleSaveDate() {
+    if (!item) return
+    setActing(true)
+    setError('')
+    setDateMessage('')
+    try {
+      const updated = await updateDeliveryNoteDates(item.id, { documentDate })
+      setItem(updated)
+      setDocumentDate(updated.documentDate)
+      setDateMessage('İrsaliye tarihi güncellendi.')
+    } catch (err: unknown) {
+      setError(apiErrorMessage(err, 'Tarih güncellenemedi.'))
+    } finally {
+      setActing(false)
+    }
+  }
 
   async function handleConvertInvoice() {
     if (!item) return
@@ -107,7 +130,24 @@ export default function IrsaliyeDetayPage() {
           <div className="col-md-3"><div className="text-body-secondary small">İrsaliye No</div><div className="fw-medium">{item.documentNo}</div></div>
           <div className="col-md-3"><div className="text-body-secondary small">Cari</div><div>{item.accountTitle}</div></div>
           <div className="col-md-2"><div className="text-body-secondary small">Tip</div><div>{item.documentType === 'SALES' ? 'Satış' : 'Alış'}</div></div>
-          <div className="col-md-2"><div className="text-body-secondary small">Tarih</div><div>{formatDate(item.documentDate)}</div></div>
+          <div className="col-md-2">
+            <div className="text-body-secondary small">Tarih</div>
+            <input
+              type="date"
+              className="form-control form-control-sm mt-1"
+              value={documentDate}
+              onChange={(e) => setDocumentDate(e.target.value)}
+            />
+            <button
+              type="button"
+              className="btn btn-sm btn-primary mt-2"
+              disabled={acting}
+              onClick={handleSaveDate}
+            >
+              Tarihi Kaydet
+            </button>
+            {dateMessage && <div className="small text-success mt-1">{dateMessage}</div>}
+          </div>
           <div className="col-md-2"><div className="text-body-secondary small">Durum</div><span className={`badge ${badge.className}`}>{badge.label}</span></div>
           {item.warehouseName && (
             <div className="col-md-4"><div className="text-body-secondary small">Depo</div><div>{item.warehouseName}</div></div>

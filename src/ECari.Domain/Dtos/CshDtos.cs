@@ -19,6 +19,7 @@ public record CshTransactionListItemDto(
     long Id,
     long CashAccountId,
     string CashAccountName,
+    string? AccountTitle,
     DateOnly TransactionDate,
     string TransactionType,
     string TransactionTypeLabel,

@@ -17,6 +17,13 @@ type SettingMeta = {
 
 const KNOWN_SETTINGS: SettingMeta[] = [
   {
+    moduleCode: 'WHS',
+    settingKey: 'whs.use_warehouse',
+    label: 'Depo kullanılsın',
+    description: 'Açıkken fatura ve irsaliye formlarında depo seçimi gösterilir.',
+    dataType: 'BOOL',
+  },
+  {
     moduleCode: 'STK',
     settingKey: 'stk.allow_negative_stock',
     label: 'Negatif stok izni',

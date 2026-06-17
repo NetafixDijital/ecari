@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { fetchCariAccounts, type CariAccountListItem } from '../../api/cari'
 import { fetchWarehouses } from '../../api/cfg'
+import { useWarehouseEnabled } from '../../hooks/useModuleFlags'
 import { fetchUnits, type LookupItem } from '../../api/core'
 import { createDeliveryNote } from '../../api/dln'
 import CariInfoPanel from '../../components/cari/CariInfoPanel'
@@ -56,6 +57,7 @@ export default function IrsaliyeYeniPage() {
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
   const [stkLoadingKey, setStkLoadingKey] = useState<string | null>(null)
+  const { warehouseEnabled } = useWarehouseEnabled()
 
   useEffect(() => {
     Promise.all([fetchCariAccounts(), fetchStkItems(), fetchUnits(), fetchWarehouses()])
@@ -199,6 +201,7 @@ export default function IrsaliyeYeniPage() {
                   required
                 />
               </div>
+              {warehouseEnabled && (
               <div className="col-md-4">
                 <label className="form-label">Depo</label>
                 <select
@@ -214,6 +217,7 @@ export default function IrsaliyeYeniPage() {
                   ))}
                 </select>
               </div>
+              )}
               <div className="col-md-4">
                 <label className="form-label">Sevk Adresi</label>
                 <input

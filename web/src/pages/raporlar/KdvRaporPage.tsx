@@ -80,6 +80,38 @@ export default function KdvRaporPage() {
         </div>
       </div>
 
+      {!loading && report && report.rateGroups.length > 0 && (
+        <div className="card mb-4">
+          <div className="card-header">
+            <h6 className="mb-0">KDV oranına göre özet</h6>
+          </div>
+          <div className="table-responsive">
+            <table className="table table-hover mb-0">
+              <thead className="border-top">
+                <tr>
+                  <th>KDV Oranı</th>
+                  <th className="text-end">Satış Matrahı</th>
+                  <th className="text-end">Satış KDV</th>
+                  <th className="text-end">Alış Matrahı</th>
+                  <th className="text-end">Alış KDV</th>
+                </tr>
+              </thead>
+              <tbody>
+                {report.rateGroups.map((group) => (
+                  <tr key={group.taxRate}>
+                    <td className="fw-medium">{group.taxRateLabel}</td>
+                    <td className="text-end">{formatTry(group.salesBase)}</td>
+                    <td className="text-end text-success">{formatTry(group.salesTax)}</td>
+                    <td className="text-end">{formatTry(group.purchaseBase)}</td>
+                    <td className="text-end text-danger">{formatTry(group.purchaseTax)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
       <div className="card">
         <div className="card-header">
           <h6 className="mb-0">Fatura bazlı KDV detayı</h6>

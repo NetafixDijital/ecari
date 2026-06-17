@@ -38,6 +38,7 @@ export type CshTransactionListItem = {
   id: number
   cashAccountId: number
   cashAccountName: string
+  accountTitle: string | null
   transactionDate: string
   transactionType: string
   transactionTypeLabel: string

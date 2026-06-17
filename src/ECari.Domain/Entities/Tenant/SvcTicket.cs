@@ -9,6 +9,7 @@ public class SvcTicket
     public string? DeviceName { get; set; }
     public string ProblemDescription { get; set; } = string.Empty;
     public string? TechnicianName { get; set; }
+    public long? TechnicianId { get; set; }
     public string Status { get; set; } = "WAITING";
     public string Priority { get; set; } = "NORMAL";
     public string? Resolution { get; set; }

@@ -1,22 +1,25 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { fetchInvoices, deleteInvoice, type InvInvoiceListItem } from '../../api/inv'
+import { fetchInvoices, deleteInvoice, type InvInvoiceListItem, type InvInvoiceType } from '../../api/inv'
 import IconActionButton from '../../components/ui/IconActionButton'
 import TableSearchToolbar from '../../components/ui/TableSearchToolbar'
 import { apiErrorMessage } from '../../utils/apiError'
 import { formatDate, formatMoneyOptional, statusBadge } from '../../utils/format'
 
+type FaturaListMode = 'satis' | 'alis' | 'satis-iade' | 'alis-iade'
+
 type FaturaListConfig = {
-  invoiceType: 'SALES' | 'PURCHASE'
+  invoiceType: InvInvoiceType
   title: string
   breadcrumbActive: string
   cardTitle: string
   accountColumn: string
   searchPlaceholder: string
   newButtonLabel: string
+  newTypeParam: FaturaListMode
 }
 
-const CONFIG: Record<'satis' | 'alis', FaturaListConfig> = {
+const CONFIG: Record<FaturaListMode, FaturaListConfig> = {
   satis: {
     invoiceType: 'SALES',
     title: 'Satış Fatura',
@@ -25,6 +28,7 @@ const CONFIG: Record<'satis' | 'alis', FaturaListConfig> = {
     accountColumn: 'Müşteri (Cari)',
     searchPlaceholder: 'Satış faturası ara...',
     newButtonLabel: 'Yeni Satış Faturası',
+    newTypeParam: 'satis',
   },
   alis: {
     invoiceType: 'PURCHASE',
@@ -34,10 +38,31 @@ const CONFIG: Record<'satis' | 'alis', FaturaListConfig> = {
     accountColumn: 'Tedarikçi (Cari)',
     searchPlaceholder: 'Alış faturası ara...',
     newButtonLabel: 'Yeni Alış Faturası',
+    newTypeParam: 'alis',
+  },
+  'satis-iade': {
+    invoiceType: 'SALES_RETURN',
+    title: 'Satıştan İade',
+    breadcrumbActive: 'Satıştan İade',
+    cardTitle: 'Satıştan iade faturaları',
+    accountColumn: 'Müşteri (Cari)',
+    searchPlaceholder: 'Satış iade faturası ara...',
+    newButtonLabel: 'Yeni Satış İadesi',
+    newTypeParam: 'satis-iade',
+  },
+  'alis-iade': {
+    invoiceType: 'PURCHASE_RETURN',
+    title: 'Alıştan İade',
+    breadcrumbActive: 'Alıştan İade',
+    cardTitle: 'Alıştan iade faturaları',
+    accountColumn: 'Tedarikçi (Cari)',
+    searchPlaceholder: 'Alış iade faturası ara...',
+    newButtonLabel: 'Yeni Alış İadesi',
+    newTypeParam: 'alis-iade',
   },
 }
 
-export default function FaturaListPage({ mode }: { mode: 'satis' | 'alis' }) {
+export default function FaturaListPage({ mode }: { mode: FaturaListMode }) {
   const navigate = useNavigate()
   const cfg = CONFIG[mode]
   const [items, setItems] = useState<InvInvoiceListItem[]>([])
@@ -99,7 +124,7 @@ export default function FaturaListPage({ mode }: { mode: 'satis' | 'alis' }) {
             </ol>
           </nav>
         </div>
-        <Link to={`/fatura/yeni?type=${mode}`} className="btn btn-primary">
+        <Link to={`/fatura/yeni?type=${cfg.newTypeParam}`} className="btn btn-primary">
           <i className="ti ti-plus me-1" /> {cfg.newButtonLabel}
         </Link>
       </div>
@@ -154,6 +179,12 @@ export default function FaturaListPage({ mode }: { mode: 'satis' | 'alis' }) {
                       </td>
                       <td className="text-center">
                         <div className="d-inline-flex gap-1">
+                          <IconActionButton
+                            icon="ti-edit"
+                            color="primary"
+                            title="Düzenle"
+                            onClick={() => navigate(`/fatura/onizleme/${row.id}`)}
+                          />
                           <IconActionButton
                             icon="ti-eye"
                             color="info"

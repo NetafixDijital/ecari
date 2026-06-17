@@ -36,6 +36,7 @@ public class TenantDbContext : DbContext
     public DbSet<ExpServiceDefinition> ExpServiceDefinitions => Set<ExpServiceDefinition>();
     public DbSet<SvcTicket> SvcTickets => Set<SvcTicket>();
     public DbSet<SvcTicketLine> SvcTicketLines => Set<SvcTicketLine>();
+    public DbSet<SvcTechnician> SvcTechnicians => Set<SvcTechnician>();
     public DbSet<SvcServiceDefinition> SvcServiceDefinitions => Set<SvcServiceDefinition>();
     public DbSet<TskTask> TskTasks => Set<TskTask>();
     public DbSet<CfgModuleSetting> CfgModuleSettings => Set<CfgModuleSetting>();
@@ -608,6 +609,7 @@ public class TenantDbContext : DbContext
             e.Property(x => x.DeviceName).HasColumnName("device_name").HasMaxLength(200);
             e.Property(x => x.ProblemDescription).HasColumnName("problem_description");
             e.Property(x => x.TechnicianName).HasColumnName("technician_name").HasMaxLength(100);
+            e.Property(x => x.TechnicianId).HasColumnName("technician_id");
             e.Property(x => x.Status).HasColumnName("status").HasMaxLength(30);
             e.Property(x => x.Priority).HasColumnName("priority").HasMaxLength(20);
             e.Property(x => x.Resolution).HasColumnName("resolution");
@@ -616,6 +618,19 @@ public class TenantDbContext : DbContext
             e.Property(x => x.CreatedAt).HasColumnName("created_at");
             e.Property(x => x.IsDeleted).HasColumnName("is_deleted");
             e.HasOne(x => x.Account).WithMany().HasForeignKey(x => x.AccountId);
+        });
+
+        modelBuilder.Entity<SvcTechnician>(e =>
+        {
+            e.ToTable("svc_technicians");
+            e.HasKey(x => x.Id);
+            e.Property(x => x.Code).HasColumnName("code").HasMaxLength(30);
+            e.Property(x => x.Name).HasColumnName("name").HasMaxLength(100);
+            e.Property(x => x.Phone).HasColumnName("phone").HasMaxLength(30);
+            e.Property(x => x.IsActive).HasColumnName("is_active");
+            e.Property(x => x.SortOrder).HasColumnName("sort_order");
+            e.Property(x => x.CreatedAt).HasColumnName("created_at");
+            e.Property(x => x.IsDeleted).HasColumnName("is_deleted");
         });
 
         modelBuilder.Entity<SvcServiceDefinition>(e =>

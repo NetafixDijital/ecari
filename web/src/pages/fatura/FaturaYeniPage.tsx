@@ -1,9 +1,10 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
-import { fetchCariAccounts, type CariAccountListItem } from '../../api/cari'
+import { fetchCariAccounts, createCariAccount, type CariAccountListItem } from '../../api/cari'
 import CariInfoPanel from '../../components/cari/CariInfoPanel'
 import CariSecModal from '../../components/cari/CariSecModal'
-import { fetchTaxRates, fetchUnits, type LookupItem, type TaxRate } from '../../api/core'
+import YeniCariModal from '../cari/YeniCariModal'
+import { fetchCities, fetchPaymentTerms, fetchTaxRates, fetchUnits, type LookupItem, type TaxRate } from '../../api/core'
 import { createInvoice } from '../../api/inv'
 import StokLineSearch from '../../components/stok/StokLineSearch'
 import { fetchStkItem, fetchStkItems, type StkItemListItem } from '../../api/stk'
@@ -56,10 +57,36 @@ export default function FaturaYeniPage() {
   const navigate = useNavigate()
   const toast = useToast()
   const [searchParams] = useSearchParams()
-  const mode = searchParams.get('type') === 'alis' ? 'alis' : 'satis'
-  const invoiceType = mode === 'alis' ? 'PURCHASE' : 'SALES'
-  const listPath = mode === 'alis' ? '/fatura/alis' : '/fatura/satis'
-  const title = mode === 'alis' ? 'Yeni Alış Faturası' : 'Yeni Satış Faturası'
+  const typeParam = searchParams.get('type') ?? 'satis'
+  const mode =
+    typeParam === 'alis' || typeParam === 'satis-iade' || typeParam === 'alis-iade'
+      ? typeParam
+      : 'satis'
+  const invoiceType =
+    mode === 'alis'
+      ? 'PURCHASE'
+      : mode === 'satis-iade'
+        ? 'SALES_RETURN'
+        : mode === 'alis-iade'
+          ? 'PURCHASE_RETURN'
+          : 'SALES'
+  const listPath =
+    mode === 'alis'
+      ? '/fatura/alis'
+      : mode === 'satis-iade'
+        ? '/fatura/satis-iade'
+        : mode === 'alis-iade'
+          ? '/fatura/alis-iade'
+          : '/fatura/satis'
+  const title =
+    mode === 'alis'
+      ? 'Yeni Alış Faturası'
+      : mode === 'satis-iade'
+        ? 'Yeni Satıştan İade'
+        : mode === 'alis-iade'
+          ? 'Yeni Alıştan İade'
+          : 'Yeni Satış Faturası'
+  const isPurchaseSide = mode === 'alis' || mode === 'alis-iade'
 
   const [cariler, setCariler] = useState<Awaited<ReturnType<typeof fetchCariAccounts>>>([])
   const [items, setItems] = useState<StkItemListItem[]>([])
@@ -74,14 +101,20 @@ export default function FaturaYeniPage() {
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
   const [stkLoadingKey, setStkLoadingKey] = useState<string | null>(null)
+  const [cities, setCities] = useState<Awaited<ReturnType<typeof fetchCities>>>([])
+  const [paymentTerms, setPaymentTerms] = useState<Awaited<ReturnType<typeof fetchPaymentTerms>>>([])
+  const [creatingCari, setCreatingCari] = useState(false)
+  const [createCariError, setCreateCariError] = useState('')
 
   useEffect(() => {
-    Promise.all([fetchCariAccounts(), fetchStkItems(), fetchUnits(), fetchTaxRates()])
-      .then(([cariData, stkData, unitData, taxData]) => {
+    Promise.all([fetchCariAccounts(), fetchStkItems(), fetchUnits(), fetchTaxRates(), fetchCities(), fetchPaymentTerms()])
+      .then(([cariData, stkData, unitData, taxData, cityData, termData]) => {
         setCariler(cariData)
         setItems(stkData)
         setUnits(unitData)
         setTaxRates(taxData)
+        setCities(cityData)
+        setPaymentTerms(termData)
         setLines([newLine(unitData, taxData)])
       })
       .catch(() => setError('Form verileri yüklenemedi.'))
@@ -109,7 +142,7 @@ export default function FaturaYeniPage() {
     setStkLoadingKey(lineKey)
     try {
       const detail = await fetchStkItem(item.id)
-      const price = mode === 'alis' ? detail.purchasePrice : detail.salesPrice
+      const price = isPurchaseSide ? detail.purchasePrice : detail.salesPrice
       updateLine(lineKey, {
         itemId: item.id,
         description: item.name,
@@ -163,6 +196,25 @@ export default function FaturaYeniPage() {
     }
   }
 
+  async function handleCreateCari(body: Parameters<typeof createCariAccount>[0]) {
+    setCreatingCari(true)
+    setCreateCariError('')
+    try {
+      await createCariAccount(body)
+      const list = await fetchCariAccounts()
+      setCariler(list)
+      const picked = list.find((c) => c.title === body.title) ?? list[list.length - 1] ?? null
+      setSelectedCari(picked)
+      toast.success('Cari eklendi', body.title)
+    } catch (err: unknown) {
+      const message = apiErrorMessage(err, 'Cari eklenemedi.')
+      setCreateCariError(message)
+      throw err
+    } finally {
+      setCreatingCari(false)
+    }
+  }
+
   if (loading) {
     return (
       <div className="app-page-content">
@@ -188,28 +240,45 @@ export default function FaturaYeniPage() {
             </ol>
           </nav>
         </div>
-        <div className="d-flex align-items-center flex-wrap gap-2">
-          <div className="d-flex align-items-center gap-2 px-3 py-2 rounded-3 bg-body">
-            <i className="ti ti-user text-primary" />
-            <span className="small text-body-secondary">Seçili:</span>
-            <span className="fw-medium">{selectedCari ? selectedCari.title : 'Cari seçilmedi'}</span>
+      </div>
+
+      <div className="card mb-4 border-primary border-opacity-25">
+        <div className="card-body d-flex flex-wrap align-items-center justify-content-between gap-3">
+          <div>
+            <h6 className="mb-1">Cari Hesap</h6>
+            <p className="mb-0 small text-body-secondary">
+              {selectedCari ? (
+                <>
+                  <strong>{selectedCari.title}</strong> <span className="font-mono">({selectedCari.code})</span>
+                </>
+              ) : (
+                'Fatura için cari seçin veya yeni cari ekleyin.'
+              )}
+            </p>
+          </div>
+          <div className="d-flex flex-wrap gap-2">
+            <button
+              type="button"
+              className="btn btn-success"
+              data-bs-toggle="modal"
+              data-bs-target="#modalYeniCari"
+            >
+              <i className="ti ti-user-plus me-1" /> Cari Ekle
+            </button>
+            <button
+              type="button"
+              className="btn btn-primary"
+              data-bs-toggle="modal"
+              data-bs-target="#modalCariSecFatura"
+            >
+              <i className="ti ti-users me-1" /> Cari Seç
+            </button>
             {selectedCari && (
-              <span className="badge bg-label-primary font-mono">{selectedCari.code}</span>
+              <button type="button" className="btn btn-label-secondary" onClick={() => setSelectedCari(null)}>
+                <i className="ti ti-x me-1" /> Temizle
+              </button>
             )}
           </div>
-          <button
-            type="button"
-            className="btn btn-primary"
-            data-bs-toggle="modal"
-            data-bs-target="#modalCariSecFatura"
-          >
-            <i className="ti ti-users me-1" /> Cari Seç
-          </button>
-          {selectedCari && (
-            <button type="button" className="btn btn-label-secondary" onClick={() => setSelectedCari(null)}>
-              <i className="ti ti-x me-1" /> Temizle
-            </button>
-          )}
         </div>
       </div>
 
@@ -396,6 +465,13 @@ export default function FaturaYeniPage() {
         loading={loading}
         accountTypeFilter={mode === 'alis' ? 'SUPPLIER' : 'CUSTOMER'}
         onSelect={setSelectedCari}
+      />
+      <YeniCariModal
+        cities={cities}
+        paymentTerms={paymentTerms}
+        onCreate={handleCreateCari}
+        creating={creatingCari}
+        createError={createCariError}
       />
     </div>
   )

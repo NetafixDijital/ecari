@@ -1,5 +1,5 @@
 import { type FormEvent, useEffect, useState } from 'react'
-import type { LookupItem } from '../../api/core'
+import type { LookupItem, TaxRate } from '../../api/core'
 import type { CreateStkItemRequest, StkItemDetail, UpdateStkItemRequest } from '../../api/stk'
 
 type StokFormModalProps =
@@ -7,6 +7,7 @@ type StokFormModalProps =
       mode: 'create'
       item: null
       units: LookupItem[]
+      taxRates: TaxRate[]
       onSubmit: (body: CreateStkItemRequest) => Promise<void>
       saving: boolean
       error: string
@@ -15,6 +16,7 @@ type StokFormModalProps =
       mode: 'edit'
       item: StkItemDetail | null
       units: LookupItem[]
+      taxRates: TaxRate[]
       onSubmit: (body: UpdateStkItemRequest) => Promise<void>
       saving: boolean
       error: string
@@ -22,7 +24,7 @@ type StokFormModalProps =
     }
 
 export default function StokFormModal(props: StokFormModalProps) {
-  const { units, saving, error } = props
+  const { units, taxRates, saving, error } = props
   const isEdit = props.mode === 'edit'
 
   const [name, setName] = useState('')
@@ -30,6 +32,7 @@ export default function StokFormModal(props: StokFormModalProps) {
   const [baseUnitId, setBaseUnitId] = useState<number | ''>('')
   const [purchasePrice, setPurchasePrice] = useState('')
   const [salesPrice, setSalesPrice] = useState('')
+  const [taxRateId, setTaxRateId] = useState<number | ''>('')
   const [isActive, setIsActive] = useState(true)
 
   const modalId = isEdit ? 'modalDuzenleStok' : 'modalYeniStok'
@@ -44,6 +47,10 @@ export default function StokFormModal(props: StokFormModalProps) {
         const adet = units.find((u) => u.code === 'ADET') ?? units[0]
         setBaseUnitId(adet.id)
       }
+      if (taxRates.length > 0 && taxRateId === '') {
+        const defaultRate = taxRates.find((t) => t.rate === 20) ?? taxRates[0]
+        setTaxRateId(defaultRate.id)
+      }
       return
     }
     if (!props.item) return
@@ -53,8 +60,9 @@ export default function StokFormModal(props: StokFormModalProps) {
     setBaseUnitId(d.baseUnitId)
     setPurchasePrice(d.purchasePrice != null ? String(d.purchasePrice) : '')
     setSalesPrice(d.salesPrice != null ? String(d.salesPrice) : '')
+    setTaxRateId(d.taxRateId)
     setIsActive(d.isActive)
-  }, [isEdit, props.item, units, baseUnitId])
+  }, [isEdit, props.item, units, baseUnitId, taxRates, taxRateId])
 
   useEffect(() => {
     if (!isEdit) {
@@ -93,6 +101,7 @@ export default function StokFormModal(props: StokFormModalProps) {
           barcode: barcode.trim() || undefined,
           purchasePrice: purchasePrice ? Number(purchasePrice) : undefined,
           salesPrice: salesPrice ? Number(salesPrice) : undefined,
+          taxRateId: taxRateId === '' ? undefined : taxRateId,
           isActive,
         })
       } else {
@@ -102,6 +111,7 @@ export default function StokFormModal(props: StokFormModalProps) {
           purchasePrice: purchasePrice ? Number(purchasePrice) : undefined,
           salesPrice: salesPrice ? Number(salesPrice) : undefined,
           baseUnitId: baseUnitId === '' ? undefined : baseUnitId,
+          taxRateId: taxRateId === '' ? undefined : taxRateId,
         })
         setName('')
         setBarcode('')
@@ -194,6 +204,21 @@ export default function StokFormModal(props: StokFormModalProps) {
                         ))}
                       </select>
                     )}
+                  </div>
+                  <div className="col-md-4">
+                    <label className="form-label">KDV Oranı</label>
+                    <select
+                      className="form-select"
+                      value={taxRateId}
+                      onChange={(e) => setTaxRateId(Number(e.target.value))}
+                      disabled={saving || taxRates.length === 0}
+                    >
+                      {taxRates.map((t) => (
+                        <option key={t.id} value={t.id}>
+                          %{t.rate}
+                        </option>
+                      ))}
+                    </select>
                   </div>
                   <div className="col-md-4">
                     <label className="form-label">Barkod</label>

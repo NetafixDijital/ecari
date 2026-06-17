@@ -28,6 +28,10 @@ public record CreateInvInvoiceRequest(
     IReadOnlyList<CreateInvInvoiceLineRequest> Lines,
     string? PaymentStatus = null);
 
+public record UpdateInvInvoiceDatesRequest(
+    DateOnly DocumentDate,
+    DateOnly? DueDate);
+
 public record InvInvoiceDetailDto(
     long Id,
     string DocumentNo,
@@ -70,4 +74,13 @@ public record InvKdvReportDto(
     decimal PurchaseTaxTotal,
     decimal DeductibleTaxTotal,
     decimal NetPayableTax,
-    IReadOnlyList<InvKdvReportRowDto> Rows);
+    IReadOnlyList<InvKdvReportRowDto> Rows,
+    IReadOnlyList<InvKdvRateGroupDto> RateGroups);
+
+public record InvKdvRateGroupDto(
+    decimal TaxRate,
+    string TaxRateLabel,
+    decimal SalesBase,
+    decimal SalesTax,
+    decimal PurchaseBase,
+    decimal PurchaseTax);

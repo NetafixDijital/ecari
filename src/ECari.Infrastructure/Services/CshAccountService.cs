@@ -80,10 +80,24 @@ public class CshAccountService(
             .Take(500)
             .ToListAsync(ct);
 
+        var refNos = items
+            .Select(x => x.t.ReferenceNo)
+            .Where(r => !string.IsNullOrWhiteSpace(r))
+            .Distinct()
+            .ToList();
+
+        var cariByRef = await (
+            from m in db.CariMovements.AsNoTracking()
+            join a in db.CariAccounts.AsNoTracking() on m.AccountId equals a.Id
+            where !m.IsDeleted && m.DocumentModule == "CSH" && m.DocumentNo != null && refNos.Contains(m.DocumentNo)
+            select new { m.DocumentNo, a.Title })
+            .ToDictionaryAsync(x => x.DocumentNo!, x => x.Title, ct);
+
         return items.Select(x => new CshTransactionListItemDto(
             x.t.Id,
             x.t.CashAccountId,
             x.a.Name,
+            x.t.ReferenceNo != null && cariByRef.TryGetValue(x.t.ReferenceNo, out var title) ? title : null,
             x.t.TransactionDate,
             x.t.TransactionType,
             x.t.TransactionType == "IN" ? "Giriş" : "Çıkış",

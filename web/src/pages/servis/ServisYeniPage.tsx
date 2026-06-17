@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { fetchCariAccounts, type CariAccountListItem } from '../../api/cari'
 import CariInfoPanel from '../../components/cari/CariInfoPanel'
 import CariSecModal from '../../components/cari/CariSecModal'
-import { createSvcTicket } from '../../api/svc'
+import { createSvcTicket, fetchSvcTechnicians, type SvcTechnician } from '../../api/svc'
 import { useToast } from '../../context/ToastContext'
 import { apiErrorMessage } from '../../utils/apiError'
 
@@ -21,15 +21,19 @@ export default function ServisYeniPage() {
   const [selectedCari, setSelectedCari] = useState<CariAccountListItem | null>(null)
   const [device, setDevice] = useState('')
   const [problem, setProblem] = useState('')
-  const [technician, setTechnician] = useState('')
+  const [technicians, setTechnicians] = useState<SvcTechnician[]>([])
+  const [technicianId, setTechnicianId] = useState<number | ''>('')
   const [priority, setPriority] = useState('NORMAL')
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
 
   useEffect(() => {
-    fetchCariAccounts()
-      .then(setCariler)
+    Promise.all([fetchCariAccounts(), fetchSvcTechnicians()])
+      .then(([cariData, techData]) => {
+        setCariler(cariData)
+        setTechnicians(techData)
+      })
       .catch(() => setError('Cari listesi yüklenemedi.'))
       .finally(() => setLoading(false))
   }, [])
@@ -51,7 +55,7 @@ export default function ServisYeniPage() {
         accountId: selectedCari.id,
         deviceName: device.trim() || null,
         problemDescription: problem.trim(),
-        technicianName: technician.trim() || null,
+        technicianId: technicianId === '' ? null : Number(technicianId),
         priority,
       })
       toast.success('Kayıt oluşturuldu', 'Servis kaydı listeye eklendi.')
@@ -140,13 +144,25 @@ export default function ServisYeniPage() {
                 <div className="row g-3">
                   <div className="col-md-6">
                     <label className="form-label">Teknisyen</label>
-                    <input
-                      type="text"
-                      className="form-control"
-                      value={technician}
-                      onChange={(e) => setTechnician(e.target.value)}
-                      placeholder="Atanan teknisyen"
-                    />
+                    <select
+                      className="form-select"
+                      value={technicianId}
+                      onChange={(e) =>
+                        setTechnicianId(e.target.value ? Number(e.target.value) : '')
+                      }
+                    >
+                      <option value="">Seçiniz...</option>
+                      {technicians.map((t) => (
+                        <option key={t.id} value={t.id}>
+                          {t.name}
+                        </option>
+                      ))}
+                    </select>
+                    <div className="mt-1">
+                      <Link to="/servis/teknisyenler" className="small">
+                        Teknisyen tanımları
+                      </Link>
+                    </div>
                   </div>
                   <div className="col-md-6">
                     <label className="form-label">Öncelik</label>

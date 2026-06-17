@@ -18,12 +18,16 @@ public class StkController(
         [FromQuery] long? warehouseId,
         [FromQuery] long? itemId,
         [FromQuery] string? search,
+        [FromQuery] DateOnly? dateFrom,
+        [FromQuery] DateOnly? dateTo,
+        [FromQuery] string? movementType,
         CancellationToken ct)
     {
         if (!tenant.HasTenantContext())
             return BadRequest(new { message = "Önce şirket seçin: POST /api/auth/select-company" });
 
-        return Ok(await movementService.ListAsync(warehouseId, itemId, search, ct));
+        return Ok(await movementService.ListAsync(
+            warehouseId, itemId, search, dateFrom, dateTo, movementType, ct));
     }
 
     [HttpGet("items")]

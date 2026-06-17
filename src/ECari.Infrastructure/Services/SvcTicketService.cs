@@ -18,8 +18,25 @@ public class SvcTicketService(
         return await Db.SvcServiceDefinitions.AsNoTracking()
             .Where(s => !s.IsDeleted && s.IsActive)
             .OrderBy(s => s.SortOrder)
-            .Select(s => new SvcServiceDefinitionDto(s.Id, s.Code, s.Name, s.DefaultTaxRateId))
+            .Select(s => new SvcServiceDefinitionDto(s.Id, s.Code, s.Name, s.DefaultTaxRateId, s.IsActive, s.SortOrder))
             .ToListAsync(ct);
+    }
+
+    private static async Task<(long? TechnicianId, string? TechnicianName)> ResolveTechnicianAsync(
+        TenantDbContext db,
+        long? technicianId,
+        string? technicianName,
+        CancellationToken ct)
+    {
+        if (technicianId.HasValue)
+        {
+            var tech = await db.SvcTechnicians.AsNoTracking()
+                .FirstOrDefaultAsync(t => t.Id == technicianId && !t.IsDeleted && t.IsActive, ct)
+                ?? throw new InvalidOperationException("Geçersiz teknisyen seçimi.");
+            return (tech.Id, tech.Name);
+        }
+
+        return (null, technicianName?.Trim());
     }
 
     public async Task<IReadOnlyList<SvcTicketListItemDto>> ListAsync(
@@ -63,6 +80,9 @@ public class SvcTicketService(
             .FirstOrDefaultAsync(a => a.Id == request.AccountId && !a.IsDeleted, ct)
             ?? throw new InvalidOperationException("Cari hesap bulunamadı.");
 
+        var (technicianId, technicianName) = await ResolveTechnicianAsync(
+            db, request.TechnicianId, request.TechnicianName, ct);
+
         var entity = new SvcTicket
         {
             TicketNo = await GenerateTicketNoAsync(db, ct),
@@ -70,7 +90,8 @@ public class SvcTicketService(
             AccountId = account.Id,
             DeviceName = request.DeviceName?.Trim(),
             ProblemDescription = request.ProblemDescription.Trim(),
-            TechnicianName = request.TechnicianName?.Trim(),
+            TechnicianId = technicianId,
+            TechnicianName = technicianName,
             Status = "WAITING",
             Priority = NormalizePriority(request.Priority),
             CreatedAt = DateTime.UtcNow,
@@ -96,9 +117,13 @@ public class SvcTicketService(
 
         if (ticket is null) return null;
 
+        var (technicianId, technicianName) = await ResolveTechnicianAsync(
+            db, request.TechnicianId, request.TechnicianName, ct);
+
         ticket.DeviceName = request.DeviceName?.Trim();
         ticket.ProblemDescription = request.ProblemDescription.Trim();
-        ticket.TechnicianName = request.TechnicianName?.Trim();
+        ticket.TechnicianId = technicianId;
+        ticket.TechnicianName = technicianName;
         ticket.Priority = NormalizePriority(request.Priority);
         ticket.Resolution = request.Resolution?.Trim();
         await db.SaveChangesAsync(ct);
@@ -297,6 +322,7 @@ public class SvcTicketService(
             t.DeviceName,
             t.ProblemDescription,
             t.TechnicianName,
+            t.TechnicianId,
             priorityKey,
             priorityLabel,
             statusKey,

@@ -21,6 +21,7 @@
     13) 12-svc-invoice.sql   (Servis fatura bağlantısı)
     14) 13-faz7-auth.sql     (Kullanıcı & yetkilendirme tabloları)
     15) 14-svc-lines.sql     (Servis malzeme/hizmet kalemleri)
+    16) 15-svc-technicians.sql (Teknisyen tanımları)
 
   Mobil: mobile/ — Flutter Faz 1 (login + cari). Bkz. mobile/README.md
 

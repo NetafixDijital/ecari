@@ -33,8 +33,10 @@ export const moduleGroups: MenuGroup[] = [
     icon: 'ti-file-invoice',
     children: [
       { id: 'fatura-alis', label: 'Alış Fatura', icon: 'ti-file-invoice', to: '/fatura/alis' },
+      { id: 'fatura-alis-iade', label: 'Alıştan İade', icon: 'ti-arrow-back-up', to: '/fatura/alis-iade' },
       { id: 'fatura-alis-rapor', label: 'Fatura Raporu', icon: 'ti-file-invoice', to: '/raporlar/fatura-alis' },
       { id: 'fatura-satis', label: 'Satış Fatura', icon: 'ti-file-invoice', to: '/fatura/satis' },
+      { id: 'fatura-satis-iade', label: 'Satıştan İade', icon: 'ti-arrow-back-up', to: '/fatura/satis-iade' },
       { id: 'fatura-satis-rapor', label: 'Fatura Raporu', icon: 'ti-file-invoice', to: '/raporlar/fatura-satis' },
     ],
   },
@@ -83,6 +85,7 @@ export const moduleGroups: MenuGroup[] = [
     children: [
       { id: 'depo-liste', label: 'Depo Listesi', icon: 'ti-building-warehouse', to: '/depo' },
       { id: 'depo-hareketler', label: 'Stok Hareketleri', icon: 'ti-building-warehouse', to: '/depo/hareketler' },
+      { id: 'depo-hareket-rapor', label: 'Stok Hareket Raporu', icon: 'ti-report-analytics', to: '/raporlar/stok-hareket' },
     ],
   },
   {
@@ -104,6 +107,8 @@ export const moduleGroups: MenuGroup[] = [
     children: [
       { id: 'servis-liste', label: 'Servis Listesi', icon: 'ti-tool', to: '/servis' },
       { id: 'servis-yeni', label: 'Yeni Servis Kaydı', icon: 'ti-tool', to: '/servis/yeni' },
+      { id: 'servis-teknisyen', label: 'Teknisyen Tanımları', icon: 'ti-user-cog', to: '/servis/teknisyenler' },
+      { id: 'servis-hizmet', label: 'Hizmet Tanımları', icon: 'ti-list-check', to: '/servis/hizmetler' },
     ],
   },
   {
@@ -156,12 +161,9 @@ export const financeLinks: MenuLink[] = [
 ]
 
 export const reportsLinks: MenuLink[] = [
-  { id: 'rapor-fs', label: 'Satış Fatura Raporu', icon: 'ti-file-invoice', to: '/raporlar/fatura-satis', tone: 'primary' },
-  { id: 'rapor-fa', label: 'Alış Fatura Raporu', icon: 'ti-file-invoice', to: '/raporlar/fatura-alis', tone: 'info' },
-  { id: 'rapor-is', label: 'Satış İrsaliye', icon: 'ti-truck-delivery', to: '/raporlar/irsaliye-satis', tone: 'success' },
-  { id: 'rapor-ia', label: 'Alış İrsaliye', icon: 'ti-truck-delivery', to: '/raporlar/irsaliye-alis', tone: 'warning' },
   { id: 'rapor-gg', label: 'Gelir / Gider', icon: 'ti-chart-bar', to: '/raporlar/gelir-gider', tone: 'success' },
   { id: 'rapor-kdv', label: 'KDV Raporu', icon: 'ti-receipt-tax', to: '/raporlar/kdv', tone: 'danger' },
+  { id: 'rapor-stok', label: 'Stok Hareket Raporu', icon: 'ti-report-analytics', to: '/raporlar/stok-hareket', tone: 'info' },
 ]
 
 export const settingsLinks: MenuLink[] = [

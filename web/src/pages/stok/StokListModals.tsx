@@ -4,6 +4,7 @@ import StokFormModal from './StokFormModal'
 
 interface StokListModalsProps {
   units: LookupItem[]
+  taxRates: import('../../api/core').TaxRate[]
   editItem: StkItemDetail | null
   onEditClose: () => void
   onCreate: (body: CreateStkItemRequest) => Promise<void>
@@ -16,6 +17,7 @@ interface StokListModalsProps {
 
 export default function StokListModals({
   units,
+  taxRates,
   editItem,
   onEditClose,
   onCreate,
@@ -27,11 +29,12 @@ export default function StokListModals({
 }: StokListModalsProps) {
   return (
     <>
-      <StokFormModal mode="create" item={null} units={units} onSubmit={onCreate} saving={creating} error={createError} />
+      <StokFormModal mode="create" item={null} units={units} taxRates={taxRates} onSubmit={onCreate} saving={creating} error={createError} />
       <StokFormModal
         mode="edit"
         item={editItem}
         units={units}
+        taxRates={taxRates}
         onSubmit={onUpdate}
         saving={updating}
         error={updateError}

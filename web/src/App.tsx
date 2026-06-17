@@ -20,6 +20,8 @@ import HizliSatisPage from './pages/hizli-satis/HizliSatisPage'
 import ServisDetayPage from './pages/servis/ServisDetayPage'
 import ServisListPage from './pages/servis/ServisListPage'
 import ServisYeniPage from './pages/servis/ServisYeniPage'
+import TeknisyenTanimPage from './pages/servis/TeknisyenTanimPage'
+import HizmetTanimPage from './pages/servis/HizmetTanimPage'
 import TeklifDetayPage from './pages/teklif/TeklifDetayPage'
 import TeklifListPage from './pages/teklif/TeklifListPage'
 import TeklifYeniPage from './pages/teklif/TeklifYeniPage'
@@ -38,6 +40,7 @@ import DepoHareketlerPage from './pages/depo/DepoHareketlerPage'
 import BelgeRaporPage from './pages/raporlar/BelgeRaporPage'
 import GelirGiderRaporPage from './pages/raporlar/GelirGiderRaporPage'
 import KdvRaporPage from './pages/raporlar/KdvRaporPage'
+import StokHareketRaporPage from './pages/raporlar/StokHareketRaporPage'
 import SiparisDetayPage from './pages/siparis/SiparisDetayPage'
 import SiparisListPage from './pages/siparis/SiparisListPage'
 import SiparisYeniPage from './pages/siparis/SiparisYeniPage'
@@ -77,6 +80,8 @@ export default function App() {
           <Route path="/fatura/onizleme/:id" element={<FaturaOnizlemePage />} />
           <Route path="/fatura/satis" element={<FaturaListPage mode="satis" />} />
           <Route path="/fatura/alis" element={<FaturaListPage mode="alis" />} />
+          <Route path="/fatura/satis-iade" element={<FaturaListPage mode="satis-iade" />} />
+          <Route path="/fatura/alis-iade" element={<FaturaListPage mode="alis-iade" />} />
           <Route path="/irsaliye/yeni" element={<IrsaliyeYeniPage />} />
           <Route path="/irsaliye/satis" element={<IrsaliyeListPage mode="satis" />} />
           <Route path="/irsaliye/alis" element={<IrsaliyeListPage mode="alis" />} />
@@ -92,6 +97,8 @@ export default function App() {
           <Route path="/hizli-satis" element={<HizliSatisPage />} />
           <Route path="/servis" element={<ServisListPage />} />
           <Route path="/servis/yeni" element={<ServisYeniPage />} />
+          <Route path="/servis/teknisyenler" element={<TeknisyenTanimPage />} />
+          <Route path="/servis/hizmetler" element={<HizmetTanimPage />} />
           <Route path="/servis/:id" element={<ServisDetayPage />} />
           <Route path="/gorev" element={<GorevListPage />} />
           <Route path="/masraf" element={<MasrafListPage />} />
@@ -108,6 +115,7 @@ export default function App() {
           <Route path="/raporlar/irsaliye-alis" element={<BelgeRaporPage mode="irsaliye-alis" />} />
           <Route path="/raporlar/gelir-gider" element={<GelirGiderRaporPage />} />
           <Route path="/raporlar/kdv" element={<KdvRaporPage />} />
+          <Route path="/raporlar/stok-hareket" element={<StokHareketRaporPage />} />
           <Route path="/ayarlar" element={<AyarlarGenelPage />} />
           <Route path="/ayarlar/menu" element={<AyarlarMenuPage />} />
           <Route path="/ayarlar/ozel" element={<AyarlarOzelPage />} />

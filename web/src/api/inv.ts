@@ -22,13 +22,15 @@ export type CreateInvInvoiceLineRequest = {
 }
 
 export type CreateInvInvoiceRequest = {
-  invoiceType: 'SALES' | 'PURCHASE'
+  invoiceType: 'SALES' | 'PURCHASE' | 'SALES_RETURN' | 'PURCHASE_RETURN'
   accountId: number
   documentDate: string
   dueDate?: string | null
   notes?: string | null
   lines: CreateInvInvoiceLineRequest[]
 }
+
+export type InvInvoiceType = CreateInvInvoiceRequest['invoiceType']
 
 export type InvInvoiceLine = {
   lineNo: number
@@ -60,7 +62,7 @@ export type InvInvoiceDetail = {
   lines: InvInvoiceLine[]
 }
 
-export async function fetchInvoices(type: 'SALES' | 'PURCHASE', search?: string) {
+export async function fetchInvoices(type: InvInvoiceType, search?: string) {
   const { data } = await api.get<InvInvoiceListItem[]>('/api/inv/invoices', {
     params: { type, search: search || undefined },
   })
@@ -93,6 +95,16 @@ export type InvKdvReport = {
   deductibleTaxTotal: number
   netPayableTax: number
   rows: InvKdvReportRow[]
+  rateGroups: InvKdvRateGroup[]
+}
+
+export type InvKdvRateGroup = {
+  taxRate: number
+  taxRateLabel: string
+  salesBase: number
+  salesTax: number
+  purchaseBase: number
+  purchaseTax: number
 }
 
 export async function fetchKdvReport() {
@@ -102,4 +114,12 @@ export async function fetchKdvReport() {
 
 export async function deleteInvoice(id: number) {
   await api.delete(`/api/inv/invoices/${id}`)
+}
+
+export async function updateInvoiceDates(
+  id: number,
+  body: { documentDate: string; dueDate?: string | null },
+) {
+  const { data } = await api.patch<InvInvoiceDetail>(`/api/inv/invoices/${id}/dates`, body)
+  return data
 }

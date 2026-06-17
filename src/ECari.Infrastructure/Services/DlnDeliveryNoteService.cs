@@ -281,6 +281,30 @@ public class DlnDeliveryNoteService(
         return true;
     }
 
+    public async Task<DlnDeliveryNoteDetailDto?> UpdateDatesAsync(
+        long id,
+        UpdateDlnDeliveryNoteDatesRequest request,
+        CancellationToken ct = default)
+    {
+        var db = Db;
+        var note = await db.DlnDeliveryNotes.FirstOrDefaultAsync(n => n.Id == id && !n.IsDeleted, ct);
+        if (note is null) return null;
+
+        note.DocumentDate = request.DocumentDate;
+        note.UpdatedAt = DateTime.UtcNow;
+
+        var stockMoves = await db.StkStockMovements
+            .Where(m => !m.IsDeleted && m.DocumentModule == "DLN" && m.DocumentId == id)
+            .ToListAsync(ct);
+
+        var movementDateTime = request.DocumentDate.ToDateTime(TimeOnly.MinValue);
+        foreach (var stockMove in stockMoves)
+            stockMove.MovementDate = movementDateTime;
+
+        await db.SaveChangesAsync(ct);
+        return await GetByIdAsync(id, ct);
+    }
+
     private static async Task<string> GenerateDocumentNoAsync(
         TenantDbContext db,
         string documentType,

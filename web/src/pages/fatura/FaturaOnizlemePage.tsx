@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
-import { fetchInvoice, type InvInvoiceDetail } from '../../api/inv'
+import { fetchInvoice, updateInvoiceDates, type InvInvoiceDetail } from '../../api/inv'
+import { apiErrorMessage } from '../../utils/apiError'
 import { formatDate, formatMoneyOptional, formatQuantity, formatTry, statusBadge } from '../../utils/format'
 
 export default function FaturaOnizlemePage() {
@@ -10,10 +11,21 @@ export default function FaturaOnizlemePage() {
   const [invoice, setInvoice] = useState<InvInvoiceDetail | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+  const [documentDate, setDocumentDate] = useState('')
+  const [dueDate, setDueDate] = useState('')
+  const [savingDates, setSavingDates] = useState(false)
+  const [dateMessage, setDateMessage] = useState('')
 
   const invoiceId = Number(id)
-  const isSales = invoice?.invoiceType === 'SALES'
-  const listPath = isSales ? '/fatura/satis' : '/fatura/alis'
+  const isSales = invoice?.invoiceType === 'SALES' || invoice?.invoiceType === 'SALES_RETURN'
+  const listPath =
+    invoice?.invoiceType === 'PURCHASE'
+      ? '/fatura/alis'
+      : invoice?.invoiceType === 'PURCHASE_RETURN'
+        ? '/fatura/alis-iade'
+        : invoice?.invoiceType === 'SALES_RETURN'
+          ? '/fatura/satis-iade'
+          : '/fatura/satis'
 
   useEffect(() => {
     if (!invoiceId || Number.isNaN(invoiceId)) {
@@ -22,7 +34,11 @@ export default function FaturaOnizlemePage() {
       return
     }
     fetchInvoice(invoiceId)
-      .then(setInvoice)
+      .then((data) => {
+        setInvoice(data)
+        setDocumentDate(data.documentDate)
+        setDueDate(data.dueDate ?? data.documentDate)
+      })
       .catch(() => setError('Fatura yüklenemedi.'))
       .finally(() => setLoading(false))
   }, [invoiceId])
@@ -35,6 +51,27 @@ export default function FaturaOnizlemePage() {
 
   function handlePrint() {
     window.print()
+  }
+
+  async function handleSaveDates() {
+    if (!invoice) return
+    setSavingDates(true)
+    setDateMessage('')
+    setError('')
+    try {
+      const updated = await updateInvoiceDates(invoice.id, {
+        documentDate,
+        dueDate: invoice.paymentStatusKey === 'odendi' ? documentDate : dueDate,
+      })
+      setInvoice(updated)
+      setDocumentDate(updated.documentDate)
+      setDueDate(updated.dueDate ?? updated.documentDate)
+      setDateMessage('Tarihler güncellendi.')
+    } catch (err: unknown) {
+      setError(apiErrorMessage(err, 'Tarih güncellenemedi.'))
+    } finally {
+      setSavingDates(false)
+    }
   }
 
   if (loading) {
@@ -117,7 +154,38 @@ export default function FaturaOnizlemePage() {
               </p>
               <span className={`badge ${badge.className}`}>{badge.label}</span>
             </div>
-            <div className="text-md-end">
+            <div className="text-md-end d-print-none">
+              <div className="mb-2">
+                <label className="form-label small mb-1">Fatura Tarihi</label>
+                <input
+                  type="date"
+                  className="form-control form-control-sm"
+                  value={documentDate}
+                  onChange={(e) => setDocumentDate(e.target.value)}
+                />
+              </div>
+              {invoice.paymentStatusKey !== 'odendi' && (
+                <div className="mb-2">
+                  <label className="form-label small mb-1">Vade Tarihi</label>
+                  <input
+                    type="date"
+                    className="form-control form-control-sm"
+                    value={dueDate}
+                    onChange={(e) => setDueDate(e.target.value)}
+                  />
+                </div>
+              )}
+              <button
+                type="button"
+                className="btn btn-sm btn-primary"
+                disabled={savingDates}
+                onClick={handleSaveDates}
+              >
+                Tarihi Kaydet
+              </button>
+              {dateMessage && <div className="small text-success mt-1">{dateMessage}</div>}
+            </div>
+            <div className="text-md-end d-none d-print-block">
               <h6 className="mb-1">Fatura Tarihi: {formatDate(invoice.documentDate)}</h6>
               <p className="mb-0 text-body-secondary">Vade: {formatDate(invoice.dueDate)}</p>
             </div>

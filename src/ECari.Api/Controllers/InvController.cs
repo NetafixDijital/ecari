@@ -25,11 +25,13 @@ public class InvController(
         {
             "SALES" or "SATIS" => "SALES",
             "PURCHASE" or "ALIS" => "PURCHASE",
+            "SALES_RETURN" or "SATIS_IADE" or "SATISIADE" => "SALES_RETURN",
+            "PURCHASE_RETURN" or "ALIS_IADE" or "ALISIADE" => "PURCHASE_RETURN",
             _ => null,
         };
 
         if (invoiceType is null)
-            return BadRequest(new { message = "Geçerli type: SALES veya PURCHASE" });
+            return BadRequest(new { message = "Geçerli type: SALES, PURCHASE, SALES_RETURN, PURCHASE_RETURN" });
 
         return Ok(await invService.ListAsync(invoiceType, search, ct));
     }
@@ -71,6 +73,21 @@ public class InvController(
         {
             return BadRequest(new { message = ex.Message });
         }
+    }
+
+    [HttpPatch("invoices/{id:long}/dates")]
+    public async Task<ActionResult<InvInvoiceDetailDto>> UpdateDates(
+        long id,
+        [FromBody] UpdateInvInvoiceDatesRequest request,
+        CancellationToken ct)
+    {
+        if (!tenant.HasTenantContext())
+            return BadRequest(new { message = "Önce şirket seçin: POST /api/auth/select-company" });
+
+        var updated = await invService.UpdateDatesAsync(id, request, ct);
+        if (updated is null) return NotFound();
+
+        return Ok(updated);
     }
 
     [HttpDelete("invoices/{id:long}")]

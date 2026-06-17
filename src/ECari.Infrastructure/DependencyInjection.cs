@@ -37,6 +37,7 @@ public static class DependencyInjection
         services.AddScoped<ChqInstrumentService>();
         services.AddScoped<StkMovementService>();
         services.AddScoped<ExpExpenseService>();
+        services.AddScoped<SvcDefinitionService>();
         services.AddScoped<SvcTicketService>();
         services.AddScoped<TskTaskService>();
         services.AddScoped<CshAccountService>();

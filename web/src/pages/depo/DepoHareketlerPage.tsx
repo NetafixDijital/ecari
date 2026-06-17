@@ -1,14 +1,17 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useSearchParams } from 'react-router-dom'
 import { fetchWarehouses } from '../../api/cfg'
 import { fetchStkMovements, type StkStockMovementListItem } from '../../api/stk'
 import TableSearchToolbar from '../../components/ui/TableSearchToolbar'
 import { formatDateTime, formatQuantity } from '../../utils/format'
 
 export default function DepoHareketlerPage() {
+  const [searchParams] = useSearchParams()
+  const initialItemId = Number(searchParams.get('itemId') || '') || ''
   const [items, setItems] = useState<StkStockMovementListItem[]>([])
   const [warehouses, setWarehouses] = useState<Awaited<ReturnType<typeof fetchWarehouses>>>([])
   const [warehouseId, setWarehouseId] = useState<number | ''>('')
+  const [itemId] = useState<number | ''>(initialItemId)
   const [tableSearch, setTableSearch] = useState('')
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
@@ -18,11 +21,12 @@ export default function DepoHareketlerPage() {
     setError('')
     fetchStkMovements({
       warehouseId: warehouseId === '' ? undefined : Number(warehouseId),
+      itemId: itemId === '' ? undefined : Number(itemId),
     })
       .then(setItems)
       .catch(() => setError('Stok hareketleri yüklenemedi.'))
       .finally(() => setLoading(false))
-  }, [warehouseId])
+  }, [warehouseId, itemId])
 
   useEffect(() => {
     fetchWarehouses().then(setWarehouses).catch(() => undefined)

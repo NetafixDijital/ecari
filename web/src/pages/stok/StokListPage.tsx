@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { fetchUnits, type LookupItem } from '../../api/core'
+import { Link } from 'react-router-dom'
+import { fetchUnits, fetchTaxRates, type LookupItem, type TaxRate } from '../../api/core'
 import {
   createStkItem,
   deleteStkItem,
@@ -22,6 +23,7 @@ export default function StokListPage() {
   const toast = useToast()
   const [items, setItems] = useState<StkItemListItem[]>([])
   const [units, setUnits] = useState<LookupItem[]>([])
+  const [taxRates, setTaxRates] = useState<TaxRate[]>([])
   const [editItem, setEditItem] = useState<StkItemDetail | null>(null)
   const [tableSearch, setTableSearch] = useState('')
   const [loading, setLoading] = useState(true)
@@ -44,6 +46,7 @@ export default function StokListPage() {
   useEffect(() => {
     loadItems()
     fetchUnits().then(setUnits).catch(() => undefined)
+    fetchTaxRates().then(setTaxRates).catch(() => undefined)
   }, [loadItems])
 
   const filteredItems = useMemo(() => {
@@ -185,12 +188,9 @@ export default function StokListPage() {
                       <td className="text-center">
                         <div className="d-flex justify-content-center gap-1">
                           <IconActionButton icon="ti-edit" color="primary" title="Düzenle" onClick={() => handleEdit(row)} />
-                          <IconActionButton
-                            icon="ti-history"
-                            color="info"
-                            title="Hareketler"
-                            onClick={() => window.alert('Depo hareketleri fatura modülü ile eklenecek.')}
-                          />
+                          <Link to={`/depo/hareketler?itemId=${row.id}`} className="btn btn-icon btn-sm btn-label-info" title="Hareketler">
+                            <i className="ti ti-history" />
+                          </Link>
                           <IconActionButton
                             icon="ti-trash"
                             color="danger"
@@ -210,6 +210,7 @@ export default function StokListPage() {
 
       <StokListModals
         units={units}
+        taxRates={taxRates}
         editItem={editItem}
         onEditClose={() => setEditItem(null)}
         onCreate={handleCreate}

@@ -77,3 +77,8 @@ export async function convertDeliveryNoteToInvoice(id: number) {
 export async function deleteDeliveryNote(id: number) {
   await api.delete(`/api/dln/delivery-notes/${id}`)
 }
+
+export async function updateDeliveryNoteDates(id: number, body: { documentDate: string }) {
+  const { data } = await api.patch<DlnDeliveryNoteDetail>(`/api/dln/delivery-notes/${id}/dates`, body)
+  return data
+}

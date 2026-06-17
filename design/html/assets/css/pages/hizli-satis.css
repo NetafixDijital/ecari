@@ -77,6 +77,10 @@
   cursor: pointer;
   transition: border-color 0.15s, box-shadow 0.15s, transform 0.1s;
   background: var(--bs-paper-bg);
+  width: 100%;
+  font: inherit;
+  color: inherit;
+  appearance: none;
 }
 
 .hs-product-card:hover,

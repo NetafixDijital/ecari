@@ -15,6 +15,9 @@ public class StkMovementService(
         long? warehouseId,
         long? itemId,
         string? search,
+        DateOnly? dateFrom,
+        DateOnly? dateTo,
+        string? movementType,
         CancellationToken ct = default)
     {
         var db = Db;
@@ -30,6 +33,24 @@ public class StkMovementService(
         if (itemId.HasValue)
             query = query.Where(m => m.ItemId == itemId.Value);
 
+        if (dateFrom.HasValue)
+        {
+            var from = dateFrom.Value.ToDateTime(TimeOnly.MinValue);
+            query = query.Where(m => m.MovementDate >= from);
+        }
+
+        if (dateTo.HasValue)
+        {
+            var to = dateTo.Value.ToDateTime(TimeOnly.MaxValue);
+            query = query.Where(m => m.MovementDate <= to);
+        }
+
+        if (!string.IsNullOrWhiteSpace(movementType))
+        {
+            var type = movementType.Trim().ToUpperInvariant();
+            query = query.Where(m => m.MovementType == type);
+        }
+
         if (!string.IsNullOrWhiteSpace(search))
         {
             var term = search.Trim();
@@ -42,7 +63,7 @@ public class StkMovementService(
         var items = await query
             .OrderByDescending(m => m.MovementDate)
             .ThenByDescending(m => m.Id)
-            .Take(500)
+            .Take(2000)
             .ToListAsync(ct);
 
         return items.Select(m => new StkStockMovementListItemDto(
@@ -64,6 +85,7 @@ public class StkMovementService(
         "OUT" => "Çıkış",
         "TRANSFER" => "Transfer",
         "ADJUSTMENT" => "Sayım",
+        "OPENING" => "Açılış",
         _ => type,
     };
 }

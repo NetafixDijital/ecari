@@ -33,6 +33,33 @@ export type SvcServiceDefinition = {
   code: string
   name: string
   defaultTaxRateId: number | null
+  isActive?: boolean
+  sortOrder?: number
+}
+
+export type SvcTechnician = {
+  id: number
+  code: string
+  name: string
+  phone: string | null
+  isActive: boolean
+  sortOrder: number
+}
+
+export type UpsertSvcTechnicianRequest = {
+  code: string
+  name: string
+  phone?: string | null
+  isActive?: boolean
+  sortOrder?: number
+}
+
+export type UpsertSvcServiceDefinitionRequest = {
+  code: string
+  name: string
+  defaultTaxRateId?: number | null
+  isActive?: boolean
+  sortOrder?: number
 }
 
 export type SvcTicketDetail = {
@@ -44,6 +71,7 @@ export type SvcTicketDetail = {
   deviceName: string | null
   problemDescription: string
   technicianName: string | null
+  technicianId: number | null
   priorityKey: string
   priorityLabel: string
   statusKey: string
@@ -62,6 +90,7 @@ export type CreateSvcTicketRequest = {
   deviceName?: string | null
   problemDescription: string
   technicianName?: string | null
+  technicianId?: number | null
   priority: string
 }
 
@@ -69,6 +98,7 @@ export type UpdateSvcTicketRequest = {
   deviceName?: string | null
   problemDescription: string
   technicianName?: string | null
+  technicianId?: number | null
   priority: string
   resolution?: string | null
 }
@@ -83,9 +113,46 @@ export type SaveSvcTicketLineRequest = {
   taxRateId: number
 }
 
-export async function fetchSvcServices() {
-  const { data } = await api.get<SvcServiceDefinition[]>('/api/svc/services')
+export async function fetchSvcServices(includeInactive = false) {
+  const { data } = await api.get<SvcServiceDefinition[]>('/api/svc/services', {
+    params: { includeInactive },
+  })
   return data
+}
+
+export async function createSvcService(body: UpsertSvcServiceDefinitionRequest) {
+  const { data } = await api.post<SvcServiceDefinition>('/api/svc/services', body)
+  return data
+}
+
+export async function updateSvcService(id: number, body: UpsertSvcServiceDefinitionRequest) {
+  const { data } = await api.put<SvcServiceDefinition>(`/api/svc/services/${id}`, body)
+  return data
+}
+
+export async function deleteSvcService(id: number) {
+  await api.delete(`/api/svc/services/${id}`)
+}
+
+export async function fetchSvcTechnicians(includeInactive = false) {
+  const { data } = await api.get<SvcTechnician[]>('/api/svc/technicians', {
+    params: { includeInactive },
+  })
+  return data
+}
+
+export async function createSvcTechnician(body: UpsertSvcTechnicianRequest) {
+  const { data } = await api.post<SvcTechnician>('/api/svc/technicians', body)
+  return data
+}
+
+export async function updateSvcTechnician(id: number, body: UpsertSvcTechnicianRequest) {
+  const { data } = await api.put<SvcTechnician>(`/api/svc/technicians/${id}`, body)
+  return data
+}
+
+export async function deleteSvcTechnician(id: number) {
+  await api.delete(`/api/svc/technicians/${id}`)
 }
 
 export async function fetchSvcTickets(status?: string, search?: string) {

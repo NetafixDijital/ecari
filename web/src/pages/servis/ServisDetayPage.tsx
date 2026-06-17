@@ -5,6 +5,8 @@ import {
   convertSvcToInvoice,
   deleteSvcTicket,
   fetchSvcServices,
+  fetchSvcTechnicians,
+  type SvcTechnician,
   fetchSvcTicket,
   saveSvcTicketLines,
   updateSvcTicket,
@@ -85,7 +87,8 @@ export default function ServisDetayPage() {
   const [error, setError] = useState('')
   const [deviceName, setDeviceName] = useState('')
   const [problemDescription, setProblemDescription] = useState('')
-  const [technicianName, setTechnicianName] = useState('')
+  const [technicians, setTechnicians] = useState<SvcTechnician[]>([])
+  const [technicianId, setTechnicianId] = useState<number | ''>('')
   const [resolution, setResolution] = useState('')
   const [priority, setPriority] = useState('NORMAL')
   const [stkLoadingKey, setStkLoadingKey] = useState<string | null>(null)
@@ -100,17 +103,19 @@ export default function ServisDetayPage() {
       fetchStkItems(),
       fetchUnits(),
       fetchTaxRates(),
+      fetchSvcTechnicians(),
     ])
-      .then(([ticket, svcData, stkData, unitData, taxData]) => {
+      .then(([ticket, svcData, stkData, unitData, taxData, techData]) => {
         setItem(ticket)
         setServices(svcData)
         setItems(stkData)
         setUnits(unitData)
         setTaxRates(taxData)
+        setTechnicians(techData)
         setLines(linesFromDetail(ticket, unitData, taxData))
         setDeviceName(ticket.deviceName ?? '')
         setProblemDescription(ticket.problemDescription)
-        setTechnicianName(ticket.technicianName ?? '')
+        setTechnicianId(ticket.technicianId ?? '')
         setResolution(ticket.resolution ?? '')
         setPriority(
           ticket.priorityKey === 'dusuk'
@@ -186,7 +191,7 @@ export default function ServisDetayPage() {
       const updated = await updateSvcTicket(ticketId, {
         deviceName: deviceName.trim() || null,
         problemDescription: problemDescription.trim(),
-        technicianName: technicianName.trim() || null,
+        technicianId: technicianId === '' ? null : Number(technicianId),
         priority,
         resolution: resolution.trim() || null,
       })
@@ -365,7 +370,18 @@ export default function ServisDetayPage() {
             </div>
             <div className="col-md-6">
               <label className="form-label">Teknisyen</label>
-              <input className="form-control" value={technicianName} onChange={(e) => setTechnicianName(e.target.value)} />
+              <select
+                className="form-select"
+                value={technicianId}
+                onChange={(e) => setTechnicianId(e.target.value ? Number(e.target.value) : '')}
+              >
+                <option value="">Seçiniz...</option>
+                {technicians.map((t) => (
+                  <option key={t.id} value={t.id}>
+                    {t.name}
+                  </option>
+                ))}
+              </select>
             </div>
             <div className="col-12">
               <label className="form-label">Problem Açıklaması</label>

@@ -111,7 +111,10 @@ public class InvInvoiceService(
         {
             "SALES" or "SATIS" => "SALES",
             "PURCHASE" or "ALIS" => "PURCHASE",
-            _ => throw new InvalidOperationException("Geçerli fatura tipi: SALES veya PURCHASE"),
+            "SALES_RETURN" or "SATIS_IADE" or "SATISIADE" => "SALES_RETURN",
+            "PURCHASE_RETURN" or "ALIS_IADE" or "ALISIADE" => "PURCHASE_RETURN",
+            _ => throw new InvalidOperationException(
+                "Geçerli fatura tipi: SALES, PURCHASE, SALES_RETURN veya PURCHASE_RETURN"),
         };
 
         var db = Db;
@@ -129,6 +132,10 @@ public class InvInvoiceService(
             .Where(w => w.IsDefault && !w.IsDeleted)
             .Select(w => (long?)w.BranchId)
             .FirstOrDefaultAsync(ct);
+
+        var warehouseId = await StkStockPostingService.ResolveDefaultWarehouseIdAsync(db, ct);
+        if (warehouseId == 0)
+            throw new InvalidOperationException("Varsayılan depo bulunamadı. Önce depo tanımlayın.");
 
         var lineEntities = new List<InvInvoiceLine>();
         decimal subtotal = 0;
@@ -179,6 +186,7 @@ public class InvInvoiceService(
             Status = "APPROVED",
             AccountId = account.Id,
             BranchId = branchId,
+            WarehouseId = warehouseId,
             CurrencyId = account.CurrencyId,
             DueDate = request.PaymentStatus == "ODENDI" ? request.DocumentDate : request.DueDate,
             Subtotal = subtotal,
@@ -197,23 +205,35 @@ public class InvInvoiceService(
 
         db.InvInvoiceLines.AddRange(lineEntities);
 
-        var isSales = invoiceType == "SALES";
+        var debitSide = invoiceType is "SALES" or "PURCHASE_RETURN";
+        var cariDescription = invoiceType switch
+        {
+            "SALES" => "Satış faturası",
+            "PURCHASE" => "Alış faturası",
+            "SALES_RETURN" => "Satıştan iade faturası",
+            "PURCHASE_RETURN" => "Alıştan iade faturası",
+            _ => "Fatura",
+        };
+
         db.CariMovements.Add(new CariMovement
         {
             AccountId = account.Id,
             MovementDate = request.DocumentDate,
             DueDate = request.DueDate,
             MovementType = "INVOICE",
-            Debit = isSales ? grandTotal : 0,
-            Credit = isSales ? 0 : grandTotal,
+            Debit = debitSide ? grandTotal : 0,
+            Credit = debitSide ? 0 : grandTotal,
             CurrencyId = account.CurrencyId,
             DocumentModule = "INV",
             DocumentId = invoice.Id,
             DocumentNo = documentNo,
-            Description = isSales ? "Satış faturası" : "Alış faturası",
+            Description = cariDescription,
             CreatedAt = DateTime.UtcNow,
         });
 
+        await db.SaveChangesAsync(ct);
+
+        await StkStockPostingService.PostForInvoiceAsync(db, invoice, lineEntities, warehouseId, ct);
         await db.SaveChangesAsync(ct);
         await tx.CommitAsync(ct);
 
@@ -253,7 +273,8 @@ public class InvInvoiceService(
 
     public async Task<InvKdvReportDto> GetKdvReportAsync(CancellationToken ct = default)
     {
-        var invoices = await Db.InvInvoices.AsNoTracking()
+        var db = Db;
+        var invoices = await db.InvInvoices.AsNoTracking()
             .Include(i => i.Account)
             .Where(i => !i.IsDeleted)
             .OrderByDescending(i => i.DocumentDate)
@@ -269,15 +290,47 @@ public class InvInvoiceService(
             i.Subtotal,
             i.TaxTotal)).ToList();
 
-        var salesTax = rows.Where(r => r.InvoiceType == "SALES").Sum(r => r.TaxTotal);
-        var purchaseTax = rows.Where(r => r.InvoiceType == "PURCHASE").Sum(r => r.TaxTotal);
+        var salesTax = rows.Where(r => r.InvoiceType == "SALES").Sum(r => r.TaxTotal)
+            - rows.Where(r => r.InvoiceType == "SALES_RETURN").Sum(r => r.TaxTotal);
+        var purchaseTax = rows.Where(r => r.InvoiceType == "PURCHASE").Sum(r => r.TaxTotal)
+            - rows.Where(r => r.InvoiceType == "PURCHASE_RETURN").Sum(r => r.TaxTotal);
+
+        var lineRows = await (
+            from line in db.InvInvoiceLines.AsNoTracking()
+            join inv in db.InvInvoices.AsNoTracking() on line.InvoiceId equals inv.Id
+            join tax in db.TaxRates.AsNoTracking() on line.TaxRateId equals tax.Id
+            where !line.IsDeleted && !inv.IsDeleted
+            select new
+            {
+                inv.InvoiceType,
+                tax.Rate,
+                Net = line.Quantity * line.UnitPrice - line.DiscountAmount,
+                line.TaxAmount,
+            }).ToListAsync(ct);
+
+        var rateGroups = lineRows
+            .GroupBy(x => x.Rate)
+            .OrderBy(g => g.Key)
+            .Select(g => new InvKdvRateGroupDto(
+                g.Key,
+                $"%{g.Key:0.##}",
+                g.Where(x => x.InvoiceType == "SALES").Sum(x => x.Net)
+                    - g.Where(x => x.InvoiceType == "SALES_RETURN").Sum(x => x.Net),
+                g.Where(x => x.InvoiceType == "SALES").Sum(x => x.TaxAmount)
+                    - g.Where(x => x.InvoiceType == "SALES_RETURN").Sum(x => x.TaxAmount),
+                g.Where(x => x.InvoiceType == "PURCHASE").Sum(x => x.Net)
+                    - g.Where(x => x.InvoiceType == "PURCHASE_RETURN").Sum(x => x.Net),
+                g.Where(x => x.InvoiceType == "PURCHASE").Sum(x => x.TaxAmount)
+                    - g.Where(x => x.InvoiceType == "PURCHASE_RETURN").Sum(x => x.TaxAmount)))
+            .ToList();
 
         return new InvKdvReportDto(
             salesTax,
             purchaseTax,
             purchaseTax,
             salesTax - purchaseTax,
-            rows);
+            rows,
+            rateGroups);
     }
 
     public async Task<bool> DeleteAsync(long id, CancellationToken ct = default)
@@ -294,8 +347,51 @@ public class InvInvoiceService(
         invoice.IsDeleted = true;
         invoice.Status = "CANCELLED";
         invoice.DeletedAt = DateTime.UtcNow;
+
+        await StkStockPostingService.ReverseForInvoiceAsync(db, id, ct);
         await db.SaveChangesAsync(ct);
         return true;
+    }
+
+    public async Task<InvInvoiceDetailDto?> UpdateDatesAsync(
+        long id,
+        UpdateInvInvoiceDatesRequest request,
+        CancellationToken ct = default)
+    {
+        var db = Db;
+        var invoice = await db.InvInvoices.FirstOrDefaultAsync(i => i.Id == id && !i.IsDeleted, ct);
+        if (invoice is null) return null;
+
+        invoice.DocumentDate = request.DocumentDate;
+        if (invoice.PaymentStatus == "ODENDI")
+            invoice.DueDate = request.DocumentDate;
+        else
+            invoice.DueDate = request.DueDate;
+
+        invoice.UpdatedAt = DateTime.UtcNow;
+
+        var movements = await db.CariMovements
+            .Where(m => !m.IsDeleted && m.DocumentModule == "INV" && m.DocumentId == id)
+            .ToListAsync(ct);
+
+        foreach (var movement in movements)
+        {
+            movement.MovementDate = request.DocumentDate;
+            movement.DueDate = invoice.PaymentStatus == "ODENDI"
+                ? request.DocumentDate
+                : request.DueDate;
+        }
+
+        var stockMoves = await db.StkStockMovements
+            .Where(m => !m.IsDeleted && m.DocumentModule == "INV" && m.DocumentId == id)
+            .ToListAsync(ct);
+
+        var movementDateTime = request.DocumentDate.ToDateTime(TimeOnly.MinValue);
+        foreach (var stockMove in stockMoves)
+            stockMove.MovementDate = movementDateTime;
+
+        await db.SaveChangesAsync(ct);
+        return await GetByIdAsync(id, ct);
     }
 
     private static async Task<string> GenerateDocumentNoAsync(
@@ -304,7 +400,14 @@ public class InvInvoiceService(
         DateOnly documentDate,
         CancellationToken ct)
     {
-        var prefix = invoiceType == "SALES" ? "SF" : "AF";
+        var prefix = invoiceType switch
+        {
+            "SALES" => "SF",
+            "PURCHASE" => "AF",
+            "SALES_RETURN" => "SIF",
+            "PURCHASE_RETURN" => "AIF",
+            _ => "BF",
+        };
         var year = documentDate.Year;
         var pattern = $"{prefix}-{year}-";
 
