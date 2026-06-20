@@ -67,7 +67,9 @@ public class StkItemService(
             return null;
 
         var stock = await GetStockQuantityAsync(db, item.Id, ct);
-        return MapDetail(item, stock);
+        var userNames = await AuditHelper.LoadUserNamesAsync(db, [item.CreatedBy, item.UpdatedBy], ct);
+        return MapDetail(item, stock, AuditHelper.BuildAudit(
+            item.CreatedAt, item.CreatedBy, item.UpdatedAt, item.UpdatedBy, userNames));
     }
 
     public async Task<StkItemDetailDto?> GetByBarcodeAsync(string barcode, CancellationToken ct = default)
@@ -80,7 +82,9 @@ public class StkItemService(
             return null;
 
         var stock = await GetStockQuantityAsync(db, item.Id, ct);
-        return MapDetail(item, stock);
+        var userNames = await AuditHelper.LoadUserNamesAsync(db, [item.CreatedBy, item.UpdatedBy], ct);
+        return MapDetail(item, stock, AuditHelper.BuildAudit(
+            item.CreatedAt, item.CreatedBy, item.UpdatedAt, item.UpdatedBy, userNames));
     }
 
     public async Task<StkItemDetailDto> CreateAsync(
@@ -188,6 +192,10 @@ public class StkItemService(
         if (item is null)
             return false;
 
+        var hasMovements = await db.StkStockMovements.AnyAsync(m => m.ItemId == id && !m.IsDeleted, ct);
+        if (hasMovements)
+            throw new InvalidOperationException("Stok hareketi olan kart silinemez.");
+
         item.IsDeleted = true;
         item.DeletedAt = DateTime.UtcNow;
         item.DeletedBy = tenant.GetOrgUserId();
@@ -197,7 +205,7 @@ public class StkItemService(
         return true;
     }
 
-    private static StkItemDetailDto MapDetail(StkItem item, decimal stock) =>
+    private static StkItemDetailDto MapDetail(StkItem item, decimal stock, AuditInfoDto? audit = null) =>
         new(
             item.Id,
             item.Code,
@@ -220,7 +228,8 @@ public class StkItemService(
             item.GtipCode,
             item.Description,
             stock,
-            item.IsActive);
+            item.IsActive,
+            audit);
 
     private static async Task<Dictionary<long, decimal>> GetStockQuantitiesAsync(
         TenantDbContext db,

@@ -1,4 +1,5 @@
 import { api } from './client'
+import type { AuditInfo } from '../components/ui/AuditInfoPanel'
 
 export interface StkItemListItem {
   id: number
@@ -46,6 +47,7 @@ export interface StkItemDetail {
   salesPrice?: number | null
   stockQuantity: number
   isActive: boolean
+  audit?: AuditInfo | null
 }
 
 export interface UpdateStkItemRequest {
@@ -111,5 +113,19 @@ export async function fetchStkMovements(params?: {
       movementType: params?.movementType || undefined,
     },
   })
+  return data
+}
+
+export type CreateStkManualMovementRequest = {
+  itemId: number
+  warehouseId: number
+  movementType: 'IN' | 'OUT' | 'ADJUSTMENT'
+  quantity: number
+  movementDate?: string
+  description?: string
+}
+
+export async function createStkManualMovement(body: CreateStkManualMovementRequest) {
+  const { data } = await api.post<StkStockMovementListItem>('/api/stk/movements', body)
   return data
 }

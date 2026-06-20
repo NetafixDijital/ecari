@@ -30,6 +30,24 @@ public class StkController(
             warehouseId, itemId, search, dateFrom, dateTo, movementType, ct));
     }
 
+    [HttpPost("movements")]
+    public async Task<ActionResult<StkStockMovementListItemDto>> CreateMovement(
+        [FromBody] CreateStkManualMovementRequest request,
+        CancellationToken ct)
+    {
+        if (!tenant.HasTenantContext())
+            return BadRequest(new { message = "Önce şirket seçin: POST /api/auth/select-company" });
+
+        try
+        {
+            return Ok(await movementService.CreateManualAsync(request, ct));
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
+    }
+
     [HttpGet("items")]
     public async Task<ActionResult<IReadOnlyList<StkItemListItemDto>>> List(
         [FromQuery] string? search,
@@ -115,9 +133,16 @@ public class StkController(
         if (!tenant.HasTenantContext())
             return BadRequest(new { message = "Önce şirket seçin: POST /api/auth/select-company" });
 
-        if (!await stkService.DeleteAsync(id, ct))
-            return NotFound();
+        try
+        {
+            if (!await stkService.DeleteAsync(id, ct))
+                return NotFound();
 
-        return NoContent();
+            return NoContent();
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
     }
 }

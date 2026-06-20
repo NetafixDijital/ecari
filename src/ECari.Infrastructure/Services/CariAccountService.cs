@@ -267,7 +267,11 @@ public class CariAccountService(
             account.Phone,
             account.Email,
             balance,
-            account.IsActive);
+            account.IsActive,
+            account.IsEinvoiceUser,
+            account.EinvoiceAlias,
+            account.EwaybillAlias,
+            account.GibEinvoiceCheckedAt);
 
     private static async Task<int?> ResolveDueDaysAsync(
         TenantDbContext db,

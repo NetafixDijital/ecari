@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { fetchCariAccounts, type CariAccountListItem } from '../../api/cari'
-import { fetchWarehouses } from '../../api/cfg'
+import { fetchActiveWarehouses } from '../../api/cfg'
 import CariInfoPanel from '../../components/cari/CariInfoPanel'
 import CariSecModal from '../../components/cari/CariSecModal'
 import { fetchTaxRates, fetchUnits, type LookupItem, type TaxRate } from '../../api/core'
@@ -66,7 +66,7 @@ export default function SiparisYeniPage() {
   const [items, setItems] = useState<StkItemListItem[]>([])
   const [units, setUnits] = useState<LookupItem[]>([])
   const [taxRates, setTaxRates] = useState<TaxRate[]>([])
-  const [warehouses, setWarehouses] = useState<Awaited<ReturnType<typeof fetchWarehouses>>>([])
+  const [warehouses, setWarehouses] = useState<Awaited<ReturnType<typeof fetchActiveWarehouses>>>([])
   const [selectedCari, setSelectedCari] = useState<CariAccountListItem | null>(null)
   const [documentDate, setDocumentDate] = useState(todayIso())
   const [deliveryDate, setDeliveryDate] = useState(addDaysIso(todayIso(), 30))
@@ -79,25 +79,44 @@ export default function SiparisYeniPage() {
   const [stkLoadingKey, setStkLoadingKey] = useState<string | null>(null)
 
   useEffect(() => {
-    Promise.all([
+    Promise.allSettled([
       fetchCariAccounts(),
       fetchStkItems(),
       fetchUnits(),
       fetchTaxRates(),
-      fetchWarehouses(),
-    ])
-      .then(([cariData, stkData, unitData, taxData, whData]) => {
-        setCariler(cariData)
-        setItems(stkData)
-        setUnits(unitData)
-        setTaxRates(taxData)
-        setWarehouses(whData)
-        setLines([newLine(unitData, taxData)])
-        const defaultWh = whData.find((w) => w.isDefault) ?? whData[0]
+      fetchActiveWarehouses(),
+    ]).then((results) => {
+      const errors: string[] = []
+      const [cariRes, stkRes, unitRes, taxRes, whRes] = results
+
+      if (cariRes.status === 'fulfilled') setCariler(cariRes.value)
+      else errors.push('Cari listesi')
+
+      if (stkRes.status === 'fulfilled') setItems(stkRes.value)
+      else errors.push('Stok listesi')
+
+      if (unitRes.status === 'fulfilled') {
+        setUnits(unitRes.value)
+        if (taxRes.status === 'fulfilled') {
+          setTaxRates(taxRes.value)
+          setLines([newLine(unitRes.value, taxRes.value)])
+        } else {
+          errors.push('KDV oranları')
+        }
+      } else {
+        errors.push('Birimler')
+      }
+
+      if (whRes.status === 'fulfilled') {
+        setWarehouses(whRes.value)
+        const defaultWh = whRes.value.find((w) => w.isDefault) ?? whRes.value[0]
         if (defaultWh) setWarehouseId(defaultWh.id)
-      })
-      .catch(() => setError('Form verileri yüklenemedi.'))
-      .finally(() => setLoading(false))
+      }
+
+      if (errors.length > 0) {
+        setError(`Bazı form verileri yüklenemedi: ${errors.join(', ')}.`)
+      }
+    }).finally(() => setLoading(false))
   }, [])
 
   const totals = useMemo(() => {

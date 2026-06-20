@@ -87,7 +87,14 @@ export default function AppSidebar({ panelOpen }: { panelOpen: boolean }) {
 
   useEffect(() => {
     setOpenTab(activeTab)
-  }, [activeTab])
+    const nextExpanded: Record<string, boolean> = {}
+    for (const group of orderedModuleGroups) {
+      if (isGroupActive(group)) nextExpanded[group.id] = true
+    }
+    if (Object.keys(nextExpanded).length > 0) {
+      setExpandedGroups((prev) => ({ ...prev, ...nextExpanded }))
+    }
+  }, [activeTab, pathname, orderedModuleGroups])
 
   function handleLogout() {
     logout()

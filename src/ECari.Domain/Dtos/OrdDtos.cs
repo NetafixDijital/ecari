@@ -42,16 +42,38 @@ public record OrdOrderDetailDto(
     string StatusKey,
     string StatusLabel,
     string? Notes,
-    IReadOnlyList<OrdOrderLineDto> Lines);
+    IReadOnlyList<OrdOrderLineDto> Lines,
+    AuditInfoDto? Audit = null);
 
 public record OrdOrderLineDto(
+    long Id,
     int LineNo,
     string Description,
     string UnitName,
     decimal Quantity,
+    decimal DeliveredQuantity,
+    decimal InvoicedQuantity,
+    decimal RemainingDeliveryQuantity,
+    decimal RemainingInvoiceQuantity,
     decimal UnitPrice,
     decimal TaxAmount,
     decimal LineTotal);
+
+public record ConvertOrdLineQuantityRequest(long LineId, decimal Quantity);
+
+public record ConvertOrdRequest(IReadOnlyList<ConvertOrdLineQuantityRequest>? Lines);
+
+public record OrdDeliveryReportItemDto(
+    long Id,
+    string DocumentNo,
+    string OrderType,
+    DateOnly DocumentDate,
+    DateOnly? DeliveryDate,
+    decimal GrandTotal,
+    string StatusKey,
+    string StatusLabel,
+    decimal TotalQuantity,
+    decimal DeliveredQuantity);
 
 public record ConvertOrdToDlnResultDto(long OrderId, long DeliveryNoteId, string DeliveryNoteDocumentNo);
 

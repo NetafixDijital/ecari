@@ -1,5 +1,6 @@
 using ECari.Infrastructure.Auth;
 using ECari.Infrastructure.Data;
+using ECari.Infrastructure.Integrations.Edm;
 using ECari.Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -14,6 +15,7 @@ public static class DependencyInjection
         IConfiguration configuration)
     {
         services.Configure<JwtSettings>(configuration.GetSection(JwtSettings.SectionName));
+        services.Configure<EdmOptions>(configuration.GetSection(EdmOptions.SectionName));
 
         var systemConnection = configuration.GetConnectionString("SystemDb")
             ?? throw new InvalidOperationException("SystemDb connection string is not configured.");
@@ -43,6 +45,12 @@ public static class DependencyInjection
         services.AddScoped<CshAccountService>();
         services.AddScoped<GlobalSearchService>();
         services.AddScoped<JwtTokenService>();
+        services.AddSingleton<CredentialProtector>();
+        services.AddSingleton<EdmRequestHeaderBuilder>();
+        services.AddSingleton<EdmSessionManager>();
+        services.AddHttpClient<EdmSoapClient>();
+        services.AddScoped<EblIntegratorService>();
+        services.AddScoped<EblDocumentService>();
 
         return services;
     }

@@ -1,6 +1,12 @@
 import { useEffect, useState } from 'react'
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
 import { fetchInvoice, updateInvoiceDates, type InvInvoiceDetail } from '../../api/inv'
+import {
+  fetchInvoiceEblRecord,
+  refreshInvoiceEblStatus,
+  sendInvoiceToEdm,
+  type EblEinvoiceRecord,
+} from '../../api/ebl'
 import { apiErrorMessage } from '../../utils/apiError'
 import { formatDate, formatMoneyOptional, formatQuantity, formatTry, statusBadge } from '../../utils/format'
 
@@ -15,6 +21,9 @@ export default function FaturaOnizlemePage() {
   const [dueDate, setDueDate] = useState('')
   const [savingDates, setSavingDates] = useState(false)
   const [dateMessage, setDateMessage] = useState('')
+  const [eblRecord, setEblRecord] = useState<EblEinvoiceRecord | null>(null)
+  const [eblLoading, setEblLoading] = useState(false)
+  const [eblMessage, setEblMessage] = useState('')
 
   const invoiceId = Number(id)
   const isSales = invoice?.invoiceType === 'SALES' || invoice?.invoiceType === 'SALES_RETURN'
@@ -44,6 +53,13 @@ export default function FaturaOnizlemePage() {
   }, [invoiceId])
 
   useEffect(() => {
+    if (!invoiceId || Number.isNaN(invoiceId) || !isSales) return
+    fetchInvoiceEblRecord(invoiceId)
+      .then(setEblRecord)
+      .catch(() => setEblRecord(null))
+  }, [invoiceId, isSales])
+
+  useEffect(() => {
     if (invoice && (location.state as { print?: boolean } | null)?.print) {
       window.setTimeout(() => window.print(), 300)
     }
@@ -51,6 +67,38 @@ export default function FaturaOnizlemePage() {
 
   function handlePrint() {
     window.print()
+  }
+
+  async function handleSendEinvoice() {
+    if (!invoice) return
+    setEblLoading(true)
+    setEblMessage('')
+    setError('')
+    try {
+      const result = await sendInvoiceToEdm(invoice.id)
+      setEblMessage(result.message)
+      const record = await fetchInvoiceEblRecord(invoice.id)
+      setEblRecord(record)
+    } catch (err: unknown) {
+      setError(apiErrorMessage(err, 'e-Fatura gönderilemedi.'))
+    } finally {
+      setEblLoading(false)
+    }
+  }
+
+  async function handleRefreshEinvoiceStatus() {
+    if (!invoice) return
+    setEblLoading(true)
+    setEblMessage('')
+    try {
+      const record = await refreshInvoiceEblStatus(invoice.id)
+      setEblRecord(record)
+      setEblMessage(record.statusMessage ?? 'Durum güncellendi.')
+    } catch (err: unknown) {
+      setError(apiErrorMessage(err, 'Durum sorgulanamadı.'))
+    } finally {
+      setEblLoading(false)
+    }
   }
 
   async function handleSaveDates() {
@@ -135,6 +183,29 @@ export default function FaturaOnizlemePage() {
           </nav>
         </div>
         <div className="d-flex gap-2 flex-wrap">
+          {isSales && (
+            <>
+              <button
+                type="button"
+                className="btn btn-success"
+                onClick={handleSendEinvoice}
+                disabled={eblLoading || eblRecord?.status === 'SENT' || eblRecord?.status === 'ACCEPTED'}
+              >
+                <i className="ti ti-send me-1" />
+                {eblLoading ? 'Gönderiliyor...' : 'e-Fatura Gönder'}
+              </button>
+              {eblRecord && (
+                <button
+                  type="button"
+                  className="btn btn-label-info"
+                  onClick={handleRefreshEinvoiceStatus}
+                  disabled={eblLoading}
+                >
+                  Durum Sorgula
+                </button>
+              )}
+            </>
+          )}
           <button type="button" className="btn btn-label-secondary" onClick={handlePrint}>
             <i className="ti ti-printer me-1" /> Yazdır
           </button>
@@ -143,6 +214,24 @@ export default function FaturaOnizlemePage() {
           </Link>
         </div>
       </div>
+
+      {isSales && (eblRecord || eblMessage) && (
+        <div className="alert alert-info py-2 d-print-none">
+          {eblRecord && (
+            <>
+              <strong>e-Fatura:</strong> {eblRecord.status}
+              {eblRecord.statusMessage ? ` — ${eblRecord.statusMessage}` : ''}
+              {eblRecord.uuid && (
+                <>
+                  <br />
+                  <span className="small text-body-secondary">ETTN: {eblRecord.uuid}</span>
+                </>
+              )}
+            </>
+          )}
+          {eblMessage && !eblRecord && <span>{eblMessage}</span>}
+        </div>
+      )}
 
       <div className="card">
         <div className="card-body p-4 p-md-5">

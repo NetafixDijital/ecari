@@ -33,7 +33,11 @@ public record CariAccountDetailDto(
     string? Phone,
     string? Email,
     decimal Balance,
-    bool IsActive);
+    bool IsActive,
+    bool IsEinvoiceUser,
+    string? EinvoiceAlias,
+    string? EwaybillAlias,
+    DateTime? GibEinvoiceCheckedAt);
 
 public record CreateCariAccountRequest(
     string PersonType,

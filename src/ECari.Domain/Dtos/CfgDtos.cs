@@ -16,7 +16,9 @@ public record CompanyProfileDto(
     byte FiscalYearStartMonth,
     bool IsEinvoiceUser,
     bool IsEarchiveUser,
-    bool IsEwaybillUser);
+    bool IsEwaybillUser,
+    string? EinvoiceAlias,
+    string? EwaybillAlias);
 
 public record UpdateCompanyProfileRequest(
     string LegalName,
@@ -33,11 +35,27 @@ public record UpdateCompanyProfileRequest(
     byte FiscalYearStartMonth,
     bool IsEinvoiceUser,
     bool IsEarchiveUser,
-    bool IsEwaybillUser);
+    bool IsEwaybillUser,
+    string? EinvoiceAlias,
+    string? EwaybillAlias);
 
 public record WarehouseDto(
     long Id,
     long BranchId,
+    string Code,
+    string Name,
+    string? Address,
+    bool IsDefault,
+    bool IsActive);
+
+public record CreateWarehouseRequest(
+    string Code,
+    string Name,
+    string? Address,
+    bool IsDefault,
+    bool IsActive);
+
+public record UpdateWarehouseRequest(
     string Code,
     string Name,
     string? Address,

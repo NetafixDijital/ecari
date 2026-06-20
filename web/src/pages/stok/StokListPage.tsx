@@ -18,6 +18,7 @@ import { formatMoneyOptional, formatQuantity, statusBadge } from '../../utils/fo
 import { useToast } from '../../context/ToastContext'
 import { apiErrorMessage } from '../../utils/apiError'
 import StokListModals from './StokListModals'
+import StokMovementModal, { closeStokMovementModal, openStokMovementModal } from './StokMovementModal'
 
 export default function StokListPage() {
   const toast = useToast()
@@ -33,6 +34,7 @@ export default function StokListPage() {
   const [createError, setCreateError] = useState('')
   const [updateError, setUpdateError] = useState('')
   const [deletingId, setDeletingId] = useState<number | null>(null)
+  const [movementItem, setMovementItem] = useState<StkItemListItem | null>(null)
 
   const loadItems = useCallback(() => {
     setLoading(true)
@@ -117,8 +119,8 @@ export default function StokListPage() {
       await deleteStkItem(row.id)
       toast.success('Silindi', `"${row.name}" stok kartı kaldırıldı.`)
       loadItems()
-    } catch {
-      toast.error('Silme başarısız', 'Stok silinemedi.')
+    } catch (err: unknown) {
+      toast.error('Silme başarısız', apiErrorMessage(err, 'Stok silinemedi.'))
     } finally {
       setDeletingId(null)
     }
@@ -188,7 +190,13 @@ export default function StokListPage() {
                       <td className="text-center">
                         <div className="d-flex justify-content-center gap-1">
                           <IconActionButton icon="ti-edit" color="primary" title="Düzenle" onClick={() => handleEdit(row)} />
-                          <Link to={`/depo/hareketler?itemId=${row.id}`} className="btn btn-icon btn-sm btn-label-info" title="Hareketler">
+                          <IconActionButton
+                            icon="ti-arrows-exchange"
+                            color="warning"
+                            title="Stok Hareketi"
+                            onClick={() => openStokMovementModal(row, setMovementItem)}
+                          />
+                          <Link to={`/depo/hareketler?itemId=${row.id}`} className="btn btn-icon btn-sm btn-label-info" title="Hareket Geçmişi">
                             <i className="ti ti-history" />
                           </Link>
                           <IconActionButton
@@ -219,6 +227,15 @@ export default function StokListPage() {
         updating={updating}
         createError={createError}
         updateError={updateError}
+      />
+      <StokMovementModal
+        item={movementItem}
+        onSaved={() => {
+          closeStokMovementModal()
+          setMovementItem(null)
+          toast.success('Kayıt oluşturuldu', 'Stok hareketi kaydedildi.')
+          loadItems()
+        }}
       />
     </div>
   )

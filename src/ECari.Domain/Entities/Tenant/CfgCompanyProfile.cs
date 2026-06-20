@@ -19,6 +19,8 @@ public class CfgCompanyProfile
     public bool IsEinvoiceUser { get; set; }
     public bool IsEarchiveUser { get; set; }
     public bool IsEwaybillUser { get; set; }
+    public string? EinvoiceAlias { get; set; }
+    public string? EwaybillAlias { get; set; }
     public DateTime CreatedAt { get; set; }
     public DateTime? UpdatedAt { get; set; }
     public byte[] RowVersion { get; set; } = Array.Empty<byte>();

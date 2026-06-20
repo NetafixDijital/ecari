@@ -58,6 +58,7 @@ export const moduleGroups: MenuGroup[] = [
     children: [
       { id: 'siparis-liste', label: 'Sipariş Listesi', icon: 'ti-shopping-cart', to: '/siparis' },
       { id: 'siparis-yeni', label: 'Yeni Sipariş', icon: 'ti-shopping-cart', to: '/siparis/yeni' },
+      { id: 'siparis-teslim-rapor', label: 'Teslim Raporu', icon: 'ti-report-analytics', to: '/siparis/teslim-raporu' },
     ],
   },
   {
@@ -170,6 +171,7 @@ export const settingsLinks: MenuLink[] = [
   { id: 'ayarlar-genel', label: 'Genel Ayarlar', icon: 'ti-settings', to: '/ayarlar', tone: 'primary' },
   { id: 'ayarlar-kullanicilar', label: 'Kullanıcılar', icon: 'ti-users', to: '/ayarlar/kullanicilar', tone: 'purple' },
   { id: 'ayarlar-menu', label: 'Menü Düzeni', icon: 'ti-layout-sidebar', to: '/ayarlar/menu', tone: 'info' },
+  { id: 'ayarlar-edm', label: 'E-Belge (EDM)', icon: 'ti-file-invoice', to: '/ayarlar/e-belge', tone: 'success' },
   { id: 'ayarlar-ozel', label: 'Özel Ayarlar', icon: 'ti-adjustments', to: '/ayarlar/ozel', tone: 'warning' },
 ]
 

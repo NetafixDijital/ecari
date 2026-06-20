@@ -36,7 +36,16 @@ public record StkItemDetailDto(
     string? GtipCode,
     string? Description,
     decimal StockQuantity,
-    bool IsActive);
+    bool IsActive,
+    AuditInfoDto? Audit = null);
+
+public record CreateStkManualMovementRequest(
+    long ItemId,
+    long WarehouseId,
+    string MovementType,
+    decimal Quantity,
+    DateOnly? MovementDate,
+    string? Description);
 
 public record CreateStkItemRequest(
     string Name,

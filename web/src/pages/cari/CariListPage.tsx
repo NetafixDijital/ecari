@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { fetchCities, fetchPaymentTerms, type City, type PaymentTerm } from '../../api/core'
 import {
   createCariAccount,
@@ -15,6 +16,7 @@ import {
 } from '../../api/cari'
 import { fetchCshAccounts, recordPayment } from '../../api/csh'
 import { fetchBnkAccounts } from '../../api/bnk'
+import { checkCariGibUser } from '../../api/ebl'
 import IconActionButton from '../../components/ui/IconActionButton'
 import TableSearchToolbar from '../../components/ui/TableSearchToolbar'
 import { displayTaxId, formatCariBalance, personTypeBadge } from '../../utils/format'
@@ -44,6 +46,7 @@ function todayIso() {
 }
 
 export default function CariListPage() {
+  const navigate = useNavigate()
   const toast = useToast()
   const [items, setItems] = useState<CariAccountListItem[]>([])
   const [cities, setCities] = useState<City[]>([])
@@ -78,6 +81,7 @@ export default function CariListPage() {
   const [virmanAmount, setVirmanAmount] = useState('')
   const [virmanDescription, setVirmanDescription] = useState('')
   const [virmanSaving, setVirmanSaving] = useState(false)
+  const [gibCheckingId, setGibCheckingId] = useState<number | null>(null)
   const [virmanError, setVirmanError] = useState('')
 
   const loadItems = useCallback(() => {
@@ -205,6 +209,30 @@ export default function CariListPage() {
         .catch(() => setReportMovements([]))
         .finally(() => setReportLoading(false))
       openModal('modalHareketRaporu')
+      return
+    }
+    if (action === 'satis-fatura') {
+      navigate(`/fatura/yeni?type=satis&accountId=${row.id}`)
+      return
+    }
+    if (action === 'alis-fatura') {
+      navigate(`/fatura/yeni?type=alis&accountId=${row.id}`)
+      return
+    }
+    if (action === 'gib-check') {
+      setGibCheckingId(row.id)
+      checkCariGibUser(row.id)
+        .then((result) => {
+          toast.success(
+            result.isEinvoiceUser ? 'e-Fatura kullanıcısı' : 'Kayıt yok',
+            result.message,
+          )
+          loadItems()
+        })
+        .catch((err: unknown) => {
+          toast.error('GİB sorgusu', apiErrorMessage(err, 'GİB sorgusu başarısız.'))
+        })
+        .finally(() => setGibCheckingId(null))
     }
   }
 
@@ -394,10 +422,19 @@ export default function CariListPage() {
                       <td className="text-center">
                         <div className="d-flex justify-content-center gap-1 cari-actions flex-wrap">
                           <IconActionButton icon="ti-edit" color="primary" title="Düzenle" onClick={() => handleCariAction('edit', row)} />
+                          <IconActionButton icon="ti-file-invoice" color="success" title="Satış Faturası Oluştur" onClick={() => handleCariAction('satis-fatura', row)} />
+                          <IconActionButton icon="ti-file-invoice" color="info" title="Alış Faturası Oluştur" onClick={() => handleCariAction('alis-fatura', row)} />
                           <IconActionButton icon="ti-cash" color="success" title="Tahsilat" onClick={() => handleCariAction('tahsilat', row)} />
                           <IconActionButton icon="ti-cash-off" color="danger" title="Tediye" onClick={() => handleCariAction('tediye', row)} />
                           <IconActionButton icon="ti-arrows-exchange" color="primary" title="Virman" onClick={() => handleCariAction('virman', row)} />
                           <IconActionButton icon="ti-report-analytics" color="info" title="Hareket Raporu" onClick={() => handleCariAction('rapor', row)} />
+                          <IconActionButton
+                            icon="ti-search"
+                            color="warning"
+                            title="GİB e-Fatura Sorgula"
+                            onClick={() => handleCariAction('gib-check', row)}
+                            disabled={gibCheckingId === row.id}
+                          />
                           <IconActionButton
                             icon="ti-trash"
                             color="danger"

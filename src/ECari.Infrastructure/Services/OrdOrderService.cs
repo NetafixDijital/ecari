@@ -74,6 +74,9 @@ public class OrdOrderService(
             .Where(u => lines.Select(l => l.UnitId).Contains(u.Id))
             .ToDictionaryAsync(u => u.Id, u => u.Name, ct);
 
+        var userNames = await AuditHelper.LoadUserNamesAsync(
+            db, [order.CreatedBy, order.UpdatedBy], ct);
+
         var (key, label) = MapStatus(order.Status);
 
         return new OrdOrderDetailDto(
@@ -90,14 +93,8 @@ public class OrdOrderService(
             key,
             label,
             order.Notes,
-            lines.Select(l => new OrdOrderLineDto(
-                l.LineNo,
-                l.Description,
-                unitMap.TryGetValue(l.UnitId, out var unitName) ? unitName : "—",
-                l.Quantity,
-                l.UnitPrice,
-                l.TaxAmount,
-                l.LineTotal)).ToList());
+            lines.Select(l => MapLine(l, unitMap)).ToList(),
+            AuditHelper.BuildAudit(order.CreatedAt, order.CreatedBy, order.UpdatedAt, order.UpdatedBy, userNames));
     }
 
     public async Task<OrdOrderDetailDto> CreateAsync(CreateOrdOrderRequest request, CancellationToken ct = default)
@@ -188,7 +185,7 @@ public class OrdOrderService(
             DocumentNo = documentNo,
             DocumentDate = request.DocumentDate,
             OrderType = orderType,
-            Status = "APPROVED",
+            Status = "WAITING",
             AccountId = account.Id,
             BranchId = branchId,
             WarehouseId = warehouseId,
@@ -199,6 +196,7 @@ public class OrdOrderService(
             GrandTotal = subtotal + taxTotal,
             Notes = request.Notes,
             CreatedAt = DateTime.UtcNow,
+            CreatedBy = tenant.GetOrgUserId(),
         };
 
         db.OrdOrders.Add(order);
@@ -214,31 +212,92 @@ public class OrdOrderService(
         return (await GetByIdAsync(order.Id, ct))!;
     }
 
-    public async Task<ConvertOrdToDlnResultDto> ConvertToDeliveryNoteAsync(long id, CancellationToken ct = default)
+    public async Task<OrdOrderDetailDto> ApproveAsync(long id, CancellationToken ct = default)
     {
         var db = Db;
         var order = await db.OrdOrders.FirstOrDefaultAsync(o => o.Id == id && !o.IsDeleted, ct)
             ?? throw new InvalidOperationException("Sipariş bulunamadı.");
 
-        if (order.Status == "CANCELLED")
-            throw new InvalidOperationException("İptal edilmiş sipariş irsaliyeye dönüştürülemez.");
+        if (order.Status != "WAITING")
+            throw new InvalidOperationException("Sadece beklemedeki siparişler onaylanabilir.");
+
+        order.Status = "APPROVED";
+        order.UpdatedAt = DateTime.UtcNow;
+        order.UpdatedBy = tenant.GetOrgUserId();
+        await db.SaveChangesAsync(ct);
+
+        return (await GetByIdAsync(id, ct))!;
+    }
+
+    public async Task<IReadOnlyList<OrdDeliveryReportItemDto>> DeliveryReportAsync(
+        long accountId,
+        CancellationToken ct = default)
+    {
+        var db = Db;
+        var orders = await db.OrdOrders.AsNoTracking()
+            .Where(o => !o.IsDeleted && o.AccountId == accountId)
+            .OrderByDescending(o => o.DocumentDate)
+            .ThenByDescending(o => o.Id)
+            .ToListAsync(ct);
+
+        if (orders.Count == 0)
+            return Array.Empty<OrdDeliveryReportItemDto>();
+
+        var orderIds = orders.Select(o => o.Id).ToList();
+        var lineTotals = await db.OrdOrderLines.AsNoTracking()
+            .Where(l => orderIds.Contains(l.OrderId) && !l.IsDeleted)
+            .GroupBy(l => l.OrderId)
+            .Select(g => new
+            {
+                OrderId = g.Key,
+                TotalQuantity = g.Sum(x => x.Quantity),
+                DeliveredQuantity = g.Sum(x => x.DeliveredQuantity),
+            })
+            .ToDictionaryAsync(x => x.OrderId, ct);
+
+        return orders.Select(o =>
+        {
+            var (key, label) = MapStatus(o.Status);
+            lineTotals.TryGetValue(o.Id, out var totals);
+            return new OrdDeliveryReportItemDto(
+                o.Id,
+                o.DocumentNo,
+                o.OrderType,
+                o.DocumentDate,
+                o.DeliveryDate,
+                o.GrandTotal,
+                key,
+                label,
+                totals?.TotalQuantity ?? 0,
+                totals?.DeliveredQuantity ?? 0);
+        }).ToList();
+    }
+
+    public async Task<ConvertOrdToDlnResultDto> ConvertToDeliveryNoteAsync(
+        long id,
+        ConvertOrdRequest? request = null,
+        CancellationToken ct = default)
+    {
+        var db = Db;
+        var order = await db.OrdOrders.FirstOrDefaultAsync(o => o.Id == id && !o.IsDeleted, ct)
+            ?? throw new InvalidOperationException("Sipariş bulunamadı.");
+
+        EnsureConvertible(order);
 
         var lines = await db.OrdOrderLines
             .Where(l => l.OrderId == id && !l.IsDeleted)
             .OrderBy(l => l.LineNo)
             .ToListAsync(ct);
 
-        var shipLines = lines
-            .Where(l => l.Quantity > l.DeliveredQuantity)
-            .Select(l => new CreateDlnDeliveryNoteLineRequest(
-                l.ItemId,
-                l.Description,
-                l.Quantity - l.DeliveredQuantity,
-                l.UnitId))
-            .ToList();
+        var quantities = ResolveLineQuantities(
+            lines,
+            request?.Lines,
+            l => l.Quantity - l.DeliveredQuantity);
+
+        var shipLines = BuildDeliveryNoteLines(lines, quantities);
 
         if (shipLines.Count == 0)
-            throw new InvalidOperationException("Sevk edilecek kalem kalmadı.");
+            throw new InvalidOperationException("Sevk edilecek kalem seçilmedi.");
 
         var dln = await dlnService.CreateAsync(new CreateDlnDeliveryNoteRequest(
             order.OrderType,
@@ -254,55 +313,40 @@ public class OrdOrderService(
             .OrderBy(l => l.LineNo)
             .ToListAsync(ct);
 
-        var ordLineIdx = 0;
-        foreach (var dlnLine in dlnLineEntities)
-        {
-            while (ordLineIdx < lines.Count && lines[ordLineIdx].Quantity <= lines[ordLineIdx].DeliveredQuantity)
-                ordLineIdx++;
-
-            if (ordLineIdx >= lines.Count) break;
-
-            var ordLine = lines[ordLineIdx];
-            dlnLine.SourceLineId = ordLine.Id;
-            ordLine.DeliveredQuantity += dlnLine.Quantity;
-            ordLineIdx++;
-        }
-
-        var allDelivered = lines.All(l => l.DeliveredQuantity >= l.Quantity);
-        order.Status = allDelivered ? "COMPLETED" : "PARTIAL";
+        ApplyDeliveredQuantities(lines, quantities, dlnLineEntities);
+        UpdateOrderStatusAfterDelivery(order, lines);
         order.UpdatedAt = DateTime.UtcNow;
+        order.UpdatedBy = tenant.GetOrgUserId();
         await db.SaveChangesAsync(ct);
 
         return new ConvertOrdToDlnResultDto(order.Id, dln.Id, dln.DocumentNo);
     }
 
-    public async Task<ConvertOrdToInvResultDto> ConvertToInvoiceAsync(long id, CancellationToken ct = default)
+    public async Task<ConvertOrdToInvResultDto> ConvertToInvoiceAsync(
+        long id,
+        ConvertOrdRequest? request = null,
+        CancellationToken ct = default)
     {
         var db = Db;
         var order = await db.OrdOrders.FirstOrDefaultAsync(o => o.Id == id && !o.IsDeleted, ct)
             ?? throw new InvalidOperationException("Sipariş bulunamadı.");
 
-        if (order.Status == "CANCELLED")
-            throw new InvalidOperationException("İptal edilmiş sipariş faturalandırılamaz.");
+        EnsureConvertible(order);
 
         var lines = await db.OrdOrderLines
             .Where(l => l.OrderId == id && !l.IsDeleted)
             .OrderBy(l => l.LineNo)
             .ToListAsync(ct);
 
-        var invLines = lines
-            .Where(l => l.Quantity > l.InvoicedQuantity)
-            .Select(l => new CreateInvInvoiceLineRequest(
-                l.ItemId,
-                l.Description,
-                l.Quantity - l.InvoicedQuantity,
-                l.UnitId,
-                l.UnitPrice,
-                l.TaxRateId))
-            .ToList();
+        var quantities = ResolveLineQuantities(
+            lines,
+            request?.Lines,
+            l => l.Quantity - l.InvoicedQuantity);
+
+        var invLines = BuildInvoiceLines(lines, quantities);
 
         if (invLines.Count == 0)
-            throw new InvalidOperationException("Faturalanacak kalem kalmadı.");
+            throw new InvalidOperationException("Faturalanacak kalem seçilmedi.");
 
         var invoiceType = order.OrderType == "PURCHASE" ? "PURCHASE" : "SALES";
         var invoice = await invService.CreateAsync(new CreateInvInvoiceRequest(
@@ -314,14 +358,15 @@ public class OrdOrderService(
             invLines,
             "BEKLIYOR"), ct);
 
-        foreach (var line in lines.Where(l => l.Quantity > l.InvoicedQuantity))
-            line.InvoicedQuantity = line.Quantity;
+        foreach (var line in lines)
+        {
+            if (quantities.TryGetValue(line.Id, out var qty))
+                line.InvoicedQuantity += qty;
+        }
 
-        var allInvoiced = lines.All(l => l.InvoicedQuantity >= l.Quantity);
-        if (allInvoiced && order.Status != "CANCELLED")
-            order.Status = "COMPLETED";
-
+        UpdateOrderStatusAfterInvoice(order, lines);
         order.UpdatedAt = DateTime.UtcNow;
+        order.UpdatedBy = tenant.GetOrgUserId();
         await db.SaveChangesAsync(ct);
 
         return new ConvertOrdToInvResultDto(order.Id, invoice.Id, invoice.DocumentNo);
@@ -341,6 +386,119 @@ public class OrdOrderService(
         order.DeletedAt = DateTime.UtcNow;
         await db.SaveChangesAsync(ct);
         return true;
+    }
+
+    private static OrdOrderLineDto MapLine(OrdOrderLine l, IReadOnlyDictionary<long, string> unitMap) =>
+        new(
+            l.Id,
+            l.LineNo,
+            l.Description,
+            unitMap.TryGetValue(l.UnitId, out var unitName) ? unitName : "—",
+            l.Quantity,
+            l.DeliveredQuantity,
+            l.InvoicedQuantity,
+            Math.Max(0, l.Quantity - l.DeliveredQuantity),
+            Math.Max(0, l.Quantity - l.InvoicedQuantity),
+            l.UnitPrice,
+            l.TaxAmount,
+            l.LineTotal);
+
+    private static void EnsureConvertible(OrdOrder order)
+    {
+        if (order.Status == "CANCELLED")
+            throw new InvalidOperationException("İptal edilmiş sipariş dönüştürülemez.");
+        if (order.Status == "WAITING")
+            throw new InvalidOperationException("Beklemedeki sipariş önce onaylanmalı.");
+    }
+
+    private static Dictionary<long, decimal> ResolveLineQuantities(
+        IReadOnlyList<OrdOrderLine> lines,
+        IReadOnlyList<ConvertOrdLineQuantityRequest>? selections,
+        Func<OrdOrderLine, decimal> remainingFn)
+    {
+        var lineMap = lines.ToDictionary(l => l.Id);
+
+        if (selections is null || selections.Count == 0)
+        {
+            return lines
+                .Where(l => remainingFn(l) > 0)
+                .ToDictionary(l => l.Id, remainingFn);
+        }
+
+        var result = new Dictionary<long, decimal>();
+        foreach (var selection in selections)
+        {
+            if (!lineMap.TryGetValue(selection.LineId, out var line))
+                throw new InvalidOperationException("Geçersiz sipariş kalemi.");
+
+            var remaining = remainingFn(line);
+            if (selection.Quantity <= 0)
+                throw new InvalidOperationException($"{line.Description}: miktar sıfırdan büyük olmalı.");
+            if (selection.Quantity > remaining)
+                throw new InvalidOperationException($"{line.Description}: en fazla {remaining} birim seçilebilir.");
+
+            result[line.Id] = selection.Quantity;
+        }
+
+        return result;
+    }
+
+    private static List<CreateDlnDeliveryNoteLineRequest> BuildDeliveryNoteLines(
+        IReadOnlyList<OrdOrderLine> lines,
+        IReadOnlyDictionary<long, decimal> quantities) =>
+        lines
+            .Where(l => quantities.ContainsKey(l.Id))
+            .Select(l => new CreateDlnDeliveryNoteLineRequest(
+                l.ItemId,
+                l.Description,
+                quantities[l.Id],
+                l.UnitId))
+            .ToList();
+
+    private static List<CreateInvInvoiceLineRequest> BuildInvoiceLines(
+        IReadOnlyList<OrdOrderLine> lines,
+        IReadOnlyDictionary<long, decimal> quantities) =>
+        lines
+            .Where(l => quantities.ContainsKey(l.Id))
+            .Select(l => new CreateInvInvoiceLineRequest(
+                l.ItemId,
+                l.Description,
+                quantities[l.Id],
+                l.UnitId,
+                l.UnitPrice,
+                l.TaxRateId))
+            .ToList();
+
+    private static void ApplyDeliveredQuantities(
+        IReadOnlyList<OrdOrderLine> lines,
+        IReadOnlyDictionary<long, decimal> quantities,
+        IReadOnlyList<DlnDeliveryNoteLine> dlnLines)
+    {
+        var lineMap = lines.ToDictionary(l => l.Id);
+        var idx = 0;
+        foreach (var pair in quantities)
+        {
+            if (!lineMap.TryGetValue(pair.Key, out var ordLine))
+                continue;
+
+            if (idx < dlnLines.Count)
+                dlnLines[idx].SourceLineId = ordLine.Id;
+
+            ordLine.DeliveredQuantity += pair.Value;
+            idx++;
+        }
+    }
+
+    private static void UpdateOrderStatusAfterDelivery(OrdOrder order, IReadOnlyList<OrdOrderLine> lines)
+    {
+        var allDelivered = lines.All(l => l.DeliveredQuantity >= l.Quantity);
+        order.Status = allDelivered ? "COMPLETED" : "PARTIAL";
+    }
+
+    private static void UpdateOrderStatusAfterInvoice(OrdOrder order, IReadOnlyList<OrdOrderLine> lines)
+    {
+        var allInvoiced = lines.All(l => l.InvoicedQuantity >= l.Quantity);
+        order.Status = allInvoiced ? "COMPLETED" : "PARTIAL";
     }
 
     private static async Task<string> GenerateDocumentNoAsync(
@@ -373,10 +531,11 @@ public class OrdOrderService(
     private static (string Key, string Label) MapStatus(string status) => status switch
     {
         "DRAFT" => ("taslak", "Taslak"),
-        "APPROVED" => ("onayli", "Onaylı"),
+        "WAITING" => ("beklemede", "Beklemede"),
+        "APPROVED" => ("onaylandi", "Onaylandı"),
         "PARTIAL" => ("kismi", "Kısmi Sevk"),
         "COMPLETED" => ("tamamlandi", "Tamamlandı"),
         "CANCELLED" => ("iptal", "İptal"),
-        _ => ("onayli", status),
+        _ => ("beklemede", status),
     };
 }

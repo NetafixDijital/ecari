@@ -1,4 +1,5 @@
 import { api } from './client'
+import type { AuditInfo } from '../components/ui/AuditInfoPanel'
 
 export type OrdOrderListItem = {
   id: number
@@ -10,6 +11,21 @@ export type OrdOrderListItem = {
   grandTotal: number
   statusKey: string
   statusLabel: string
+}
+
+export type OrdOrderLine = {
+  id: number
+  lineNo: number
+  description: string
+  unitName: string
+  quantity: number
+  deliveredQuantity: number
+  invoicedQuantity: number
+  remainingDeliveryQuantity: number
+  remainingInvoiceQuantity: number
+  unitPrice: number
+  taxAmount: number
+  lineTotal: number
 }
 
 export type OrdOrderDetail = {
@@ -26,15 +42,8 @@ export type OrdOrderDetail = {
   statusKey: string
   statusLabel: string
   notes: string | null
-  lines: Array<{
-    lineNo: number
-    description: string
-    unitName: string
-    quantity: number
-    unitPrice: number
-    taxAmount: number
-    lineTotal: number
-  }>
+  lines: OrdOrderLine[]
+  audit?: AuditInfo | null
 }
 
 export type CreateOrdOrderRequest = {
@@ -54,6 +63,28 @@ export type CreateOrdOrderRequest = {
   }>
 }
 
+export type ConvertOrdLineQuantity = {
+  lineId: number
+  quantity: number
+}
+
+export type ConvertOrdRequest = {
+  lines?: ConvertOrdLineQuantity[]
+}
+
+export type OrdDeliveryReportItem = {
+  id: number
+  documentNo: string
+  orderType: string
+  documentDate: string
+  deliveryDate: string | null
+  grandTotal: number
+  statusKey: string
+  statusLabel: string
+  totalQuantity: number
+  deliveredQuantity: number
+}
+
 export async function fetchOrders(type?: 'SALES' | 'PURCHASE', search?: string) {
   const { data } = await api.get<OrdOrderListItem[]>('/api/ord/orders', {
     params: { type: type || undefined, search: search || undefined },
@@ -66,8 +97,20 @@ export async function fetchOrder(id: number) {
   return data
 }
 
+export async function fetchOrderDeliveryReport(accountId: number) {
+  const { data } = await api.get<OrdDeliveryReportItem[]>('/api/ord/delivery-report', {
+    params: { accountId },
+  })
+  return data
+}
+
 export async function createOrder(body: CreateOrdOrderRequest) {
   const { data } = await api.post('/api/ord/orders', body)
+  return data
+}
+
+export async function approveOrder(id: number) {
+  const { data } = await api.post<OrdOrderDetail>(`/api/ord/orders/${id}/approve`)
   return data
 }
 
@@ -83,13 +126,19 @@ export type ConvertOrdToInvResult = {
   invoiceDocumentNo: string
 }
 
-export async function convertOrderToDeliveryNote(id: number) {
-  const { data } = await api.post<ConvertOrdToDlnResult>(`/api/ord/orders/${id}/convert-to-delivery-note`)
+export async function convertOrderToDeliveryNote(id: number, body?: ConvertOrdRequest) {
+  const { data } = await api.post<ConvertOrdToDlnResult>(
+    `/api/ord/orders/${id}/convert-to-delivery-note`,
+    body ?? {},
+  )
   return data
 }
 
-export async function convertOrderToInvoice(id: number) {
-  const { data } = await api.post<ConvertOrdToInvResult>(`/api/ord/orders/${id}/convert-to-invoice`)
+export async function convertOrderToInvoice(id: number, body?: ConvertOrdRequest) {
+  const { data } = await api.post<ConvertOrdToInvResult>(
+    `/api/ord/orders/${id}/convert-to-invoice`,
+    body ?? {},
+  )
   return data
 }
 

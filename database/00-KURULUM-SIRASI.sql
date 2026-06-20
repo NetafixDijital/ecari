@@ -22,6 +22,7 @@
     14) 13-faz7-auth.sql     (Kullanıcı & yetkilendirme tabloları)
     15) 14-svc-lines.sql     (Servis malzeme/hizmet kalemleri)
     16) 15-svc-technicians.sql (Teknisyen tanımları)
+    17) 16-ebl-edm.sql         (E-Belge / EDM tabloları, ecari_sirket_demo)
 
   Mobil: mobile/ — Flutter Faz 1 (login + cari). Bkz. mobile/README.md
 

@@ -22,6 +22,11 @@ public class CariAccount
     public string? Mobile { get; set; }
     public string? Email { get; set; }
     public long CurrencyId { get; set; }
+    public bool IsEinvoiceUser { get; set; }
+    public string? EinvoiceAlias { get; set; }
+    public string? EwaybillAlias { get; set; }
+    public DateTime? GibTitleFetchedAt { get; set; }
+    public DateTime? GibEinvoiceCheckedAt { get; set; }
     public bool IsActive { get; set; } = true;
     public string? Notes { get; set; }
     public DateTime CreatedAt { get; set; }

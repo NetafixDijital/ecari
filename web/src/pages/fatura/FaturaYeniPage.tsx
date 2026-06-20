@@ -58,6 +58,7 @@ export default function FaturaYeniPage() {
   const toast = useToast()
   const [searchParams] = useSearchParams()
   const typeParam = searchParams.get('type') ?? 'satis'
+  const accountIdParam = searchParams.get('accountId')
   const mode =
     typeParam === 'alis' || typeParam === 'satis-iade' || typeParam === 'alis-iade'
       ? typeParam
@@ -107,19 +108,40 @@ export default function FaturaYeniPage() {
   const [createCariError, setCreateCariError] = useState('')
 
   useEffect(() => {
-    Promise.all([fetchCariAccounts(), fetchStkItems(), fetchUnits(), fetchTaxRates(), fetchCities(), fetchPaymentTerms()])
-      .then(([cariData, stkData, unitData, taxData, cityData, termData]) => {
-        setCariler(cariData)
-        setItems(stkData)
-        setUnits(unitData)
-        setTaxRates(taxData)
-        setCities(cityData)
-        setPaymentTerms(termData)
-        setLines([newLine(unitData, taxData)])
+    Promise.allSettled([fetchCariAccounts(), fetchStkItems(), fetchUnits(), fetchTaxRates(), fetchCities(), fetchPaymentTerms()])
+      .then((results) => {
+        const [cariRes, stkRes, unitRes, taxRes, cityRes, termRes] = results
+        const errors: string[] = []
+
+        if (cariRes.status === 'fulfilled') setCariler(cariRes.value)
+        else errors.push('Cari listesi')
+
+        if (stkRes.status === 'fulfilled') setItems(stkRes.value)
+        else errors.push('Stok listesi')
+
+        if (unitRes.status === 'fulfilled' && taxRes.status === 'fulfilled') {
+          setUnits(unitRes.value)
+          setTaxRates(taxRes.value)
+          setLines([newLine(unitRes.value, taxRes.value)])
+        } else {
+          if (unitRes.status === 'rejected') errors.push('Birimler')
+          if (taxRes.status === 'rejected') errors.push('KDV oranları')
+        }
+
+        if (cityRes.status === 'fulfilled') setCities(cityRes.value)
+        if (termRes.status === 'fulfilled') setPaymentTerms(termRes.value)
+
+        if (errors.length > 0) setError(`Bazı form verileri yüklenemedi: ${errors.join(', ')}.`)
       })
-      .catch(() => setError('Form verileri yüklenemedi.'))
       .finally(() => setLoading(false))
   }, [])
+
+  useEffect(() => {
+    if (!accountIdParam || cariler.length === 0) return
+    const accountId = Number(accountIdParam)
+    const found = cariler.find((c) => c.id === accountId)
+    if (found) setSelectedCari(found)
+  }, [accountIdParam, cariler])
 
   const totals = useMemo(() => {
     let subtotal = 0

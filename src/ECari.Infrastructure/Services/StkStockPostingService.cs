@@ -77,6 +77,31 @@ public static class StkStockPostingService
         }
     }
 
+    public static async Task ApplyManualBalanceAsync(
+        TenantDbContext db,
+        long itemId,
+        long warehouseId,
+        decimal delta,
+        CancellationToken ct)
+    {
+        var balance = await db.StkStockBalances
+            .FirstOrDefaultAsync(b => b.ItemId == itemId && b.WarehouseId == warehouseId, ct);
+
+        if (balance is null)
+        {
+            db.StkStockBalances.Add(new StkStockBalance
+            {
+                ItemId = itemId,
+                WarehouseId = warehouseId,
+                Quantity = delta,
+                ReservedQuantity = 0,
+            });
+            return;
+        }
+
+        balance.Quantity += delta;
+    }
+
     private static async Task ApplyBalanceAsync(
         TenantDbContext db,
         long itemId,

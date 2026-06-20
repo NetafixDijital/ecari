@@ -47,6 +47,20 @@ public class OrdController(
         return Ok(item);
     }
 
+    [HttpGet("delivery-report")]
+    public async Task<ActionResult<IReadOnlyList<OrdDeliveryReportItemDto>>> DeliveryReport(
+        [FromQuery] long accountId,
+        CancellationToken ct)
+    {
+        if (!tenant.HasTenantContext())
+            return BadRequest(new { message = "Önce şirket seçin: POST /api/auth/select-company" });
+
+        if (accountId <= 0)
+            return BadRequest(new { message = "Cari hesap seçin." });
+
+        return Ok(await ordService.DeliveryReportAsync(accountId, ct));
+    }
+
     [HttpPost("orders")]
     public async Task<ActionResult<OrdOrderDetailDto>> Create(
         [FromBody] CreateOrdOrderRequest request,
@@ -65,21 +79,36 @@ public class OrdController(
         }
     }
 
-    [HttpPost("orders/{id:long}/convert-to-delivery-note")]
-    public async Task<ActionResult<ConvertOrdToDlnResultDto>> ConvertToDeliveryNote(long id, CancellationToken ct)
+    [HttpPost("orders/{id:long}/approve")]
+    public async Task<ActionResult<OrdOrderDetailDto>> Approve(long id, CancellationToken ct)
     {
         if (!tenant.HasTenantContext())
             return BadRequest(new { message = "Önce şirket seçin: POST /api/auth/select-company" });
-        try { return Ok(await ordService.ConvertToDeliveryNoteAsync(id, ct)); }
+        try { return Ok(await ordService.ApproveAsync(id, ct)); }
+        catch (InvalidOperationException ex) { return BadRequest(new { message = ex.Message }); }
+    }
+
+    [HttpPost("orders/{id:long}/convert-to-delivery-note")]
+    public async Task<ActionResult<ConvertOrdToDlnResultDto>> ConvertToDeliveryNote(
+        long id,
+        [FromBody] ConvertOrdRequest? request,
+        CancellationToken ct)
+    {
+        if (!tenant.HasTenantContext())
+            return BadRequest(new { message = "Önce şirket seçin: POST /api/auth/select-company" });
+        try { return Ok(await ordService.ConvertToDeliveryNoteAsync(id, request, ct)); }
         catch (InvalidOperationException ex) { return BadRequest(new { message = ex.Message }); }
     }
 
     [HttpPost("orders/{id:long}/convert-to-invoice")]
-    public async Task<ActionResult<ConvertOrdToInvResultDto>> ConvertToInvoice(long id, CancellationToken ct)
+    public async Task<ActionResult<ConvertOrdToInvResultDto>> ConvertToInvoice(
+        long id,
+        [FromBody] ConvertOrdRequest? request,
+        CancellationToken ct)
     {
         if (!tenant.HasTenantContext())
             return BadRequest(new { message = "Önce şirket seçin: POST /api/auth/select-company" });
-        try { return Ok(await ordService.ConvertToInvoiceAsync(id, ct)); }
+        try { return Ok(await ordService.ConvertToInvoiceAsync(id, request, ct)); }
         catch (InvalidOperationException ex) { return BadRequest(new { message = ex.Message }); }
     }
 

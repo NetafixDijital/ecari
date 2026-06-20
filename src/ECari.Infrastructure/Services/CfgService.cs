@@ -49,6 +49,8 @@ public class CfgService(
         profile.IsEinvoiceUser = request.IsEinvoiceUser;
         profile.IsEarchiveUser = request.IsEarchiveUser;
         profile.IsEwaybillUser = request.IsEwaybillUser;
+        profile.EinvoiceAlias = request.EinvoiceAlias?.Trim();
+        profile.EwaybillAlias = request.EwaybillAlias?.Trim();
         profile.UpdatedAt = DateTime.UtcNow;
 
         await db.SaveChangesAsync(ct);
@@ -57,11 +59,129 @@ public class CfgService(
 
     public async Task<IReadOnlyList<WarehouseDto>> GetWarehousesAsync(CancellationToken ct = default) =>
         await Db.Warehouses.AsNoTracking()
+            .Where(w => !w.IsDeleted)
+            .OrderByDescending(w => w.IsDefault)
+            .ThenBy(w => w.Name)
+            .Select(w => new WarehouseDto(w.Id, w.BranchId, w.Code, w.Name, w.Address, w.IsDefault, w.IsActive))
+            .ToListAsync(ct);
+
+    public async Task<IReadOnlyList<WarehouseDto>> GetActiveWarehousesAsync(CancellationToken ct = default) =>
+        await Db.Warehouses.AsNoTracking()
             .Where(w => !w.IsDeleted && w.IsActive)
             .OrderByDescending(w => w.IsDefault)
             .ThenBy(w => w.Name)
             .Select(w => new WarehouseDto(w.Id, w.BranchId, w.Code, w.Name, w.Address, w.IsDefault, w.IsActive))
             .ToListAsync(ct);
+
+    public async Task<WarehouseDto> CreateWarehouseAsync(CreateWarehouseRequest request, CancellationToken ct = default)
+    {
+        var db = Db;
+        var code = request.Code.Trim().ToUpperInvariant();
+        if (string.IsNullOrWhiteSpace(code))
+            throw new InvalidOperationException("Depo kodu zorunlu.");
+
+        var exists = await db.Warehouses.AnyAsync(w => !w.IsDeleted && w.Code == code, ct);
+        if (exists)
+            throw new InvalidOperationException("Bu depo kodu zaten kullanılıyor.");
+
+        var branchId = await db.OrgBranches.AsNoTracking()
+            .Where(b => !b.IsDeleted)
+            .OrderBy(b => b.Id)
+            .Select(b => b.Id)
+            .FirstOrDefaultAsync(ct);
+
+        if (branchId == 0)
+            throw new InvalidOperationException("Şube tanımı bulunamadı.");
+
+        if (request.IsDefault)
+        {
+            var defaults = await db.Warehouses.Where(w => !w.IsDeleted && w.IsDefault).ToListAsync(ct);
+            foreach (var wh in defaults)
+                wh.IsDefault = false;
+        }
+
+        var warehouse = new StkWarehouse
+        {
+            BranchId = branchId,
+            Code = code,
+            Name = request.Name.Trim(),
+            Address = request.Address?.Trim(),
+            IsDefault = request.IsDefault,
+            IsActive = request.IsActive,
+        };
+
+        db.Warehouses.Add(warehouse);
+        await db.SaveChangesAsync(ct);
+
+        return new WarehouseDto(
+            warehouse.Id,
+            warehouse.BranchId,
+            warehouse.Code,
+            warehouse.Name,
+            warehouse.Address,
+            warehouse.IsDefault,
+            warehouse.IsActive);
+    }
+
+    public async Task<WarehouseDto?> UpdateWarehouseAsync(
+        long id,
+        UpdateWarehouseRequest request,
+        CancellationToken ct = default)
+    {
+        var db = Db;
+        var warehouse = await db.Warehouses.FirstOrDefaultAsync(w => w.Id == id && !w.IsDeleted, ct);
+        if (warehouse is null)
+            return null;
+
+        var code = request.Code.Trim().ToUpperInvariant();
+        var codeExists = await db.Warehouses.AnyAsync(
+            w => !w.IsDeleted && w.Id != id && w.Code == code, ct);
+        if (codeExists)
+            throw new InvalidOperationException("Bu depo kodu zaten kullanılıyor.");
+
+        if (request.IsDefault && !warehouse.IsDefault)
+        {
+            var defaults = await db.Warehouses.Where(w => !w.IsDeleted && w.IsDefault && w.Id != id).ToListAsync(ct);
+            foreach (var wh in defaults)
+                wh.IsDefault = false;
+        }
+
+        warehouse.Code = code;
+        warehouse.Name = request.Name.Trim();
+        warehouse.Address = request.Address?.Trim();
+        warehouse.IsDefault = request.IsDefault;
+        warehouse.IsActive = request.IsActive;
+
+        await db.SaveChangesAsync(ct);
+
+        return new WarehouseDto(
+            warehouse.Id,
+            warehouse.BranchId,
+            warehouse.Code,
+            warehouse.Name,
+            warehouse.Address,
+            warehouse.IsDefault,
+            warehouse.IsActive);
+    }
+
+    public async Task<bool> DeleteWarehouseAsync(long id, CancellationToken ct = default)
+    {
+        var db = Db;
+        var warehouse = await db.Warehouses.FirstOrDefaultAsync(w => w.Id == id && !w.IsDeleted, ct);
+        if (warehouse is null)
+            return false;
+
+        var hasMovements = await db.StkStockMovements.AnyAsync(
+            m => m.WarehouseId == id && !m.IsDeleted, ct);
+        if (hasMovements)
+            throw new InvalidOperationException("Stok hareketi olan depo silinemez.");
+
+        warehouse.IsDeleted = true;
+        warehouse.IsActive = false;
+        warehouse.IsDefault = false;
+        await db.SaveChangesAsync(ct);
+        return true;
+    }
 
     public async Task<IReadOnlyList<ModuleSettingDto>> GetModuleSettingsAsync(CancellationToken ct = default) =>
         await Db.CfgModuleSettings.AsNoTracking()
@@ -117,5 +237,7 @@ public class CfgService(
             p.FiscalYearStartMonth,
             p.IsEinvoiceUser,
             p.IsEarchiveUser,
-            p.IsEwaybillUser);
+            p.IsEwaybillUser,
+            p.EinvoiceAlias,
+            p.EwaybillAlias);
 }

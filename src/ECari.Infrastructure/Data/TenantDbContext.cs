@@ -39,6 +39,12 @@ public class TenantDbContext : DbContext
     public DbSet<SvcTechnician> SvcTechnicians => Set<SvcTechnician>();
     public DbSet<SvcServiceDefinition> SvcServiceDefinitions => Set<SvcServiceDefinition>();
     public DbSet<TskTask> TskTasks => Set<TskTask>();
+    public DbSet<EblIntegrator> EblIntegrators => Set<EblIntegrator>();
+    public DbSet<EblIntegratorCredential> EblIntegratorCredentials => Set<EblIntegratorCredential>();
+    public DbSet<EblEinvoiceRecord> EblEinvoiceRecords => Set<EblEinvoiceRecord>();
+    public DbSet<EblEwaybillRecord> EblEwaybillRecords => Set<EblEwaybillRecord>();
+    public DbSet<EblIncomingDocument> EblIncomingDocuments => Set<EblIncomingDocument>();
+    public DbSet<EblStatusHistory> EblStatusHistories => Set<EblStatusHistory>();
     public DbSet<CfgModuleSetting> CfgModuleSettings => Set<CfgModuleSetting>();
     public DbSet<CshAccount> CshAccounts => Set<CshAccount>();
     public DbSet<CshTransaction> CshTransactions => Set<CshTransaction>();
@@ -79,6 +85,11 @@ public class TenantDbContext : DbContext
             e.Property(x => x.Mobile).HasColumnName("mobile").HasMaxLength(30);
             e.Property(x => x.Email).HasColumnName("email").HasMaxLength(254);
             e.Property(x => x.CurrencyId).HasColumnName("currency_id");
+            e.Property(x => x.IsEinvoiceUser).HasColumnName("is_einvoice_user");
+            e.Property(x => x.EinvoiceAlias).HasColumnName("einvoice_alias").HasMaxLength(200);
+            e.Property(x => x.EwaybillAlias).HasColumnName("ewaybill_alias").HasMaxLength(200);
+            e.Property(x => x.GibTitleFetchedAt).HasColumnName("gib_title_fetched_at");
+            e.Property(x => x.GibEinvoiceCheckedAt).HasColumnName("gib_einvoice_checked_at");
             e.Property(x => x.IsActive).HasColumnName("is_active");
             e.Property(x => x.Notes).HasColumnName("notes");
             e.Property(x => x.CreatedAt).HasColumnName("created_at");
@@ -224,6 +235,8 @@ public class TenantDbContext : DbContext
             e.Property(x => x.IsEinvoiceUser).HasColumnName("is_einvoice_user");
             e.Property(x => x.IsEarchiveUser).HasColumnName("is_earchive_user");
             e.Property(x => x.IsEwaybillUser).HasColumnName("is_ewaybill_user");
+            e.Property(x => x.EinvoiceAlias).HasColumnName("einvoice_alias").HasMaxLength(200);
+            e.Property(x => x.EwaybillAlias).HasColumnName("ewaybill_alias").HasMaxLength(200);
             e.Property(x => x.CreatedAt).HasColumnName("created_at");
             e.Property(x => x.UpdatedAt).HasColumnName("updated_at");
             e.Property(x => x.RowVersion).HasColumnName("row_version").IsRowVersion();
@@ -888,6 +901,105 @@ public class TenantDbContext : DbContext
             e.Property(x => x.PermissionSummaryCache).HasColumnName("permission_summary_cache").HasMaxLength(500);
             e.Property(x => x.CreatedAt).HasColumnName("created_at");
             e.Property(x => x.UpdatedAt).HasColumnName("updated_at");
+        });
+
+        modelBuilder.Entity<EblIntegrator>(e =>
+        {
+            e.ToTable("ebl_integrators");
+            e.HasKey(x => x.Id);
+            e.Property(x => x.Code).HasColumnName("code").HasMaxLength(30);
+            e.Property(x => x.Name).HasColumnName("name").HasMaxLength(100);
+            e.Property(x => x.ApiBaseUrl).HasColumnName("api_base_url").HasMaxLength(500);
+            e.Property(x => x.ApiEwaybillUrl).HasColumnName("api_ewaybill_url").HasMaxLength(500);
+            e.Property(x => x.IsActive).HasColumnName("is_active");
+            e.Property(x => x.CreatedAt).HasColumnName("created_at");
+        });
+
+        modelBuilder.Entity<EblIntegratorCredential>(e =>
+        {
+            e.ToTable("ebl_integrator_credentials");
+            e.HasKey(x => x.Id);
+            e.Property(x => x.IntegratorId).HasColumnName("integrator_id");
+            e.Property(x => x.Username).HasColumnName("username").HasMaxLength(200);
+            e.Property(x => x.PasswordEncrypted).HasColumnName("password_encrypted");
+            e.Property(x => x.ApiKeyEncrypted).HasColumnName("api_key_encrypted");
+            e.Property(x => x.Environment).HasColumnName("environment").HasMaxLength(20);
+            e.Property(x => x.BranchId).HasColumnName("branch_id");
+            e.Property(x => x.InvoiceSerialPrefix).HasColumnName("invoice_serial_prefix").HasMaxLength(20);
+            e.Property(x => x.IsActive).HasColumnName("is_active");
+            e.Property(x => x.CreatedAt).HasColumnName("created_at");
+            e.Property(x => x.UpdatedAt).HasColumnName("updated_at");
+            e.HasOne(x => x.Integrator).WithMany().HasForeignKey(x => x.IntegratorId);
+        });
+
+        modelBuilder.Entity<EblEinvoiceRecord>(e =>
+        {
+            e.ToTable("ebl_einvoice_records");
+            e.HasKey(x => x.Id);
+            e.Property(x => x.InvoiceId).HasColumnName("invoice_id");
+            e.Property(x => x.IntegratorId).HasColumnName("integrator_id");
+            e.Property(x => x.Uuid).HasColumnName("uuid").HasMaxLength(50);
+            e.Property(x => x.EnvelopeUuid).HasColumnName("envelope_uuid").HasMaxLength(50);
+            e.Property(x => x.Ettn).HasColumnName("ettn").HasMaxLength(50);
+            e.Property(x => x.Scenario).HasColumnName("scenario").HasMaxLength(30);
+            e.Property(x => x.ProfileId).HasColumnName("profile_id").HasMaxLength(30);
+            e.Property(x => x.Status).HasColumnName("status").HasMaxLength(30);
+            e.Property(x => x.StatusMessage).HasColumnName("status_message").HasMaxLength(500);
+            e.Property(x => x.SentAt).HasColumnName("sent_at");
+            e.Property(x => x.ResponseAt).HasColumnName("response_at");
+            e.Property(x => x.UblXmlPath).HasColumnName("ubl_xml_path").HasMaxLength(500);
+            e.Property(x => x.PdfPath).HasColumnName("pdf_path").HasMaxLength(500);
+            e.Property(x => x.CreatedAt).HasColumnName("created_at");
+            e.Property(x => x.UpdatedAt).HasColumnName("updated_at");
+            e.HasOne(x => x.Invoice).WithMany().HasForeignKey(x => x.InvoiceId);
+            e.HasOne(x => x.Integrator).WithMany().HasForeignKey(x => x.IntegratorId);
+        });
+
+        modelBuilder.Entity<EblEwaybillRecord>(e =>
+        {
+            e.ToTable("ebl_ewaybill_records");
+            e.HasKey(x => x.Id);
+            e.Property(x => x.DeliveryNoteId).HasColumnName("delivery_note_id");
+            e.Property(x => x.IntegratorId).HasColumnName("integrator_id");
+            e.Property(x => x.Uuid).HasColumnName("uuid").HasMaxLength(50);
+            e.Property(x => x.Status).HasColumnName("status").HasMaxLength(30);
+            e.Property(x => x.StatusMessage).HasColumnName("status_message").HasMaxLength(500);
+            e.Property(x => x.SentAt).HasColumnName("sent_at");
+            e.Property(x => x.ResponseAt).HasColumnName("response_at");
+            e.Property(x => x.UblXmlPath).HasColumnName("ubl_xml_path").HasMaxLength(500);
+            e.Property(x => x.CreatedAt).HasColumnName("created_at");
+            e.Property(x => x.UpdatedAt).HasColumnName("updated_at");
+            e.HasOne(x => x.DeliveryNote).WithMany().HasForeignKey(x => x.DeliveryNoteId);
+            e.HasOne(x => x.Integrator).WithMany().HasForeignKey(x => x.IntegratorId);
+        });
+
+        modelBuilder.Entity<EblIncomingDocument>(e =>
+        {
+            e.ToTable("ebl_incoming_documents");
+            e.HasKey(x => x.Id);
+            e.Property(x => x.DocumentType).HasColumnName("document_type").HasMaxLength(30);
+            e.Property(x => x.Uuid).HasColumnName("uuid").HasMaxLength(50);
+            e.Property(x => x.SenderVkn).HasColumnName("sender_vkn").HasMaxLength(11);
+            e.Property(x => x.SenderTitle).HasColumnName("sender_title").HasMaxLength(300);
+            e.Property(x => x.DocumentDate).HasColumnName("document_date");
+            e.Property(x => x.Amount).HasColumnName("amount");
+            e.Property(x => x.Status).HasColumnName("status").HasMaxLength(30);
+            e.Property(x => x.MatchedInvoiceId).HasColumnName("matched_invoice_id");
+            e.Property(x => x.RawXmlPath).HasColumnName("raw_xml_path").HasMaxLength(500);
+            e.Property(x => x.CreatedAt).HasColumnName("created_at");
+            e.Property(x => x.UpdatedAt).HasColumnName("updated_at");
+        });
+
+        modelBuilder.Entity<EblStatusHistory>(e =>
+        {
+            e.ToTable("ebl_status_history");
+            e.HasKey(x => x.Id);
+            e.Property(x => x.RecordModule).HasColumnName("record_module").HasMaxLength(30);
+            e.Property(x => x.RecordId).HasColumnName("record_id");
+            e.Property(x => x.OldStatus).HasColumnName("old_status").HasMaxLength(30);
+            e.Property(x => x.NewStatus).HasColumnName("new_status").HasMaxLength(30);
+            e.Property(x => x.ChangedAt).HasColumnName("changed_at");
+            e.Property(x => x.ResponsePayload).HasColumnName("response_payload");
         });
 
         modelBuilder.Entity<AuthUserListView>(e =>

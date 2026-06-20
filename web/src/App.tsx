@@ -13,6 +13,7 @@ import ApiTestPage from './pages/ApiTestPage'
 import AyarlarGenelPage from './pages/ayarlar/AyarlarGenelPage'
 import AyarlarMenuPage from './pages/ayarlar/AyarlarMenuPage'
 import AyarlarOzelPage from './pages/ayarlar/AyarlarOzelPage'
+import AyarlarEdmPage from './pages/ayarlar/AyarlarEdmPage'
 import KullaniciFormPage from './pages/ayarlar/KullaniciFormPage'
 import KullaniciListPage from './pages/ayarlar/KullaniciListPage'
 import GorevListPage from './pages/gorev/GorevListPage'
@@ -44,6 +45,7 @@ import StokHareketRaporPage from './pages/raporlar/StokHareketRaporPage'
 import SiparisDetayPage from './pages/siparis/SiparisDetayPage'
 import SiparisListPage from './pages/siparis/SiparisListPage'
 import SiparisYeniPage from './pages/siparis/SiparisYeniPage'
+import SiparisTeslimRaporPage from './pages/siparis/SiparisTeslimRaporPage'
 import MasrafDetayPage from './pages/masraf/MasrafDetayPage'
 import MasrafListPage from './pages/masraf/MasrafListPage'
 import MasrafYeniPage from './pages/masraf/MasrafYeniPage'
@@ -88,6 +90,7 @@ export default function App() {
           <Route path="/irsaliye/:id" element={<IrsaliyeDetayPage />} />
           <Route path="/siparis" element={<SiparisListPage />} />
           <Route path="/siparis/yeni" element={<SiparisYeniPage />} />
+          <Route path="/siparis/teslim-raporu" element={<SiparisTeslimRaporPage />} />
           <Route path="/siparis/:id" element={<SiparisDetayPage />} />
           <Route path="/teklif" element={<TeklifListPage />} />
           <Route path="/teklif/yeni" element={<TeklifYeniPage />} />
@@ -119,6 +122,7 @@ export default function App() {
           <Route path="/ayarlar" element={<AyarlarGenelPage />} />
           <Route path="/ayarlar/menu" element={<AyarlarMenuPage />} />
           <Route path="/ayarlar/ozel" element={<AyarlarOzelPage />} />
+          <Route path="/ayarlar/e-belge" element={<AyarlarEdmPage />} />
           <Route element={<PermissionRoute permission="AUTH.USER.VIEW" />}>
             <Route path="/ayarlar/kullanicilar" element={<KullaniciListPage />} />
             <Route path="/ayarlar/kullanicilar/yeni" element={<KullaniciFormPage />} />

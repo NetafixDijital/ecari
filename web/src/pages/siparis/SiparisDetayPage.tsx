@@ -1,14 +1,29 @@
 import { useCallback, useEffect, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import {
+  approveOrder,
   convertOrderToDeliveryNote,
   convertOrderToInvoice,
   deleteOrder,
   fetchOrder,
   type OrdOrderDetail,
 } from '../../api/ord'
+import SiparisConvertModal from '../../components/siparis/SiparisConvertModal'
+import AuditInfoPanel from '../../components/ui/AuditInfoPanel'
 import { apiErrorMessage } from '../../utils/apiError'
 import { formatDate, formatMoneyOptional, formatQuantity, formatTry, orderStatusBadge } from '../../utils/format'
+
+function openModal(id: string) {
+  const el = document.getElementById(id)
+  if (!el || !window.bootstrap) return
+  window.bootstrap.Modal.getOrCreateInstance(el).show()
+}
+
+function closeModal(id: string) {
+  const el = document.getElementById(id)
+  if (!el || !window.bootstrap) return
+  window.bootstrap.Modal.getOrCreateInstance(el).hide()
+}
 
 export default function SiparisDetayPage() {
   const { id } = useParams()
@@ -17,7 +32,9 @@ export default function SiparisDetayPage() {
   const [item, setItem] = useState<OrdOrderDetail | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+  const [convertError, setConvertError] = useState('')
   const [acting, setActing] = useState(false)
+  const [convertMode, setConvertMode] = useState<'invoice' | 'delivery-note' | null>(null)
 
   const loadItem = useCallback(() => {
     if (!orderId) return
@@ -33,29 +50,43 @@ export default function SiparisDetayPage() {
     loadItem()
   }, [loadItem])
 
-  async function handleConvertDeliveryNote() {
+  async function handleApprove() {
     if (!item) return
     setActing(true)
     setError('')
     try {
-      const result = await convertOrderToDeliveryNote(item.id)
-      navigate(`/irsaliye/${result.deliveryNoteId}`)
+      const updated = await approveOrder(item.id)
+      setItem(updated)
     } catch (err: unknown) {
-      setError(apiErrorMessage(err, 'İrsaliyeye dönüştürülemedi.'))
+      setError(apiErrorMessage(err, 'Sipariş onaylanamadı.'))
     } finally {
       setActing(false)
     }
   }
 
-  async function handleConvertInvoice() {
-    if (!item) return
+  function openConvertModal(mode: 'invoice' | 'delivery-note') {
+    setConvertMode(mode)
+    setConvertError('')
+    openModal('modalSiparisConvert')
+  }
+
+  async function handleConvertSubmit(lines: Array<{ lineId: number; quantity: number }>) {
+    if (!item || !convertMode) return
     setActing(true)
-    setError('')
+    setConvertError('')
     try {
-      const result = await convertOrderToInvoice(item.id)
-      navigate(`/fatura/onizleme/${result.invoiceId}`)
+      const body = { lines }
+      if (convertMode === 'delivery-note') {
+        const result = await convertOrderToDeliveryNote(item.id, body)
+        closeModal('modalSiparisConvert')
+        navigate(`/irsaliye/${result.deliveryNoteId}`)
+      } else {
+        const result = await convertOrderToInvoice(item.id, body)
+        closeModal('modalSiparisConvert')
+        navigate(`/fatura/onizleme/${result.invoiceId}`)
+      }
     } catch (err: unknown) {
-      setError(apiErrorMessage(err, 'Faturaya dönüştürülemedi.'))
+      setConvertError(apiErrorMessage(err, 'Dönüştürme başarısız.'))
     } finally {
       setActing(false)
     }
@@ -89,6 +120,8 @@ export default function SiparisDetayPage() {
   }
 
   const badge = orderStatusBadge(item.statusKey)
+  const canApprove = item.statusKey === 'beklemede'
+  const canConvert = item.statusKey === 'onaylandi' || item.statusKey === 'onayli' || item.statusKey === 'kismi'
 
   return (
     <div className="app-page-content">
@@ -104,12 +137,21 @@ export default function SiparisDetayPage() {
           </nav>
         </div>
         <div className="d-flex flex-wrap gap-2">
-          <button type="button" className="btn btn-label-primary" disabled={acting} onClick={handleConvertDeliveryNote}>
-            İrsaliyeye Dönüştür
-          </button>
-          <button type="button" className="btn btn-label-success" disabled={acting} onClick={handleConvertInvoice}>
-            Faturaya Dönüştür
-          </button>
+          {canApprove && (
+            <button type="button" className="btn btn-label-success" disabled={acting} onClick={handleApprove}>
+              Onayla
+            </button>
+          )}
+          {canConvert && (
+            <>
+              <button type="button" className="btn btn-label-primary" disabled={acting} onClick={() => openConvertModal('delivery-note')}>
+                İrsaliyeye Dönüştür
+              </button>
+              <button type="button" className="btn btn-label-success" disabled={acting} onClick={() => openConvertModal('invoice')}>
+                Faturaya Dönüştür
+              </button>
+            </>
+          )}
           <button type="button" className="btn btn-label-danger" disabled={acting} onClick={handleDelete}>
             Sil
           </button>
@@ -140,7 +182,16 @@ export default function SiparisDetayPage() {
         <div className="table-responsive">
           <table className="table mb-0">
             <thead>
-              <tr><th>#</th><th>Açıklama</th><th>Miktar</th><th>Birim Fiyat</th><th>KDV</th><th>Tutar</th></tr>
+              <tr>
+                <th>#</th>
+                <th>Açıklama</th>
+                <th>Miktar</th>
+                <th>Teslim</th>
+                <th>Fatura</th>
+                <th>Birim Fiyat</th>
+                <th>KDV</th>
+                <th>Tutar</th>
+              </tr>
             </thead>
             <tbody>
               {item.lines.map((line) => (
@@ -148,6 +199,8 @@ export default function SiparisDetayPage() {
                   <td>{line.lineNo}</td>
                   <td>{line.description}</td>
                   <td>{formatQuantity(line.quantity)} {line.unitName}</td>
+                  <td>{formatQuantity(line.deliveredQuantity)}</td>
+                  <td>{formatQuantity(line.invoicedQuantity)}</td>
                   <td>{formatMoneyOptional(line.unitPrice)}</td>
                   <td>{formatMoneyOptional(line.taxAmount)}</td>
                   <td>{formatTry(line.lineTotal)}</td>
@@ -162,6 +215,17 @@ export default function SiparisDetayPage() {
           <h5 className="mb-0">Genel Toplam: {formatTry(item.grandTotal)}</h5>
         </div>
       </div>
+
+      <AuditInfoPanel audit={item.audit} />
+
+      <SiparisConvertModal
+        modalId="modalSiparisConvert"
+        mode={convertMode}
+        order={item}
+        acting={acting}
+        error={convertError}
+        onSubmit={handleConvertSubmit}
+      />
     </div>
   )
 }

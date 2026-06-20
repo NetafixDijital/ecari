@@ -60,6 +60,10 @@ export interface CariAccountDetail {
   email?: string | null
   balance: number
   isActive: boolean
+  isEinvoiceUser?: boolean
+  einvoiceAlias?: string | null
+  ewaybillAlias?: string | null
+  gibEinvoiceCheckedAt?: string | null
 }
 
 export interface UpdateCariAccountRequest {

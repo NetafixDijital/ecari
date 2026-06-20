@@ -58,6 +58,8 @@ const DURUM_MAP: Record<string, { label: string; className: string }> = {
   teslim: { label: 'Teslim', className: 'bg-label-success' },
   iptal: { label: 'İptal', className: 'bg-label-secondary' },
   onayli: { label: 'Onaylı', className: 'bg-label-success' },
+  onaylandi: { label: 'Onaylandı', className: 'bg-label-success' },
+  beklemede: { label: 'Beklemede', className: 'bg-label-warning' },
   taslak: { label: 'Taslak', className: 'bg-label-secondary' },
 }
 
